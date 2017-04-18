@@ -1,4 +1,6 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="ContadorSize">60sp</dimen>
+    <dimen name="subtitle">20sp</dimen>
+    <dimen name="marginStarEnd">10dp</dimen>
 </resources>
