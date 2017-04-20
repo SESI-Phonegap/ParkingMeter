@@ -60,7 +60,7 @@
                     android:id="@+id/titlehora"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/hora"
+                    android:text="@string/horadepago"
                     android:textSize="@dimen/subtitle"
                     android:layout_alignParentEnd="true" />
 
@@ -86,6 +86,7 @@
 
 
                 <TextView
+                    android:id="@+id/cardviewHora"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/horaDefault"
@@ -135,11 +136,12 @@
                 android:id="@+id/textInputLayoutHora"
                 android:layout_width="130dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/hora"
+                android:hint="@string/horadepago"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true">
 
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/textInputEditTextHora"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="text"
@@ -157,8 +159,7 @@
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:focusable="false"/>
+                    android:inputType="numberDecimal" />
 
             </android.support.design.widget.TextInputLayout>
 

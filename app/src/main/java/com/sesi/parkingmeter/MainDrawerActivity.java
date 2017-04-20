@@ -1,7 +1,7 @@
 package com.sesi.parkingmeter;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
+
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.util.Calendar;
 
@@ -26,7 +27,10 @@ public class MainDrawerActivity extends AppCompatActivity
     private int year, month, day;
     private FloatingActionButton fab;
     private DrawerLayout drawer;
-    private TextView cardviewFecha;
+    private TextView cardviewFecha,cardviewHora;
+    private TimePickerDialog timePicker1;
+    private TextInputEditText tidHhora;
+    private int hour,minute;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +48,16 @@ public class MainDrawerActivity extends AppCompatActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         cardviewFecha = (TextView) findViewById(R.id.cardviewFecha);
+        cardviewHora = (TextView) findViewById(R.id.cardviewHora);
+        tidHhora = (TextInputEditText) findViewById(R.id.textInputEditTextHora);
+        calendar = Calendar.getInstance();
+
+        hour = calendar.get(Calendar.HOUR_OF_DAY);
+        minute = calendar.get(Calendar.MINUTE);
+
+        cardviewHora.setText(hour + ":" + minute);
+        tidHhora.setText(hour + ":" + minute);
+        tidHhora.setOnClickListener(this);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +70,7 @@ public class MainDrawerActivity extends AppCompatActivity
 
         showDate();
 
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -66,9 +81,20 @@ public class MainDrawerActivity extends AppCompatActivity
 
     }
 
+    public  void showDialogHour(){
 
-    private void showDate() {
-        calendar = Calendar.getInstance();
+        timePicker1 = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                cardviewHora.setText(selectedHour + ":" + selectedMinute);
+                tidHhora.setText(selectedHour + ":" + selectedMinute);
+            }
+        },hour,minute,true);
+
+        timePicker1.show();
+    }
+    public void showDate() {
+
         year = calendar.get(Calendar.YEAR);
 
         month = calendar.get(Calendar.MONTH);
@@ -138,8 +164,9 @@ public class MainDrawerActivity extends AppCompatActivity
     public void onClick(View view) {
         switch (view.getId()){
 
-            
-
+            case R.id.textInputEditTextHora:
+                showDialogHour();
+                break;
         }
     }
 }
