@@ -25,8 +25,7 @@
     <string name="findCar">Encontrar Carro</string>
     <string name="report">Reportes</string>
 
-    <!-- Strings for Notifications and Toasts -->
-    <string name="water_chug_toast">GLUG GLUG GLUG</string>
+
 
     <string name="charging_reminder_notification_title">Device Charging - Where\'s that water?</string>
     <string name="charging_reminder_notification_body">There\'s never a better time to drink water than when you know your phone is charging. Drink up!</string>

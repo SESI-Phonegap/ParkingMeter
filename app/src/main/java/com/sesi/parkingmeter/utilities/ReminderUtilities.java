@@ -23,21 +23,25 @@ public class ReminderUtilities {
     private static final String REMINDER_JOB_TAG = "parking_reminder_tag";
 
     private static boolean sInitialized;
+    public static FirebaseJobDispatcher dispatcher;
 
-    synchronized public static  void scheduleChargingReminder(@NonNull final Context context){
-        if(sInitialized){return;}
+    synchronized public static void scheduleChargingReminder(@NonNull final Context context, int secondsStart, int syncFlextimeSeconds) {
+        if (sInitialized) {
+            return;
+        }
+
 
         Driver driver = new GooglePlayDriver(context);
-        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(driver);
+        dispatcher = new FirebaseJobDispatcher(driver);
         Job constraintReminderJob = dispatcher.newJobBuilder()
                 .setService(ParkingReminderFirebaseJobService.class)
                 .setTag(REMINDER_JOB_TAG)
-                .setConstraints(Constraint.DEVICE_CHARGING)
+                .setConstraints(Constraint.ON_ANY_NETWORK)
                 .setLifetime(Lifetime.FOREVER)
                 .setRecurring(true)
                 .setTrigger(Trigger.executionWindow(
-                        REMINDER_INTERVAL_SECONDS,
-                        REMINDER_INTERVAL_SECONDS + SYNC_FLEXTIME_SECONDS))
+                        secondsStart,
+                        secondsStart + syncFlextimeSeconds))
                 .setReplaceCurrent(true)
                 .build();
 

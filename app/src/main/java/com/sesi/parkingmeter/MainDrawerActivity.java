@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,9 +22,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -56,6 +60,12 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         btn_cancelar = (Button) findViewById(R.id.btnCancelar);
         btn_cancelar.setOnClickListener(this);
 
+        btn_inicio.setEnabled(false);
+        btn_inicio.setAlpha(0.7f);
+
+        btn_cancelar.setEnabled(false);
+        btn_cancelar.setAlpha(0.7f);
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         cardviewFecha = (TextView) findViewById(R.id.cardviewFecha);
@@ -79,7 +89,6 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         Utils.showDate(cardviewFecha);
         Utils.showHour(cardviewHora, tidHhora);
 
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -87,6 +96,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
 
     }
 
@@ -106,9 +116,10 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         }, hour, minute, true);
 
         timePicker1.show();
+        checkHour();
     }
 
-    public void showDialogHourVence(){
+    public void showDialogHourVence() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -123,8 +134,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         }, hour, minute, true);
 
         timePicker1.show();
+        checkHour();
     }
-
 
 
     @Override
@@ -187,12 +198,20 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         switch (view.getId()) {
 
             case R.id.btnInicio:
-                int min_inicial = Utils.convertHourToMinutes(horaIni,minIni);
-                int min_vence = Utils.convertHourToMinutes(horaVence,minVence);
-                int calMin = min_vence - min_inicial;
+                int min_inicial = Utils.convertHourToMinutes(horaIni, minIni);
+                int min_vence = Utils.convertHourToMinutes(horaVence, minVence);
+                int calMin = (min_vence - min_inicial) - 15;
+                int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
+                ReminderUtilities.scheduleChargingReminder(this, secondsStart, secondsStart);
+                btn_inicio.setEnabled(false);
+                btn_inicio.setAlpha(0.5f);
+
+                btn_cancelar.setEnabled(true);
+                btn_cancelar.setAlpha(1.0f);
                 break;
 
             case R.id.btnCancelar:
+                ReminderUtilities.dispatcher.cancelAll();
                 break;
 
             case R.id.textInputEditTextHora:
@@ -208,5 +227,20 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+    }
+
+
+    public void checkHour() {
+        if (!cardviewHora.getText().toString().equals(getResources().getString(R.string.horaCero)) &&
+                !cardviewHoraVence.getText().toString().equals(getResources().getString(R.string.horaCero))) {
+            btn_inicio.setEnabled(true);
+            btn_inicio.setAlpha(1.0f);
+
+        } else {
+            btn_inicio.setEnabled(false);
+            btn_inicio.setAlpha(0.7f);
+            btn_cancelar.setEnabled(false);
+            btn_cancelar.setAlpha(0.7f);
+        }
     }
 }
