@@ -7,9 +7,12 @@
     <string name="fechaDefault">12/04/2017</string>
     <string name="horaDefault">13:00</string>
     <string name="horadepago">Hora de pago</string>
+    <string name="vence">Vence:</string>
+    <string name="Horavencimiento">Hora de vencimiento</string>
     <string name="iniciar">Iniciar</string>
     <string name="cancelar">Cancelar</string>
     <string name="gasto">Gasto</string>
+    <string name="manualmente">Introduce los datos manualmente</string>
 
     <string name="title_activity_main_drawer">MainDrawerActivity</string>
 
@@ -20,5 +23,12 @@
     <string name="alarma">Alarma</string>
     <string name="findCar">Encontrar Carro</string>
     <string name="report">Reportes</string>
+
+    <!-- Strings for Notifications and Toasts -->
+    <string name="water_chug_toast">GLUG GLUG GLUG</string>
+
+    <string name="charging_reminder_notification_title">Device Charging - Where\'s that water?</string>
+    <string name="charging_reminder_notification_body">There\'s never a better time to drink water than when you know your phone is charging. Drink up!</string>
+
 
 </resources>
