@@ -111,11 +111,12 @@
                         android:textSize="@dimen/size_hora_vence" />
 
                     <TextView
+                        android:id="@+id/cardViewHoraVence"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/marginStartEnd"
                         android:layout_toEndOf="@+id/titleVence"
-                        android:text="@string/horaDefault"
+                        android:text="@string/horaCero"
                         android:textSize="@dimen/size_hora_vence"
                         android:textStyle="bold" />
                 </RelativeLayout>

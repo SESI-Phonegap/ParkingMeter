@@ -29,10 +29,12 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
     private FloatingActionButton fab;
     private DrawerLayout drawer;
-    private TextView cardviewFecha, cardviewHora;
+    private TextView cardviewFecha, cardviewHora, cardviewHoraVence;
     private TextInputEditText tidHhora, tidHoraVence;
     private Button btn_inicio, btn_cancelar;
     private final static String ACTION_HOUR_VENCE = "";
+    private int horaIni, horaVence;
+    private int minIni, minVence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         cardviewFecha = (TextView) findViewById(R.id.cardviewFecha);
         cardviewHora = (TextView) findViewById(R.id.cardviewHora);
+        cardviewHoraVence = (TextView) findViewById(R.id.cardViewHoraVence);
 
         tidHoraVence = (TextInputEditText) findViewById(R.id.textInputEditTextHoraVence);
         tidHoraVence.setOnClickListener(this);
@@ -92,11 +95,30 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        TimePickerDialog timePicker1 = new TimePickerDialog(getApplicationContext(), new TimePickerDialog.OnTimeSetListener() {
+        TimePickerDialog timePicker1 = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                 cardviewHora.setText(selectedHour + ":" + selectedMinute);
                 tidHhora.setText(selectedHour + ":" + selectedMinute);
+                horaIni = selectedHour;
+                minIni = selectedMinute;
+            }
+        }, hour, minute, true);
+
+        timePicker1.show();
+    }
+
+    public void showDialogHourVence(){
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        TimePickerDialog timePicker1 = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                cardviewHoraVence.setText(selectedHour + ":" + selectedMinute);
+                tidHoraVence.setText(selectedHour + ":" + selectedMinute);
+                horaVence = selectedHour;
+                minVence = selectedMinute;
             }
         }, hour, minute, true);
 
@@ -165,7 +187,9 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         switch (view.getId()) {
 
             case R.id.btnInicio:
-
+                int min_inicial = Utils.convertHourToMinutes(horaIni,minIni);
+                int min_vence = Utils.convertHourToMinutes(horaVence,minVence);
+                int calMin = min_vence - min_inicial;
                 break;
 
             case R.id.btnCancelar:
@@ -176,7 +200,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 break;
 
             case R.id.textInputEditTextHoraVence:
-
+                showDialogHourVence();
                 break;
         }
     }
