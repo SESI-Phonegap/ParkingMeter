@@ -37,11 +37,13 @@ public class NotificationUtils {
                 .setContentTitle(context.getString(R.string.charging_reminder_notification_title))
                 .setContentText(context.getString(R.string.charging_reminder_notification_body))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
-                        context.getString(R.string.charging_reminder_notification_body)))
+                        context.getString(R.string.charging_reminder_notification_body))
+                        .setBigContentTitle(context.getString(R.string.charging_reminder_notification_title)))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(contentIntent(context))
                 .addAction(FinishParkingAction(context))
                 .addAction(ignoreReminderAction(context))
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setAutoCancel(true);
 
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);

@@ -29,7 +29,7 @@
 
     <!-- Notification -->
     <string name="charging_reminder_notification_title">! Hora de ir por tu automóvil !</string>
-    <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil, evita costosas multas.</string>
+    <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil.Que no te pongan la araña, evita costosas multas. </string>
 
 
 </resources>

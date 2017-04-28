@@ -224,6 +224,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 btn_cancelar.setEnabled(false);
                 PreferenceUtilities.changeStatusButtonCancel(this, false);
                 PreferenceUtilities.savePreferencesFinalHour(this, getResources().getString(R.string.horaCero));
+                PreferenceUtilities.savePreferenceHourIni(this,getResources().getString(R.string.horaCero));
                 cardviewHora.setText(getResources().getString(R.string.horaCero));
                 cardviewHoraVence.setText(getResources().getString(R.string.horaCero));
                 tidHhora.setText(getResources().getString(R.string.horaCero));
