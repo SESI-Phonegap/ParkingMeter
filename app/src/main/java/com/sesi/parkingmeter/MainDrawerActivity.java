@@ -4,12 +4,9 @@ package com.sesi.parkingmeter;
 import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -213,24 +210,24 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 ReminderUtilities.scheduleChargingReminder(this, secondsStart, secondsStart);
                 btn_inicio.setEnabled(false);
                 btn_inicio.setAlpha(0.7f);
-          //      btn_cancelar.setEnabled(true);
-          //      btn_cancelar.setAlpha(1.0f);
+                btn_cancelar.setEnabled(true);
+                btn_cancelar.setAlpha(1.0f);
                 PreferenceUtilities.changeStatusButtonCancel(this, true);
                 PreferenceUtilities.savePreferencesFinalHour(this, cardviewHoraVence.getText().toString());
                 PreferenceUtilities.savePreferenceHourIni(this, cardviewHora.getText().toString());
-
                 break;
 
             case R.id.btnCancelar:
+                ReminderUtilities.sInitialized = false;
                 ReminderUtilities.dispatcher.cancelAll();
-          //      btn_cancelar.setAlpha(0.7f);
-          //      btn_cancelar.setEnabled(false);
+                btn_cancelar.setAlpha(0.7f);
+                btn_cancelar.setEnabled(false);
                 PreferenceUtilities.changeStatusButtonCancel(this, false);
                 PreferenceUtilities.savePreferencesFinalHour(this, getResources().getString(R.string.horaCero));
-        /*        cardviewHora.setText(getResources().getString(R.string.horaCero));
+                cardviewHora.setText(getResources().getString(R.string.horaCero));
                 cardviewHoraVence.setText(getResources().getString(R.string.horaCero));
                 tidHhora.setText(getResources().getString(R.string.horaCero));
-                tidHoraVence.setText(getResources().getString(R.string.horaCero));*/
+                tidHoraVence.setText(getResources().getString(R.string.horaCero));
                 break;
 
             case R.id.textInputEditTextHora:

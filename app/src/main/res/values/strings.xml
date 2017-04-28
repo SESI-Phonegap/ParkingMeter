@@ -27,8 +27,9 @@
 
 
 
-    <string name="charging_reminder_notification_title">Device Charging - Where\'s that water?</string>
-    <string name="charging_reminder_notification_body">There\'s never a better time to drink water than when you know your phone is charging. Drink up!</string>
+    <!-- Notification -->
+    <string name="charging_reminder_notification_title">! Hora de ir por tu automóvil !</string>
+    <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil, evita costosas multas.</string>
 
 
 </resources>

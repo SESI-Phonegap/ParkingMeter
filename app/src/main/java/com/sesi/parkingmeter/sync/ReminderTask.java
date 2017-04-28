@@ -22,12 +22,12 @@ public class ReminderTask {
     }
 
     private static void issueChargingReminder(Context context) {
-        PreferenceUtilities.incrementChargingReminderCount(context);
+     //   PreferenceUtilities.incrementChargingReminderCount(context);
         NotificationUtils.remindUserBecauseCharging(context);
     }
 
     private static void incrementWaterCount(Context context){
-        PreferenceUtilities.incrementWaterCount(context);
+      //  PreferenceUtilities.incrementWaterCount(context);
 
         NotificationUtils.clearAllNotifications(context);
     }

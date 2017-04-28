@@ -22,7 +22,7 @@ public class ReminderUtilities {
 
     private static final String REMINDER_JOB_TAG = "parking_reminder_tag";
 
-    private static boolean sInitialized;
+    public static boolean sInitialized;
     public static FirebaseJobDispatcher dispatcher;
 
     synchronized public static void scheduleChargingReminder(@NonNull final Context context, int secondsStart, int syncFlextimeSeconds) {
