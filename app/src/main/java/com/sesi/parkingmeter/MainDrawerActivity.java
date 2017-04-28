@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
 
@@ -64,7 +65,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         btn_inicio.setEnabled(false);
         btn_inicio.setAlpha(0.7f);
 
-        btn_cancelar.setEnabled(Utils.getStatusButtonCancel(this));
+        btn_cancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(this));
         btn_cancelar.setAlpha(0.7f);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -88,10 +89,12 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         });
 
         Utils.showDate(cardviewFecha);
-        Utils.showHour(cardviewHora, tidHhora);
+        //  Utils.showHour(cardviewHora, tidHhora);
 
-        cardviewHoraVence.setText(Utils.getPreferencesFinalHour(this));
-        tidHoraVence.setText(Utils.getPreferencesFinalHour(this));
+        cardviewHora.setText(PreferenceUtilities.getPreferencesInitialHour(this));
+        tidHhora.setText(PreferenceUtilities.getPreferencesInitialHour(this));
+        cardviewHoraVence.setText(PreferenceUtilities.getPreferencesFinalHour(this));
+        tidHoraVence.setText(PreferenceUtilities.getPreferencesFinalHour(this));
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -119,8 +122,6 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 checkHour();
             }
         }, hour, minute, true);
-        horaIni = hour;
-        minIni = minute;
         timePicker1.show();
         checkHour();
     }
@@ -143,7 +144,6 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         timePicker1.show();
         checkHour();
     }
-
 
 
     @Override
@@ -213,23 +213,24 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 ReminderUtilities.scheduleChargingReminder(this, secondsStart, secondsStart);
                 btn_inicio.setEnabled(false);
                 btn_inicio.setAlpha(0.7f);
-                btn_cancelar.setEnabled(true);
-                btn_cancelar.setAlpha(1.0f);
-                Utils.changeStatusButtonCancel(this,true);
-                Utils.savePreferencesFinalHour(this,cardviewHoraVence.getText().toString());
+          //      btn_cancelar.setEnabled(true);
+          //      btn_cancelar.setAlpha(1.0f);
+                PreferenceUtilities.changeStatusButtonCancel(this, true);
+                PreferenceUtilities.savePreferencesFinalHour(this, cardviewHoraVence.getText().toString());
+                PreferenceUtilities.savePreferenceHourIni(this, cardviewHora.getText().toString());
 
                 break;
 
             case R.id.btnCancelar:
                 ReminderUtilities.dispatcher.cancelAll();
-                btn_cancelar.setAlpha(0.7f);
-                btn_cancelar.setEnabled(false);
-                Utils.changeStatusButtonCancel(this,false);
-                Utils.savePreferencesFinalHour(this,getResources().getString(R.string.horaCero));
-                cardviewHora.setText(getResources().getString(R.string.horaCero);
-                cardviewHoraVence.setText(getResources().getString(R.string.horaCero);
-                tidHhora.setText(getResources().getString(R.string.horaCero);
-                tidHoraVence.setText(getResources().getString(R.string.horaCero);
+          //      btn_cancelar.setAlpha(0.7f);
+          //      btn_cancelar.setEnabled(false);
+                PreferenceUtilities.changeStatusButtonCancel(this, false);
+                PreferenceUtilities.savePreferencesFinalHour(this, getResources().getString(R.string.horaCero));
+        /*        cardviewHora.setText(getResources().getString(R.string.horaCero));
+                cardviewHoraVence.setText(getResources().getString(R.string.horaCero));
+                tidHhora.setText(getResources().getString(R.string.horaCero));
+                tidHoraVence.setText(getResources().getString(R.string.horaCero));*/
                 break;
 
             case R.id.textInputEditTextHora:
@@ -245,6 +246,13 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+        if (PreferenceUtilities.STATUS_BUTTON_CANCEL.equals(key)) {
+            updateGuiButtonCancel();
+        } else if (PreferenceUtilities.SAVE_INITIAL_HOUR.equals(key)) {
+            updateGuiTextviewInitalHour();
+        } else if (PreferenceUtilities.SAVE_FINAL_HOUR.equals(key)) {
+            updateGuiTexviewFinalHour();
+        }
     }
 
 
@@ -260,5 +268,28 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             btn_cancelar.setEnabled(false);
             btn_cancelar.setAlpha(0.7f);
         }
+    }
+
+    public void updateGuiButtonCancel() {
+        boolean status = PreferenceUtilities.getStatusButtonCancel(this);
+        if (status) {
+            btn_cancelar.setAlpha(1.0f);
+        } else {
+            btn_cancelar.setAlpha(0.7f);
+        }
+        btn_cancelar.setEnabled(status);
+
+    }
+
+    public void updateGuiTextviewInitalHour() {
+        String hour = PreferenceUtilities.getPreferencesInitialHour(this);
+        cardviewHora.setText(hour);
+        tidHhora.setText(hour);
+    }
+
+    public void updateGuiTexviewFinalHour() {
+        String hour = PreferenceUtilities.getPreferencesFinalHour(this);
+        cardviewHoraVence.setText(hour);
+        tidHoraVence.setText(hour);
     }
 }
