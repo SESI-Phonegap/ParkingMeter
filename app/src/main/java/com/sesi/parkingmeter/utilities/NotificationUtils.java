@@ -1,9 +1,5 @@
 package com.sesi.parkingmeter.utilities;
 
-/**
- * Created by QUALITY on 26/04/2017.
- */
-
 
 import android.app.Notification;
 import android.app.NotificationManager;
