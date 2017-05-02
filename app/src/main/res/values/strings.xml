@@ -7,13 +7,15 @@
     <string name="fechaDefault">12/04/2017</string>
     <string name="horaDefault">13:00</string>
     <string name="horaCero">00:00</string>
-    <string name="horadepago">Hora de pago</string>
+    <string name="horadepago">Hora actual</string>
     <string name="vence">Vence:</string>
     <string name="Horavencimiento">Hora de vencimiento</string>
     <string name="iniciar">Iniciar</string>
     <string name="cancelar">Cancelar</string>
     <string name="gasto">Gasto</string>
     <string name="manualmente">Introduce los datos manualmente</string>
+    <string name="msgLimiteTiempo">El tiempo es menor al limite de tiempo de la alarma</string>
+    <string name="msgHoraVencMenor">La hora de vencimiento no puede ser igual o menor a la hora de actual</string>
 
     <string name="title_activity_main_drawer">MainDrawerActivity</string>
 

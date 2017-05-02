@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
@@ -38,6 +39,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     private final static String ACTION_HOUR_VENCE = "";
     private int horaIni, horaVence;
     private int minIni, minVence;
+    private int min_inicial;
+    private static final int TIME_LIMIT = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +89,10 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         });
 
         Utils.showDate(cardviewFecha);
-        //  Utils.showHour(cardviewHora, tidHhora);
+        Utils.showHour(cardviewHora, tidHhora);
 
-        cardviewHora.setText(PreferenceUtilities.getPreferencesInitialHour(this));
-        tidHhora.setText(PreferenceUtilities.getPreferencesInitialHour(this));
+      //  cardviewHora.setText(PreferenceUtilities.getPreferencesInitialHour(this));
+      //  tidHhora.setText(PreferenceUtilities.getPreferencesInitialHour(this));
         cardviewHoraVence.setText(PreferenceUtilities.getPreferencesFinalHour(this));
         tidHoraVence.setText(PreferenceUtilities.getPreferencesFinalHour(this));
 
@@ -104,7 +107,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
     }
 
-    public void showDialogHour() {
+  /*  public void showDialogHour() {
 
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -114,14 +117,14 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                 cardviewHora.setText(selectedHour + ":" + selectedMinute);
                 tidHhora.setText(selectedHour + ":" + selectedMinute);
-                horaIni = selectedHour;
-                minIni = selectedMinute;
+              //  horaIni = selectedHour;
+              //  minIni = selectedMinute;
                 checkHour();
             }
         }, hour, minute, true);
         timePicker1.show();
         checkHour();
-    }
+    }*/
 
     public void showDialogHourVence() {
         Calendar calendar = Calendar.getInstance();
@@ -203,18 +206,25 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         switch (view.getId()) {
 
             case R.id.btnInicio:
-                int min_inicial = Utils.convertHourToMinutes(horaIni, minIni);
+                int min_inicial = Utils.convertActualHourToMinutes();
                 int min_vence = Utils.convertHourToMinutes(horaVence, minVence);
-                int calMin = (min_vence - min_inicial) - 15;
-                int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
-                ReminderUtilities.scheduleChargingReminder(this, secondsStart, secondsStart);
-                btn_inicio.setEnabled(false);
-                btn_inicio.setAlpha(0.7f);
-                btn_cancelar.setEnabled(true);
-                btn_cancelar.setAlpha(1.0f);
-                PreferenceUtilities.changeStatusButtonCancel(this, true);
-                PreferenceUtilities.savePreferencesFinalHour(this, cardviewHoraVence.getText().toString());
-                PreferenceUtilities.savePreferenceHourIni(this, cardviewHora.getText().toString());
+                if (min_inicial < min_vence) {
+                    int calMin = (min_vence - min_inicial) - 15;
+                    if (calMin >= TIME_LIMIT){
+                        int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
+                        ReminderUtilities.scheduleChargingReminder(this, secondsStart, secondsStart);
+                        btn_inicio.setEnabled(false);
+                        btn_inicio.setAlpha(0.7f);
+                        btn_cancelar.setEnabled(true);
+                        btn_cancelar.setAlpha(1.0f);
+                        PreferenceUtilities.changeStatusButtonCancel(this, true);
+                        PreferenceUtilities.savePreferencesFinalHour(this, cardviewHoraVence.getText().toString());
+                    } else {
+                        Toast.makeText(this,getResources().getString(R.string.msgLimiteTiempo),Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(this,getResources().getString(R.string.msgHoraVencMenor),Toast.LENGTH_LONG).show();
+                }
                 break;
 
             case R.id.btnCancelar:
@@ -224,7 +234,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 btn_cancelar.setEnabled(false);
                 PreferenceUtilities.changeStatusButtonCancel(this, false);
                 PreferenceUtilities.savePreferencesFinalHour(this, getResources().getString(R.string.horaCero));
-                PreferenceUtilities.savePreferenceHourIni(this,getResources().getString(R.string.horaCero));
+            //    PreferenceUtilities.savePreferenceHourIni(this,getResources().getString(R.string.horaCero));
                 cardviewHora.setText(getResources().getString(R.string.horaCero));
                 cardviewHoraVence.setText(getResources().getString(R.string.horaCero));
                 tidHhora.setText(getResources().getString(R.string.horaCero));
@@ -232,7 +242,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 break;
 
             case R.id.textInputEditTextHora:
-                showDialogHour();
+                //showDialogHour();
                 break;
 
             case R.id.textInputEditTextHoraVence:

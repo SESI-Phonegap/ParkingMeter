@@ -50,6 +50,16 @@ public class Utils {
         tidHhora.setText(hour + ":" + minute);
     }
 
+    public static int convertActualHourToMinutes(){
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        int result = convertHourToMinutes(hour,minute);
+
+        return result;
+    }
+
     public static int convertHourToMinutes(int hour, int minutes) {
 
         int convertMinutes = (hour * SIXTY_MINUTES) + minutes;
