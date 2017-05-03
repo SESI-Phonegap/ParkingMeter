@@ -28,10 +28,13 @@
     <string name="report">Reportes</string>
 
 
-
     <!-- Notification -->
     <string name="charging_reminder_notification_title">! Hora de ir por tu automóvil !</string>
     <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil.Que no te pongan la araña, evita costosas multas. </string>
+
+    <!-- Dialog alarm -->
+    <string name="configAlarm">Configuración de alarma</string>
+    <string name="btn_guardar_dialog_alarm">Guardar</string>
 
 
 </resources>
