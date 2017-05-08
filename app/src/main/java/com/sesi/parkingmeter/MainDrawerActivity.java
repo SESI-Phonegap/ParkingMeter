@@ -2,10 +2,10 @@ package com.sesi.parkingmeter;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -21,11 +21,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 
 public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private FloatingActionButton fab;
+
     private DrawerLayout drawer;
     private LayoutInflater inflater;
     private AlertDialog dialog;
@@ -36,7 +37,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
-
+        final String sTime = this.getIntent().getStringExtra("time");
         init();
 
 
@@ -49,15 +50,9 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -133,20 +128,22 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     public void changeFragment(Fragment fragment, int resource, boolean isRoot, boolean backStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        if (isRoot)
+        if (isRoot) {
             transaction.add(resource, fragment);
-        else
+        } else {
             transaction.replace(resource, fragment);
+        }
 
-        if (backStack)
+        if (backStack) {
             transaction.addToBackStack(null);
+        }
 
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.commit();
     }
 
     public void createDialogConfigAlarm() {
-        final View view = inflater.inflate(R.layout.dialog_alarm_preferences,null);
+        final View view = inflater.inflate(R.layout.dialog_alarm_preferences, null);
         builder.setView(view);
         dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));

@@ -2,6 +2,7 @@ package com.sesi.parkingmeter.fragments;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +16,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
+import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
@@ -33,6 +37,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private int minIni, minVence;
     private int min_inicial;
     private static final int TIME_LIMIT = 10;
+    private FloatingActionButton fab;
 
 
 
@@ -97,6 +102,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
         cardviewHoraVence.setText(PreferenceUtilities.getPreferencesFinalHour(getContext()));
         tidHoraVence.setText(PreferenceUtilities.getPreferencesFinalHour(getContext()));
+
+        this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        this.fab.setOnClickListener(this);
     }
 
 
@@ -163,6 +171,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
             case R.id.textInputEditTextHoraVence:
                 showDialogHourVence();
+                break;
+
+            case R.id.fab:
+                final Intent cameraActivity = new Intent(this.getContext(), CameraReaderActivity.class);
+                startActivityForResult(cameraActivity, 9999);
                 break;
         }
 
@@ -237,6 +250,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         }
     }
 
-
-
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final String sData = data.getStringExtra("time");
+        Toast.makeText(this.getContext(),  sData, Toast.LENGTH_LONG).show();
+    }
 }
