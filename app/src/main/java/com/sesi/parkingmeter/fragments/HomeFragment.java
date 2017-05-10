@@ -40,7 +40,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private FloatingActionButton fab;
 
 
-
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -72,7 +71,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         init();
     }
 
-    public void init(){
+    public void init() {
 
         btn_inicio = (Button) getActivity().findViewById(R.id.btnInicio);
         btn_inicio.setOnClickListener(this);
@@ -253,7 +252,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        final String sData = data.getStringExtra("time");
-        Toast.makeText(this.getContext(),  sData, Toast.LENGTH_LONG).show();
+        if (data != null) {
+            final String sData = data.getStringExtra("time");
+            Toast.makeText(this.getContext(), sData, Toast.LENGTH_LONG).show();
+        }
     }
 }

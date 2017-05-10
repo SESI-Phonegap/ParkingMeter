@@ -144,6 +144,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
     public void createDialogConfigAlarm() {
         final View view = inflater.inflate(R.layout.dialog_alarm_preferences, null);
+
         builder.setView(view);
         dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
