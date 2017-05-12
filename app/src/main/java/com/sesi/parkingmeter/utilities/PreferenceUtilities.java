@@ -3,6 +3,7 @@ package com.sesi.parkingmeter.utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 
 
 public class PreferenceUtilities {
@@ -11,6 +12,8 @@ public class PreferenceUtilities {
     public static final String SAVE_FINAL_HOUR = "save_final_hour";
     private static final String DEFAULT_FINAL_HOUR = "00:00";
     public static final String STATUS_BUTTON_CANCEL = "status_button_cancel";
+    public static final int DEFAULT_MIN_ALARM = 10;
+    public static final String SAVE_DEFAULT_MIN_ALARM = "save_default_min_alarm";
     private static final boolean DEFAULT_STATUS_BUTTON = false;
 
 
@@ -54,5 +57,18 @@ public class PreferenceUtilities {
         String hour = prefs.getString(SAVE_INITIAL_HOUR, DEFAULT_FINAL_HOUR);
 
         return hour;
+    }
+
+    public static void savePreferenceDefaultMinHour(Context context, int min){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(SAVE_DEFAULT_MIN_ALARM,min);
+        editor.apply();
+
+    }
+    public static int getPreferenceDefaultMinHour(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int min = prefs.getInt(SAVE_DEFAULT_MIN_ALARM, DEFAULT_MIN_ALARM);
+        return min;
     }
 }

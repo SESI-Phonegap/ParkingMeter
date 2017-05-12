@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,8 +133,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 int min_inicial = Utils.convertActualHourToMinutes();
                 int min_vence = Utils.convertHourToMinutes(horaVence, minVence);
                 if (min_inicial < min_vence) {
-                    int calMin = (min_vence - min_inicial) - 15;
-                    if (calMin <= TIME_LIMIT) {
+                    int iMinAlarm = PreferenceUtilities.getPreferenceDefaultMinHour(getContext());
+                    Log.d("AAA-", "" + iMinAlarm);
+                    int calMin = (min_vence - min_inicial) - iMinAlarm;
+                    Log.d("AAA-cal-min", "" + calMin);
+                    if (calMin >= TIME_LIMIT) {
                         int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
                         ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
                         btn_inicio.setEnabled(false);
@@ -158,9 +162,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 PreferenceUtilities.changeStatusButtonCancel(getContext(), false);
                 PreferenceUtilities.savePreferencesFinalHour(getContext(), getResources().getString(R.string.horaCero));
                 //    PreferenceUtilities.savePreferenceHourIni(this,getResources().getString(R.string.horaCero));
-                cardviewHora.setText(getResources().getString(R.string.horaCero));
+
                 cardviewHoraVence.setText(getResources().getString(R.string.horaCero));
-                tidHhora.setText(getResources().getString(R.string.horaCero));
+                Utils.showHour(cardviewHora, tidHhora);
                 tidHoraVence.setText(getResources().getString(R.string.horaCero));
                 break;
 
@@ -194,7 +198,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 minVence = selectedMinute;
                 checkHour();
             }
-        }, hour, minute, true);
+        }, hour, minute, false);
 
         timePicker1.show();
         checkHour();
