@@ -137,7 +137,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     Log.d("AAA-", "" + iMinAlarm);
                     int calMin = (min_vence - min_inicial) - iMinAlarm;
                     Log.d("AAA-cal-min", "" + calMin);
-                    if (calMin >= TIME_LIMIT) {
+                  //  if (calMin >= TIME_LIMIT) {
                         int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
                         ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
                         btn_inicio.setEnabled(false);
@@ -146,9 +146,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                         btn_cancelar.setAlpha(1.0f);
                         PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
                         PreferenceUtilities.savePreferencesFinalHour(getContext(), cardviewHoraVence.getText().toString());
-                    } else {
+                  /*  } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
-                    }
+                    }*/
                 } else {
                     Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
                 }

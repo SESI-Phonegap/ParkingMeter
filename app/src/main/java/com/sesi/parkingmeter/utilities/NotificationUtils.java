@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -26,6 +29,7 @@ public class NotificationUtils {
     private static final int ACTION_IGNORE_PENDING_INTENT_ID = 14;
 
     public static void remindUserBecauseCharging(Context context){
+        Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setColor(ContextCompat.getColor(context,R.color.colorPrimary))
                 .setSmallIcon(R.drawable.alarm)
@@ -35,7 +39,10 @@ public class NotificationUtils {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
                         context.getString(R.string.charging_reminder_notification_body))
                         .setBigContentTitle(context.getString(R.string.charging_reminder_notification_title)))
-                .setDefaults(Notification.DEFAULT_VIBRATE)
+             //   .setDefaults(Notification.DEFAULT_VIBRATE)
+                .setSound(uri)
+                .setVibrate(new long[] { 3000, 3000, 3000, 3000, 3000})
+                .setLights(Color.RED, 3000, 3000)
                 .setContentIntent(contentIntent(context))
                 .addAction(FinishParkingAction(context))
                 .addAction(ignoreReminderAction(context))
@@ -47,6 +54,7 @@ public class NotificationUtils {
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID,notificationBuilder.build());
+
 
     }
 

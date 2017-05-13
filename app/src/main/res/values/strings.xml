@@ -35,6 +35,8 @@
     <!-- Dialog alarm -->
     <string name="configAlarm">Configuración de alarma</string>
     <string name="btn_guardar_dialog_alarm">Guardar</string>
+    <string name="msg_check_switch_alert">Al menos una opción debe de estar habilitada (Vibrador o Sonido)</string>
+    <string name="tvMinutos">%1$s Min</string>
 
 
 </resources>

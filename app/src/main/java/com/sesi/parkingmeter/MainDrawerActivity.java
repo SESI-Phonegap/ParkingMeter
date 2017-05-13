@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.fragments.HomeFragment;
@@ -37,6 +39,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     private AlertDialog dialog;
     private Builder builder;
     private static final int MAX_MIN = 20;
+    private int iPreferenceMin;
 
 
     @Override
@@ -69,6 +72,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         navigationView.setNavigationItemSelectedListener(this);
 
         changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
+        iPreferenceMin = PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext());
 
 
     }
@@ -151,28 +155,44 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     public void createDialogConfigAlarm() {
         final View view = inflater.inflate(R.layout.dialog_alarm_preferences, null);
 
+        final SwitchCompat switchVibrate = (SwitchCompat) view.findViewById(R.id.switchVibrador);
+        switchVibrate.setChecked(PreferenceUtilities.getPreferenceDefaultVibrate(getApplicationContext()));
+        final SwitchCompat switchSound = (SwitchCompat) view.findViewById(R.id.switchSonido);
+        switchSound.setChecked(PreferenceUtilities.getPreferenceDefaultSound(getApplicationContext()));
+
         final TextView tvMinutos = (TextView) view.findViewById(R.id.textViewMin);
         Button btnContinuar = (Button) view.findViewById(R.id.btn_guardar_dialog_alarm);
         btnContinuar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int min = Integer.parseInt(tvMinutos.getText().toString());
-                PreferenceUtilities.savePreferenceDefaultMinHour(v.getContext(),min);
-                dialog.dismiss();
+
+                if (switchSound.isChecked() | switchVibrate.isChecked()) {
+                 //   int min = Integer.parseInt(tvMinutos.getText().toString());
+                    PreferenceUtilities.savePreferenceDefaultMinHour(v.getContext(), iPreferenceMin);
+                    PreferenceUtilities.savePreferenceDefaultVibrate(v.getContext(),switchVibrate.isChecked());
+                    PreferenceUtilities.savePreferenceDefaultSound(v.getContext(),switchSound.isChecked());
+                    dialog.dismiss();
+                } else {
+                    Toast.makeText(v.getContext(), getResources().getString(R.string.msg_check_switch_alert), Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarAlarm);
         seekBar.setMax(MAX_MIN);
+        seekBar.setProgress(iPreferenceMin);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress <= 10){
+                if (progress <= 10) {
                     tvMinutos.setText("10");
-                } else if (progress > 10 && progress <= 15){
+                    iPreferenceMin = 10;
+                } else if (progress > 10 && progress <= 15) {
                     tvMinutos.setText("15");
-                } else if (progress > 15 && progress <= 20){
+                    iPreferenceMin = 15;
+                } else if (progress > 15 && progress <= 20) {
                     tvMinutos.setText("20");
+                    iPreferenceMin = 20;
                 }
             }
 

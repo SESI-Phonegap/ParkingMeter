@@ -41,7 +41,7 @@ public class ReminderUtilities {
                 .setRecurring(true)
                 .setTrigger(Trigger.executionWindow(
                         secondsStart,
-                        secondsStart + syncFlextimeSeconds))
+                        1 + syncFlextimeSeconds))
                 .setReplaceCurrent(true)
                 .build();
 
