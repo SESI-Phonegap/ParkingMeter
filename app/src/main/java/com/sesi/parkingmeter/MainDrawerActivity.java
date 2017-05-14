@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.fragments.HomeFragment;
+import com.sesi.parkingmeter.fragments.MapFragment;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
 
@@ -116,19 +117,20 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_alarm) {
-            createDialogConfigAlarm();
-            //changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
-            // Handle the camera action
-        } else if (id == R.id.nav_findcar) {
+        switch (id){
+            case R.id.nav_home:
+                changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
+                break;
+            case R.id.nav_alarm:
+                createDialogConfigAlarm();
+                break;
 
-        } else if (id == R.id.nav_report) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+            case R.id.nav_findcar:
+                changeFragment(MapFragment.newInstance(), R.id.mainFrame, false, false);
+                break;
         }
+
+        
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -167,10 +169,10 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             public void onClick(View v) {
 
                 if (switchSound.isChecked() | switchVibrate.isChecked()) {
-                 //   int min = Integer.parseInt(tvMinutos.getText().toString());
+                    //   int min = Integer.parseInt(tvMinutos.getText().toString());
                     PreferenceUtilities.savePreferenceDefaultMinHour(v.getContext(), iPreferenceMin);
-                    PreferenceUtilities.savePreferenceDefaultVibrate(v.getContext(),switchVibrate.isChecked());
-                    PreferenceUtilities.savePreferenceDefaultSound(v.getContext(),switchSound.isChecked());
+                    PreferenceUtilities.savePreferenceDefaultVibrate(v.getContext(), switchVibrate.isChecked());
+                    PreferenceUtilities.savePreferenceDefaultSound(v.getContext(), switchSound.isChecked());
                     dialog.dismiss();
                 } else {
                     Toast.makeText(v.getContext(), getResources().getString(R.string.msg_check_switch_alert), Toast.LENGTH_LONG).show();

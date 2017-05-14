@@ -23,6 +23,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Menu Navigation Drawer-->
+    <string name="home">Inicio</string>
     <string name="alarma">Alarma</string>
     <string name="findCar">Encontrar Carro</string>
     <string name="report">Reportes</string>
@@ -37,6 +38,9 @@
     <string name="btn_guardar_dialog_alarm">Guardar</string>
     <string name="msg_check_switch_alert">Al menos una opción debe de estar habilitada (Vibrador o Sonido)</string>
     <string name="tvMinutos">%1$s Min</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

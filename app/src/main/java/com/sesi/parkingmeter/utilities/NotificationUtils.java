@@ -40,14 +40,21 @@ public class NotificationUtils {
                         context.getString(R.string.charging_reminder_notification_body))
                         .setBigContentTitle(context.getString(R.string.charging_reminder_notification_title)))
              //   .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setSound(uri)
-                .setVibrate(new long[] { 3000, 3000, 3000, 3000, 3000})
+
+
                 .setLights(Color.RED, 3000, 3000)
                 .setContentIntent(contentIntent(context))
                 .addAction(FinishParkingAction(context))
                 .addAction(ignoreReminderAction(context))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setAutoCancel(true);
+
+        if (PreferenceUtilities.getPreferenceDefaultSound(context)){
+            notificationBuilder.setSound(uri);
+        }
+        if (PreferenceUtilities.getPreferenceDefaultVibrate(context)){
+            notificationBuilder.setVibrate(new long[] { 3000, 3000, 3000, 3000, 3000});
+        }
 
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
