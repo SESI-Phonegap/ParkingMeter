@@ -26,7 +26,7 @@ public class CameraReaderActivity extends AppCompatActivity implements SurfaceHo
 
     private SurfaceView cameraView;
     private CameraSource cameraSource;
-    private final static int PERMISION_CAMERA = 1001;
+    public final static int PERMISION_CAMERA = 1001;
     private final String SCANING_REGEX = "[0-9]{2}\\:[0-9]{2}";
 
     @Override

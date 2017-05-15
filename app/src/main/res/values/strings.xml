@@ -16,6 +16,10 @@
     <string name="manualmente">Introduce los datos manualmente</string>
     <string name="msgLimiteTiempo">El tiempo es menor al limite de tiempo de la alarma</string>
     <string name="msgHoraVencMenor">La hora de vencimiento no puede ser igual o menor a la hora de actual</string>
+    <string name="msgPermissionDeniedLocation">Necesita dar permisos de Localizacion</string>
+    <string name="switchOn">On</string>
+    <string name="switchOff">Off</string>
+    <string name="switchText">Desea Guardar ubicación del coche</string>
 
     <string name="title_activity_main_drawer">MainDrawerActivity</string>
 

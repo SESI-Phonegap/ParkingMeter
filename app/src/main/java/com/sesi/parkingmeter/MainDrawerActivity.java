@@ -3,14 +3,19 @@ package com.sesi.parkingmeter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -26,6 +31,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.MapFragment;
@@ -41,6 +47,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     private Builder builder;
     private static final int MAX_MIN = 20;
     private int iPreferenceMin;
+    public final static int PERMISION_LOCATION = 1002;
+    public static LatLng latLng;
 
 
     @Override
@@ -117,7 +125,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.nav_home:
                 changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
                 break;
@@ -130,7 +138,6 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 break;
         }
 
-        
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -212,5 +219,24 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.show();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+
+            case PERMISION_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Location location = new Location(LocationManager.GPS_PROVIDER);
+                    latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    Log.d("AAA-MAIN","Latitud: "+latLng.latitude +" Long: "+latLng.longitude);
+                }else {
+                    Toast.makeText(this,getResources().getString(R.string.msgPermissionDeniedLocation),Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
     }
 }

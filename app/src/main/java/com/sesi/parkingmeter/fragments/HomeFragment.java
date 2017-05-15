@@ -1,23 +1,31 @@
 package com.sesi.parkingmeter.fragments;
 
+import android.Manifest;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.activities.CameraReaderActivity;
@@ -74,6 +82,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
     public void init() {
 
+        SwitchCompat switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
+        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                MapFragment.PERMISION_LOCATION);
+                    } else {
+                        if (MainDrawerActivity.latLng != null){
+                            Log.d("AAA-","Latitud: "+MainDrawerActivity.latLng.latitude +" Long: "+MainDrawerActivity.latLng.longitude);
+                        }else {
+                            Location location = new Location(LocationManager.GPS_PROVIDER);
+                            MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            Log.d("AAA-NOT-NULL","Latitud: "+MainDrawerActivity.latLng.latitude +" Long: "+MainDrawerActivity.latLng.longitude);
+                        }
+
+                    }
+                }
+            }
+        });
+
         btn_inicio = (Button) getActivity().findViewById(R.id.btnInicio);
         btn_inicio.setOnClickListener(this);
 
@@ -105,6 +136,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
         this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         this.fab.setOnClickListener(this);
+
+
     }
 
 
@@ -137,15 +170,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     Log.d("AAA-", "" + iMinAlarm);
                     int calMin = (min_vence - min_inicial) - iMinAlarm;
                     Log.d("AAA-cal-min", "" + calMin);
-                  //  if (calMin >= TIME_LIMIT) {
-                        int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
-                        ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
-                        btn_inicio.setEnabled(false);
-                        btn_inicio.setAlpha(0.7f);
-                        btn_cancelar.setEnabled(true);
-                        btn_cancelar.setAlpha(1.0f);
-                        PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
-                        PreferenceUtilities.savePreferencesFinalHour(getContext(), cardviewHoraVence.getText().toString());
+                    //  if (calMin >= TIME_LIMIT) {
+                    int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
+                    ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
+                    btn_inicio.setEnabled(false);
+                    btn_inicio.setAlpha(0.7f);
+                    btn_cancelar.setEnabled(true);
+                    btn_cancelar.setAlpha(1.0f);
+                    PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
+                    PreferenceUtilities.savePreferencesFinalHour(getContext(), cardviewHoraVence.getText().toString());
                   /*  } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
                     }*/
