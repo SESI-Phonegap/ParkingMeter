@@ -24,6 +24,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -118,10 +119,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
                 mMap.clear();
 
-                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(latLng).title("Yo"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+          //      Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+          //      latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(MainDrawerActivity.latLng).title("Yo"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(MainDrawerActivity.latLng));
 
             }
 

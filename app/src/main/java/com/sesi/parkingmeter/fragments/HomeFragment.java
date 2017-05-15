@@ -95,7 +95,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                         if (MainDrawerActivity.latLng != null){
                             Log.d("AAA-","Latitud: "+MainDrawerActivity.latLng.latitude +" Long: "+MainDrawerActivity.latLng.longitude);
                         }else {
-                            Location location = new Location(LocationManager.GPS_PROVIDER);
+                            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+                            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
                             Log.d("AAA-NOT-NULL","Latitud: "+MainDrawerActivity.latLng.latitude +" Long: "+MainDrawerActivity.latLng.longitude);
                         }
