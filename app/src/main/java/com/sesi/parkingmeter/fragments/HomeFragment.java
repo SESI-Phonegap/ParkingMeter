@@ -98,7 +98,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
                             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                           // MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            MainDrawerActivity.latLng = new LatLng(19.462299, -99.212428);
                             Log.d("AAA-NOT-NULL","Latitud: "+MainDrawerActivity.latLng.latitude +" Long: "+MainDrawerActivity.latLng.longitude);
                         }
 

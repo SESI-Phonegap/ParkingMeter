@@ -1,8 +1,13 @@
 package com.sesi.parkingmeter.fragments;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -22,10 +27,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
+import com.sesi.parkingmeter.utilities.Utils;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -87,9 +96,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                mMap.clear();
+    /*            mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(latLng)).setTitle("Yo");
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));*/
             }
 
             @Override
@@ -108,26 +117,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         };
 
-        if (Build.VERSION.SDK_INT < 23) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        } else {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISION_LOCATION);
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                mMap.clear();
 
-          //      Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-          //      latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(MainDrawerActivity.latLng).title("Yo"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(MainDrawerActivity.latLng));
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISION_LOCATION);
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            mMap.clear();
+
+            //      Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            //      latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+            if (MainDrawerActivity.latLng != null) {
+                Bitmap bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
+                mMap.addMarker(new MarkerOptions()
+                        .position(MainDrawerActivity.latLng)
+                        .title("Mi Auto")
+                        .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
 
             }
 
+            Bitmap bitmapUser = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_human_male));
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title("Yo")
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmapUser)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.setMinZoomPreference(15.0f);
+            mMap.setMaxZoomPreference(23.0f);
 
         }
+
+
     }
 
     @Override
@@ -156,4 +179,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        vectorDrawable.draw(canvas);
+        return bitmap;
+    }
+
 }
