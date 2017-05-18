@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Geocoder;
@@ -22,6 +23,9 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,18 +36,23 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
+import com.sesi.parkingmeter.task.DownloadTask;
 import com.sesi.parkingmeter.utilities.Utils;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
-    private GoogleMap mMap;
+    public static GoogleMap mMap;
     LocationManager locationManager;
     LocationListener locationListener;
     public final static int PERMISION_LOCATION = 1002;
     LatLng latLng;
+    public static TextView tvDetails;
+    private RelativeLayout relativeLayoutDatos;
 
     public MapFragment() {
         // Required empty public constructor
@@ -89,7 +98,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatos);
+        tvDetails = (TextView) getActivity().findViewById(R.id.tvDatos);
         mMap = googleMap;
+
+        mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+            @Override
+            public void onCameraMoveStarted(int i) {
+                AlphaAnimation alphaAnimation = new AlphaAnimation(1,0);
+                alphaAnimation.setDuration(600);
+                alphaAnimation.setRepeatMode(1);
+                relativeLayoutDatos.startAnimation(alphaAnimation);
+               // relativeLayoutDatos.setAlpha(0);
+            }
+        });
+
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                AlphaAnimation alphaAnimation = new AlphaAnimation(0,0);
+                alphaAnimation.setDuration(300);
+                alphaAnimation.setRepeatMode(1);
+                relativeLayoutDatos.startAnimation(alphaAnimation);
+            }
+        });
+
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -126,16 +159,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             mMap.clear();
 
-            //      Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            //      latLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-            if (MainDrawerActivity.latLng != null) {
-                Bitmap bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
-                mMap.addMarker(new MarkerOptions()
-                        .position(MainDrawerActivity.latLng)
-                        .title("Mi Auto")
-                        .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
-
-            }
 
             Bitmap bitmapUser = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_human_male));
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -148,9 +171,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             mMap.setMinZoomPreference(15.0f);
             mMap.setMaxZoomPreference(23.0f);
 
+
+            if (MainDrawerActivity.latLng != null) {
+                Bitmap bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
+                mMap.addMarker(new MarkerOptions()
+                        .position(MainDrawerActivity.latLng)
+                        .title("Mi Auto")
+                        .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
+
+            /*    mMap.addPolyline(new PolylineOptions()
+                        .add(latLng,MainDrawerActivity.latLng)
+                        .width(5).color(Color.BLUE)
+                        .geodesic(true)
+                        .clickable(true));*/
+                String url = obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
+                DownloadTask downloadTask = new DownloadTask();
+                downloadTask.execute(url);
+
+            }
+
+
         }
 
 
+    }
+
+    private String obtenerDireccionesURL(LatLng origin, LatLng dest) {
+
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        String sensor = "sensor=false";
+
+        String parameters = "units=metric&mode=walking&"+str_origin + "&" + str_dest + "&" + sensor;
+
+        String output = "json";
+
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+        return url;
     }
 
     @Override
@@ -179,6 +239,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
