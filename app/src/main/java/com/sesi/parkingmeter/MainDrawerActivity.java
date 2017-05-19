@@ -156,8 +156,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         if (backStack) {
             transaction.addToBackStack(null);
         }
-
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        transaction.setCustomAnimations(R.anim.enter_from_right,R.anim.enter_from_left);
+        //transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.commit();
     }
 

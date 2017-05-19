@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -106,20 +107,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onCameraMoveStarted(int i) {
                 AlphaAnimation alphaAnimation = new AlphaAnimation(1,0);
-                alphaAnimation.setDuration(600);
+                alphaAnimation.setDuration(500);
                 alphaAnimation.setRepeatMode(1);
                 relativeLayoutDatos.startAnimation(alphaAnimation);
+                relativeLayoutDatos.animate().translationY(280).setDuration(600).start();
                // relativeLayoutDatos.setAlpha(0);
             }
         });
 
+
+
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
-                AlphaAnimation alphaAnimation = new AlphaAnimation(0,0);
+             /*   AlphaAnimation alphaAnimation = new AlphaAnimation(0,0);
                 alphaAnimation.setDuration(300);
                 alphaAnimation.setRepeatMode(1);
+                relativeLayoutDatos.startAnimation(alphaAnimation);*/
+            }
+        });
+
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                AlphaAnimation alphaAnimation = new AlphaAnimation(0,1);
+                alphaAnimation.setDuration(1100);
+                alphaAnimation.setRepeatMode(1);
                 relativeLayoutDatos.startAnimation(alphaAnimation);
+                relativeLayoutDatos.animate().translationY(0).setDuration(600).start();
             }
         });
 
