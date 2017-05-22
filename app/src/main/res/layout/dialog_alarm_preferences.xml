@@ -53,40 +53,27 @@
                 android:textStyle="bold"
                 android:textSize="@dimen/size_textview_min_dialog_alarm"/>
 
-            <TextView
-                android:id="@+id/tvTitleVibrador"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vibrador"
-                android:textSize="18sp"
-                android:layout_below="@id/textViewMin"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"/>
             <android.support.v7.widget.SwitchCompat
+                android:layout_below="@id/textViewMin"
                 android:id="@+id/switchVibrador"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/tvTitleVibrador"
-                android:layout_toEndOf="@+id/tvTitleVibrador"
-                android:layout_marginStart="17dp" />
+                android:text="Vibrador"
+                app:switchPadding="@dimen/marginStartEnd"
+                android:layout_alignParentEnd="true"
+                android:paddingEnd="20dp"
+                android:layout_marginTop="@dimen/marginTop"/>
 
-            <TextView
-                android:id="@+id/tvTitleSonido"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sonido"
-                android:textSize="18sp"
-                android:layout_below="@id/tvTitleVibrador"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"/>
+
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/switchSonido"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/tvTitleSonido"
-                android:layout_alignStart="@+id/switchVibrador" />
+                android:layout_alignEnd="@+id/switchVibrador"
+                android:text="Sonido"
+                android:layout_below="@id/switchVibrador"
+                app:switchPadding="@dimen/marginStartEnd"
+                android:paddingEnd="20dp"/>
 
             <Button
                 android:id="@+id/btn_guardar_dialog_alarm"
@@ -94,15 +81,16 @@
                 android:layout_marginStart="@dimen/marginStartEndDialog"
                 android:layout_marginEnd="@dimen/marginStartEndDialog"
                 android:layout_marginTop="@dimen/marginTop"
-                android:layout_marginBottom="@dimen/marginTop"
+                android:layout_marginBottom="@dimen/marginTopBtn"
                 android:layout_below="@id/switchSonido"
                 android:layout_width="@dimen/size_button_dialog_alarm"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:background="@drawable/custom_button"
                 android:text="@string/btn_guardar_dialog_alarm"
                 android:textSize="@dimen/size_text_button_dialog_alarm"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"/>
+                android:textStyle="normal"
+                android:textColor="@android:color/white"
+                />
 
         </RelativeLayout>
 

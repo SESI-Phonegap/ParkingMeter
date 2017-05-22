@@ -9,7 +9,7 @@
     <string name="horaCero">00:00</string>
     <string name="horadepago">Hora actual</string>
     <string name="vence">Vence:</string>
-    <string name="Horavencimiento">Hora de vencimiento</string>
+    <string name="Horavencimiento">Hora</string>
     <string name="iniciar">Iniciar</string>
     <string name="cancelar">Cancelar</string>
     <string name="gasto">Gasto</string>
@@ -19,7 +19,7 @@
     <string name="msgPermissionDeniedLocation">Necesita dar permisos de Localizacion</string>
     <string name="switchOn">On</string>
     <string name="switchOff">Off</string>
-    <string name="switchText">Desea Guardar ubicación del coche</string>
+    <string name="switchText">Ubicación del coche</string>
 
     <string name="title_activity_main_drawer">MainDrawerActivity</string>
 
@@ -45,6 +45,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-2449148181464779~1658655246</string>
+    <string name="banner_intersticial">ca-app-pub-2449148181464779/7425987245</string>
 
 
 </resources>

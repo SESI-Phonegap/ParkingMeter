@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.MapFragment;
 import com.sesi.parkingmeter.utilities.DirectionsJSONParser;
 
@@ -69,9 +70,9 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
             lineOptions.color(Color.rgb(0,0,255));
         }
         if(lineOptions!=null) {
-            MapFragment.mMap.addPolyline(lineOptions);
-            MapFragment.tvDetails.setText(DirectionsJSONParser.sDistance);
-            MapFragment.tvDetails.append(DirectionsJSONParser.sDuration);
+            HomeFragment.mMap.addPolyline(lineOptions);
+            HomeFragment.tvDetails.setText(DirectionsJSONParser.sDistance);
+            HomeFragment.tvDetails.append(DirectionsJSONParser.sDuration);
         }
     }
 }
