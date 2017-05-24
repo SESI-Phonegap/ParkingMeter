@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -81,6 +82,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private Location location;
     private boolean statusHour = false;
     private InterstitialAd mInterstitialAd;
+    private AdView mAdview;
 
 
     public HomeFragment() {
@@ -118,6 +120,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     }
 
     public void init() {
+
+        mAdview = (AdView) getActivity().findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdview.loadAd(adRequest);
+        mAdview.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                // Load the next interstitial.
+                mAdview.loadAd(new AdRequest.Builder().build());
+            }
+        });
 
         mInterstitialAd = new InterstitialAd(getActivity());
         mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial));
@@ -234,6 +247,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 } else {
                     Log.d("TAG", "The interstitial wasn't loaded yet.");
                 }
+
                 break;
 
             case R.id.btnCancelar:
