@@ -83,6 +83,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private boolean statusHour = false;
     private InterstitialAd mInterstitialAd;
     private AdView mAdview;
+    private SwitchCompat switchLocation;
+    private TextView tvDatos;
 
 
     public HomeFragment() {
@@ -144,7 +146,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
         });
         tvContador = (TextView) getActivity().findViewById(R.id.contador);
-        SwitchCompat switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
+        switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
         switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -192,6 +194,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
         relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetails);
         relativeMap = (RelativeLayout) getActivity().findViewById(R.id.relativeMap);
+
+        tvDatos = (TextView) getActivity().findViewById(R.id.tvDatos);
 
 
 
@@ -261,6 +265,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 tidHoraVence.setText(getResources().getString(R.string.horaCero));
                 countTimer.cancel();
                 tvContador.setText(getString(R.string.cero));
+                switchLocation.setChecked(false);
+                tvDatos.setText("");
+                mMap.clear();
                 break;
 
             case R.id.textInputEditTextHoraVence:
