@@ -3,7 +3,6 @@ package com.sesi.parkingmeter.fragments;
 import android.Manifest;
 import android.animation.Animator;
 import android.annotation.TargetApi;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,17 +14,19 @@ import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +36,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -51,53 +51,49 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
-import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.task.DownloadTask;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
 
-import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 
-public class HomeFragment extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener, OnMapReadyCallback {
-
-    private TextView tvContador;
-    private TextInputEditText tidHoraVence;
-    private Button btn_inicio, btn_cancelar;
-    private final static String ACTION_HOUR_VENCE = "";
-    private int horaIni, horaVence;
-    private int minIni, minVence;
-    private int min_inicial;
-    private static final int TIME_LIMIT = 10;
-    private FloatingActionButton fab;
-    private CountDownTimer countTimer;
-    private static final String FORMAT = "%02d:%02d:%02d";
-    public static GoogleMap mMap;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    public final static int PERMISION_LOCATION = 1002;
-    private LatLng latLng;
-    public static TextView tvDetails;
-    private RelativeLayout relativeLayoutDatos, relativeHora, relativeMap;
-    private Location location;
-    private boolean statusHour = false;
+public class ParkingType2Fragment extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener, OnMapReadyCallback {
     private InterstitialAd mInterstitialAd;
     private AdView mAdview;
+    private LatLng latLng;
+    private TextView tvContador;
     private SwitchCompat switchLocation;
     private TextView tvDatos;
     private Bitmap bitmapUser;
     private Bitmap bitmapCar;
+    public final static int PERMISION_LOCATION = 1002;
+    private static final String FORMAT = "%02d:%02d:%02d";
+    public static GoogleMap mMap;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private Location location;
+    private Button btn_inicio, btn_cancelar;
+    private TextInputEditText tidHoraVence;
+    private CountDownTimer countTimer;
+    private RelativeLayout relativeLayoutDatos, relativeHora, relativeMap;
+    private int minVence, horaVence;
+    private boolean statusHour = false;
+    public static TextView tvDetails;
+    private static final int TIME_LIMIT = 10;
 
-
-    public HomeFragment() {
+    public ParkingType2Fragment() {
         // Required empty public constructor
     }
 
-    public static HomeFragment newInstance() {
-        HomeFragment fragment = new HomeFragment();
+
+    // TODO: Rename and change types and number of parameters
+    public static ParkingType2Fragment newInstance() {
+        ParkingType2Fragment fragment = new ParkingType2Fragment();
         Bundle args = new Bundle();
+        //   args.putString(ARG_PARAM1, param1);
+        //   args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -105,15 +101,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (getArguments() != null) {
+            //   mParam1 = getArguments().getString(ARG_PARAM1);
+            //   mParam2 = getArguments().getString(ARG_PARAM2);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        View view = inflater.inflate(R.layout.fragment_parking_type2, container, false);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapType2);
         mapFragment.getMapAsync(this);
         return view;
     }
@@ -125,7 +124,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     }
 
     public void init() {
-        mAdview = (AdView) getActivity().findViewById(R.id.adView);
+        mAdview = (AdView) getActivity().findViewById(R.id.adViewType2);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdview.loadAd(adRequest);
         mAdview.setAdListener(new AdListener() {
@@ -137,7 +136,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         });
 
         mInterstitialAd = new InterstitialAd(getActivity());
-        mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial));
+        mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial_2));
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
@@ -147,8 +146,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
             }
 
         });
-        tvContador = (TextView) getActivity().findViewById(R.id.contador);
-        switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
+
+        tvContador = (TextView) getActivity().findViewById(R.id.contadorType2);
+        switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocationType2);
         switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -156,7 +156,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(getActivity(),
                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                PERMISION_LOCATION);
+                                MapFragment.PERMISION_LOCATION);
                     } else {
                         if (MainDrawerActivity.latLng != null) {
                             Log.d("AAA-", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
@@ -176,10 +176,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
             }
         });
 
-        btn_inicio = (Button) getActivity().findViewById(R.id.btnInicio);
+        btn_inicio = (Button) getActivity().findViewById(R.id.btnInicioType2);
         btn_inicio.setOnClickListener(this);
 
-        btn_cancelar = (Button) getActivity().findViewById(R.id.btnCancelar);
+        btn_cancelar = (Button) getActivity().findViewById(R.id.btnCancelarType2);
         btn_cancelar.setOnClickListener(this);
 
         btn_inicio.setEnabled(false);
@@ -188,22 +188,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         btn_cancelar.setEnabled(false);
         btn_cancelar.setAlpha(0.7f);
 
-
-        tidHoraVence = (TextInputEditText) getActivity().findViewById(R.id.textInputEditTextHoraVence);
+        tidHoraVence = (TextInputEditText) getActivity().findViewById(R.id.textInputEditTextHoraVenceType2);
         tidHoraVence.setOnClickListener(this);
 
+        relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetailsType2);
+        relativeMap = (RelativeLayout) getActivity().findViewById(R.id.relativeMapType2);
 
-        this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        this.fab.setOnClickListener(this);
+        tvDatos = (TextView) getActivity().findViewById(R.id.tvDatosType2);
 
-        relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetails);
-        relativeMap = (RelativeLayout) getActivity().findViewById(R.id.relativeMap);
-
-        tvDatos = (TextView) getActivity().findViewById(R.id.tvDatos);
+        tidHoraVence.addTextChangedListener(textWatcher);
         cancel();
-
     }
-
 
     @Override
     public void onResume() {
@@ -215,45 +210,44 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-
+        //mListener = null;
     }
 
+
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-
-            case R.id.btnInicio:
-                int min_inicial = Utils.convertActualHourToMinutes();
-                int min_vence = Utils.convertHourToMinutes(horaVence, minVence);
-                if (min_inicial < min_vence) {
+            case R.id.btnInicioType2:
+                //  int min_inicial = Utils.convertActualHourToMinutes();
+                int min_vence = Integer.parseInt(tidHoraVence.getText().toString());
+                if (0 < min_vence) {
                     int iMinAlarm = PreferenceUtilities.getPreferenceDefaultMinHour(getContext());
                     Log.d("AAA-", "" + iMinAlarm);
-                    int calMin = (min_vence - min_inicial) - iMinAlarm;
+                    int calMin = min_vence - iMinAlarm;
                     Log.d("AAA-cal-min", "" + calMin);
-                    //  if (calMin >= TIME_LIMIT) {
-                    int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
-                    //   updateTimer(secondsStart);
-                    controlTimer(secondsStart);
-                    ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
-                    btn_inicio.setEnabled(false);
-                    btn_inicio.setAlpha(0.7f);
-                    btn_cancelar.setEnabled(true);
-                    btn_cancelar.setAlpha(1.0f);
-                    PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
-                  /*  } else {
+                    if (calMin >= 0) {
+                        int secondsStartCount = (int) (TimeUnit.MINUTES.toSeconds(min_vence));
+                        int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
+                        controlTimer(secondsStartCount);
+                        ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
+                        btn_inicio.setEnabled(false);
+                        btn_inicio.setAlpha(0.7f);
+                        btn_cancelar.setEnabled(true);
+                        btn_cancelar.setAlpha(1.0f);
+                        PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
+                    } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
-                    }*/
+                    }
                 } else {
                     Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
                 }
@@ -265,125 +259,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
                 break;
 
-            case R.id.btnCancelar:
+            case R.id.btnCancelarType2:
                 cancel();
                 if (ReminderUtilities.dispatcher != null) {
                     ReminderUtilities.dispatcher.cancelAll();
                 }
                 break;
-
-            case R.id.textInputEditTextHoraVence:
-                showDialogHourVence();
-                break;
-
-            case R.id.fab:
-                final Intent cameraActivity = new Intent(this.getContext(), CameraReaderActivity.class);
-                startActivityForResult(cameraActivity, 9999);
-                break;
         }
-
-    }
-
-
-    public void showDialogHourVence() {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        TimePickerDialog timePicker1 = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-
-                tidHoraVence.setText(selectedHour + ":" + selectedMinute);
-                horaVence = selectedHour;
-                minVence = selectedMinute;
-                btn_inicio.setEnabled(true);
-                btn_inicio.setAlpha(1);
-
-            }
-        }, hour, minute, true);
-
-        timePicker1.show();
-    }
-
-
-    public void updateGuiButtonCancel() {
-        boolean status = PreferenceUtilities.getStatusButtonCancel(getContext());
-        if (status) {
-            btn_cancelar.setAlpha(1.0f);
-        } else {
-            btn_cancelar.setAlpha(0.7f);
-        }
-        btn_cancelar.setEnabled(status);
-
-    }
-
-    public void updateGuiTextviewInitalHour() {
-        String hour = PreferenceUtilities.getPreferencesInitialHour(getContext());
-    }
-
-    public void updateGuiTexviewFinalHour() {
-        String hour = PreferenceUtilities.getPreferencesFinalHour(getContext());
-        tidHoraVence.setText(hour);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (PreferenceUtilities.STATUS_BUTTON_CANCEL.equals(key)) {
-            updateGuiButtonCancel();
-        } else if (PreferenceUtilities.SAVE_INITIAL_HOUR.equals(key)) {
-            updateGuiTextviewInitalHour();
-        } else if (PreferenceUtilities.SAVE_FINAL_HOUR.equals(key)) {
-            updateGuiTexviewFinalHour();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            final String sData = data.getStringExtra("time");
-            Toast.makeText(this.getContext(), sData, Toast.LENGTH_LONG).show();
-            btn_inicio.setEnabled(true);
-            btn_inicio.setAlpha(1);
-        }
-    }
-
-    public void controlTimer(int min) {
-        countTimer = new CountDownTimer(min * 1000 + 100, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                String contador = "" + String.format(FORMAT,
-                        TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
-                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
-                                TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
-                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(
-                                TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)));
-
-                tvContador.setText(contador);
-                // updateTimer((int) millisUntilFinished / 1000);
-            }
-
-            @Override
-            public void onFinish() {
-                tvContador.setText(getString(R.string.cero));
-                btn_cancelar.setEnabled(false);
-                btn_cancelar.setAlpha(0.7f);
-                resetTimer();
-            }
-        }.start();
-    }
-
-
-    public void resetTimer() {
-        tvContador.setText(getString(R.string.cero));
-
-        countTimer.cancel();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatos);
-        tvDetails = (TextView) getActivity().findViewById(R.id.tvDatos);
+
+        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatosType2);
+        tvDetails = (TextView) getActivity().findViewById(R.id.tvDatosType2);
         mMap = googleMap;
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -506,34 +395,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
     }
 
-    private String obtenerDireccionesURL(LatLng origin, LatLng dest) {
-
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-
-        String sensor = "sensor=false";
-
-        String parameters = "units=metric&mode=walking&" + str_origin + "&" + str_dest + "&" + sensor;
-
-        String output = "json";
-
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-        return url;
-    }
-
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        vectorDrawable.draw(canvas);
-        return bitmap;
-    }
-
     public void addMarkers() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
@@ -562,7 +423,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 mMap.setMaxZoomPreference(23.0f);
             }
 
-            if (MainDrawerActivity.latLng != null && latLng != null) {
+            if (MainDrawerActivity.latLng != null) {
                 if (Build.VERSION.SDK_INT >= 21) {
                     bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
                 } else {
@@ -578,7 +439,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                         .width(5).color(Color.BLUE)
                         .geodesic(true)
                         .clickable(true));*/
-
                 String url = obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
                 DownloadTask downloadTask = new DownloadTask();
                 downloadTask.execute(url);
@@ -589,6 +449,64 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        vectorDrawable.draw(canvas);
+        return bitmap;
+    }
+
+    public void controlTimer(int min) {
+        countTimer = new CountDownTimer(min * 1000 + 100, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String contador = "" + String.format(FORMAT,
+                        TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
+                        TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
+                                TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
+                        TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(
+                                TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)));
+
+                tvContador.setText(contador);
+                // updateTimer((int) millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                tvContador.setText(getString(R.string.cero));
+                btn_cancelar.setEnabled(false);
+                btn_cancelar.setAlpha(0.7f);
+                resetTimer();
+            }
+        }.start();
+    }
+
+    public void resetTimer() {
+        tvContador.setText(getString(R.string.cero));
+
+        countTimer.cancel();
+    }
+
+    private String obtenerDireccionesURL(LatLng origin, LatLng dest) {
+
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        String sensor = "sensor=false";
+
+        String parameters = "units=metric&mode=walking&" + str_origin + "&" + str_dest + "&" + sensor;
+
+        String output = "json";
+
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+        return url;
+    }
+
     public void cancel() {
         ReminderUtilities.sInitialized = false;
         btn_cancelar.setAlpha(0.7f);
@@ -596,7 +514,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         PreferenceUtilities.changeStatusButtonCancel(getContext(), false);
         PreferenceUtilities.savePreferencesFinalHour(getContext(), getResources().getString(R.string.horaCero));
         //    PreferenceUtilities.savePreferenceHourIni(this,getResources().getString(R.string.horaCero));
-        tidHoraVence.setText(getResources().getString(R.string.horaCero));
+        tidHoraVence.setText(getResources().getString(R.string.ceroMinutes));
         if (countTimer != null && mMap != null) {
             countTimer.cancel();
             mMap.clear();
@@ -606,4 +524,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         tvDatos.setText("");
 
     }
+
+    TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (s.length() > 0) {
+                btn_inicio.setEnabled(true);
+                btn_inicio.setAlpha(1);
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
+
 }

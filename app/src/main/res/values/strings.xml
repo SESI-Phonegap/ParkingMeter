@@ -7,9 +7,11 @@
     <string name="fechaDefault">12/04/2017</string>
     <string name="horaDefault">13:00</string>
     <string name="horaCero">00:00</string>
+    <string name="ceroMinutes"></string>
     <string name="horadepago">Hora actual</string>
     <string name="vence">Vence:</string>
     <string name="Horavencimiento">Hora</string>
+    <string name="minutes">Minutos</string>
     <string name="iniciar">Iniciar</string>
     <string name="cancelar">Cancelar</string>
     <string name="gasto">Gasto</string>
@@ -28,9 +30,11 @@
 
     <!-- Menu Navigation Drawer-->
     <string name="home">Inicio</string>
+    <string name="parking1">Tipo 1</string>
+    <string name="parking2">Tipo 2</string>
     <string name="alarma">Alarma</string>
     <string name="findCar">Encontrar Carro</string>
-    <string name="report">Reportes</string>
+    <string name="compartir">Compartir</string>
 
 
     <!-- Notification -->
@@ -51,6 +55,8 @@
     <string name="banner_ad_unit_id">ca-app-pub-2449148181464779~1658655246</string>
     <string name="banner_intersticial">ca-app-pub-2449148181464779/7425987245</string>
     <string name="banner">ca-app-pub-2449148181464779/5005414441</string>
+    <string name="banner_2">ca-app-pub-2449148181464779/3117735242</string>
+    <string name="banner_intersticial_2">ca-app-pub-2449148181464779/7547934849</string>
 
 
 </resources>

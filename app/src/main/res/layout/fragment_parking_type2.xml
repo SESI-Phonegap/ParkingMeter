@@ -3,37 +3,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.HomeFragment">
+    tools:context=".fragments.ParkingType2Fragment">
 
     <RelativeLayout
-        android:id="@+id/relativeMain"
+        android:id="@+id/relativeMainType2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
 
 
-            <RelativeLayout
-                android:id="@+id/relativeContentCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <RelativeLayout
+            android:id="@+id/relativeContentCountType2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/contador"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:text="@string/cero"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/ContadorSize"
-                    android:textStyle="normal" />
+            <TextView
+                android:id="@+id/contadorType2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="@string/cero"
+                android:textAlignment="center"
+                android:textSize="@dimen/ContadorSize"
+                android:textStyle="normal" />
 
-            </RelativeLayout>
+        </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/relativeDetails"
+            android:id="@+id/relativeDetailsType2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/relativeContentCount">
+            android:layout_below="@+id/relativeContentCountType2">
 
             <View
                 android:layout_width="match_parent"
@@ -41,7 +41,7 @@
                 android:background="@android:color/darker_gray"/>
 
             <android.support.v7.widget.SwitchCompat
-                android:id="@+id/switchLocation"
+                android:id="@+id/switchLocationType2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/marginStartEnd"
@@ -51,18 +51,18 @@
                 android:layout_marginTop="10dp"/>
 
             <Button
-                android:id="@+id/btnInicio"
+                android:id="@+id/btnInicioType2"
                 style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@+id/btnCancelar"
+                android:layout_toStartOf="@+id/btnCancelarType2"
                 android:text="@string/iniciar"
                 android:textSize="@dimen/subtitle"
                 android:textStyle="bold"
-                android:layout_below="@id/switchLocation"/>
+                android:layout_below="@id/switchLocationType2"/>
 
             <Button
-                android:id="@+id/btnCancelar"
+                android:id="@+id/btnCancelarType2"
                 style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,23 +70,21 @@
                 android:text="@string/cancelar"
                 android:textSize="@dimen/subtitle"
                 android:textStyle="bold"
-                android:layout_below="@id/switchLocation"/>
+                android:layout_below="@id/switchLocationType2"/>
 
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/textInputLayoutHoraVence"
+                android:id="@+id/textInputLayoutHoraVenceType2"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/Horavencimiento"
-                android:layout_below="@id/switchLocation">
+                android:hint="@string/minutes"
+                android:layout_below="@id/switchLocationType2">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/textInputEditTextHoraVence"
+                    android:id="@+id/textInputEditTextHoraVenceType2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/subtitle"
-                    android:focusable="false"
-                    android:inputType="text" />
+                    android:inputType="number" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -94,31 +92,31 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/relativeMap"
-            android:layout_below="@id/relativeDetails"
+            android:id="@+id/relativeMapType2"
+            android:layout_below="@id/relativeDetailsType2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/map"
+                android:id="@+id/mapType2"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context="com.sesi.chris.googlemapslocation.MapsActivity" />
 
             <com.google.android.gms.ads.AdView
-                android:id="@+id/adView"
+                android:id="@+id/adViewType2"
                 xmlns:ads="http://schemas.android.com/apk/res-auto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 ads:adSize="BANNER"
-                ads:adUnitId = "@string/banner"
-                android:layout_above="@+id/relativeDatos"
+                ads:adUnitId = "@string/banner_2"
+                android:layout_above="@+id/relativeDatosType2"
                 android:layout_alignParentStart="true" />
 
             <RelativeLayout
-                android:id="@+id/relativeDatos"
+                android:id="@+id/relativeDatosType2"
                 android:layout_alignParentBottom="true"
                 android:layout_marginBottom="@dimen/marginTop"
                 android:layout_marginStart="@dimen/marginStartEnd"
@@ -130,7 +128,7 @@
                 <TextView
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
-                    android:id="@+id/tvDatos"
+                    android:id="@+id/tvDatosType2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Distancia"
@@ -142,17 +140,7 @@
 
         </RelativeLayout>
 
-
     </RelativeLayout>
 
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_barcode_scan_white_24dp" />
 
 </FrameLayout>

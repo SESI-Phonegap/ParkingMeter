@@ -3,9 +3,13 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/home"
-            android:title="@string/home" />
+            android:id="@+id/nav_parking1"
+            android:icon="@drawable/nav_parking_1"
+            android:title="@string/parking1" />
+        <item
+            android:id="@+id/nav_parking2"
+            android:icon="@drawable/nav_parking_2"
+            android:title="@string/parking2" />
         <item
             android:id="@+id/nav_alarm"
             android:icon="@drawable/alarm_black"
@@ -14,10 +18,6 @@
             android:id="@+id/nav_findcar"
             android:icon="@drawable/map_marker_radius"
             android:title="@string/findCar" />
-        <item
-            android:id="@+id/nav_report"
-            android:icon="@drawable/note_text"
-            android:title="@string/report" />
 
     </group>
 
@@ -26,11 +26,8 @@
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="@string/compartir" />
+
         </menu>
     </item>
 

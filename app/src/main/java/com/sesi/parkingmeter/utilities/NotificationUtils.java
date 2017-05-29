@@ -62,6 +62,7 @@ public class NotificationUtils {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID,notificationBuilder.build());
 
+        ReminderUtilities.dispatcher.cancelAll();
 
     }
 

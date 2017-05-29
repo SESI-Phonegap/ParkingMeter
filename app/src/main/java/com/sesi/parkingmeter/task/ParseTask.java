@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.MapFragment;
+import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.DirectionsJSONParser;
 
 import org.json.JSONObject;
@@ -70,9 +71,18 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
             lineOptions.color(Color.rgb(0,0,255));
         }
         if(lineOptions!=null) {
-            HomeFragment.mMap.addPolyline(lineOptions);
-            HomeFragment.tvDetails.setText(DirectionsJSONParser.sDistance);
-            HomeFragment.tvDetails.append(DirectionsJSONParser.sDuration);
+            if (null != HomeFragment.mMap && null != HomeFragment.tvDetails && null != HomeFragment.tvDetails) {
+                HomeFragment.mMap.addPolyline(lineOptions);
+                HomeFragment.tvDetails.setText(DirectionsJSONParser.sDistance);
+                HomeFragment.tvDetails.append(DirectionsJSONParser.sDuration);
+            }
+
+            if (null != ParkingType2Fragment.mMap && null != ParkingType2Fragment.tvDetails && null != ParkingType2Fragment.tvDetails) {
+                ParkingType2Fragment.mMap.addPolyline(lineOptions);
+                ParkingType2Fragment.tvDetails.setText(DirectionsJSONParser.sDistance);
+                ParkingType2Fragment.tvDetails.append(DirectionsJSONParser.sDuration);
+            }
+
         }
     }
 }

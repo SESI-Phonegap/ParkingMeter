@@ -31,6 +31,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.jobdispatcher.Driver;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -39,7 +42,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.MapFragment;
+import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
+import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
 
 public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -53,8 +58,6 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     private int iPreferenceMin;
     public final static int PERMISION_LOCATION = 1002;
     public static LatLng latLng;
-
-
 
 
     @Override
@@ -134,8 +137,11 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.nav_home:
+            case R.id.nav_parking1:
                 changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
+                break;
+            case R.id.nav_parking2:
+                changeFragment(ParkingType2Fragment.newInstance(), R.id.mainFrame, false, false);
                 break;
             case R.id.nav_alarm:
                 createDialogConfigAlarm();
@@ -164,7 +170,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         if (backStack) {
             transaction.addToBackStack(null);
         }
-        transaction.setCustomAnimations(R.anim.enter_from_right,R.anim.enter_from_left);
+        transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.enter_from_left);
         //transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         transaction.commit();
     }
@@ -240,11 +246,16 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Location location = new Location(LocationManager.GPS_PROVIDER);
                     latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    Log.d("AAA-MAIN","Latitud: "+latLng.latitude +" Long: "+latLng.longitude);
-                }else {
-                    Toast.makeText(this,getResources().getString(R.string.msgPermissionDeniedLocation),Toast.LENGTH_LONG).show();
+                    Log.d("AAA-MAIN", "Latitud: " + latLng.latitude + " Long: " + latLng.longitude);
+                } else {
+                    Toast.makeText(this, getResources().getString(R.string.msgPermissionDeniedLocation), Toast.LENGTH_LONG).show();
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
