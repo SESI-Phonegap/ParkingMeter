@@ -1,13 +1,16 @@
 package com.sesi.parkingmeter;
 
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -46,6 +49,11 @@ import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -108,27 +116,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_drawer, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -149,6 +137,10 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
             case R.id.nav_findcar:
                 changeFragment(MapFragment.newInstance(), R.id.mainFrame, false, false);
+                break;
+
+            case R.id.nav_share:
+                sharedSocial();
                 break;
         }
 
@@ -257,5 +249,56 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    public void sharedSocial(){
+        List<Intent> targetShareIntents = new ArrayList<>();
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        PackageManager pm = getApplicationContext().getPackageManager();
+        List<ResolveInfo> resInfos = pm.queryIntentActivities(shareIntent, 0);
+        if (!resInfos.isEmpty()) {
+            System.out.println("Have package");
+            for (ResolveInfo resInfo : resInfos) {
+                String packageName = resInfo.activityInfo.packageName;
+                Log.i("Package Name", packageName);
+
+/*         if (packageName.contains("com.twitter.android") || packageName.contains("com.facebook.katana")
+                 || packageName.contains("com.whatsapp") || packageName.contains("com.google.android.apps.plus")
+                 || packageName.contains("com.google.android.talk") || packageName.contains("com.slack")
+                 || packageName.contains("com.google.android.gm") || packageName.contains("com.facebook.orca")
+                 || packageName.contains("com.yahoo.mobile") || packageName.contains("com.skype.raider")
+                 || packageName.contains("com.android.mms")|| packageName.contains("com.linkedin.android")
+                 || packageName.contains("com.google.android.apps.messaging")) {*/
+                if (packageName.contains("com.twitter.android") || packageName.contains("com.facebook.katana")
+                        || packageName.contains("com.whatsapp")
+                        || packageName.contains("com.google.android.apps.plus")) {
+                    Intent intent = new Intent();
+
+                    intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
+                    intent.putExtra("AppName", resInfo.loadLabel(pm).toString());
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, "URL de la APP");
+                    intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.compartir));
+                    intent.setPackage(packageName);
+                    targetShareIntents.add(intent);
+                }
+            }
+            if (!targetShareIntents.isEmpty()) {
+                Collections.sort(targetShareIntents, new Comparator<Intent>() {
+                    @Override
+                    public int compare(Intent o1, Intent o2) {
+                        return o1.getStringExtra("AppName").compareTo(o2.getStringExtra("AppName"));
+                    }
+                });
+                Intent chooserIntent = Intent.createChooser(targetShareIntents.remove(0), "Select app to share");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetShareIntents.toArray(new Parcelable[]{}));
+                startActivity(chooserIntent);
+            } else {
+                Toast.makeText(getApplicationContext(), "No app to share.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

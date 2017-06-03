@@ -201,6 +201,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
         tvDatos = (TextView) getActivity().findViewById(R.id.tvDatos);
         cancel();
+        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatos);
 
     }
 
@@ -382,7 +383,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatos);
+
         tvDetails = (TextView) getActivity().findViewById(R.id.tvDatos);
         mMap = googleMap;
 
@@ -445,12 +446,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
             @Override
             public void onCameraMoveStarted(int i) {
-                AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-                alphaAnimation.setDuration(500);
-                alphaAnimation.setRepeatMode(1);
-                relativeLayoutDatos.startAnimation(alphaAnimation);
-                relativeLayoutDatos.animate().translationY(280).setDuration(600).start();
-                // relativeLayoutDatos.setAlpha(0);
+                if (relativeLayoutDatos.getVisibility() == View.VISIBLE) {
+                    AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+                    alphaAnimation.setDuration(500);
+                    alphaAnimation.setRepeatMode(1);
+                    relativeLayoutDatos.startAnimation(alphaAnimation);
+                    relativeLayoutDatos.animate().translationY(280).setDuration(600).start();
+                    // relativeLayoutDatos.setAlpha(0);
+                }
             }
         });
 
@@ -464,11 +467,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-                AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-                alphaAnimation.setDuration(1100);
-                alphaAnimation.setRepeatMode(1);
-                relativeLayoutDatos.startAnimation(alphaAnimation);
-                relativeLayoutDatos.animate().translationY(0).setDuration(600).start();
+                if (relativeLayoutDatos.getVisibility() == View.VISIBLE) {
+                    AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+                    alphaAnimation.setDuration(1100);
+                    alphaAnimation.setRepeatMode(1);
+                    relativeLayoutDatos.startAnimation(alphaAnimation);
+                    relativeLayoutDatos.animate().translationY(0).setDuration(600).start();
+                }
             }
         });
 
@@ -568,6 +573,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 } else {
                     bitmapCar = BitmapFactory.decodeResource(getResources(), R.drawable.sedan_car_front);
                 }
+                relativeLayoutDatos.setVisibility(View.VISIBLE);
                 mMap.addMarker(new MarkerOptions()
                         .position(MainDrawerActivity.latLng)
                         .title("Mi Auto")
