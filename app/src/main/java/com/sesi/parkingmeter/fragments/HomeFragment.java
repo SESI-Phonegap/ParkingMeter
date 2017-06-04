@@ -252,6 +252,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     btn_cancelar.setEnabled(true);
                     btn_cancelar.setAlpha(1.0f);
                     PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
+                    tidHoraVence.setEnabled(false);
+                    tidHoraVence.setAlpha(0.7f);
                   /*  } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
                     }*/
@@ -270,6 +272,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 cancel();
                 if (ReminderUtilities.dispatcher != null) {
                     ReminderUtilities.dispatcher.cancelAll();
+                    tidHoraVence.setEnabled(true);
+                    tidHoraVence.setAlpha(1);
                 }
                 break;
 

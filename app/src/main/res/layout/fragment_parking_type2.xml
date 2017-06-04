@@ -84,7 +84,8 @@
                     android:id="@+id/textInputEditTextHoraVenceType2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number" />
+                    android:inputType="number"
+                    android:textSize="@dimen/sizeTextSwitch"/>
 
             </android.support.design.widget.TextInputLayout>
 

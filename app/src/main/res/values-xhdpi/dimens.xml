@@ -2,7 +2,7 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="ContadorSize">60sp</dimen>
-    <dimen name="subtitle">15sp</dimen>
+    <dimen name="subtitle">18sp</dimen>
     <dimen name="size_hora_vence">30sp</dimen>
     <dimen name="size_title_manual">20sp</dimen>
     <dimen name="marginStartEnd">20dp</dimen>
@@ -14,6 +14,7 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="heightDetails">40dp</dimen>
+    <dimen name="sizeTextSwitch">18sp</dimen>
 
 
     <!-- Dialog Alarm -->

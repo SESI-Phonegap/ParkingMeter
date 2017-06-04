@@ -3,4 +3,5 @@
     <dimen name="ContadorSize">40sp</dimen>
     <dimen name="subtitle">12sp</dimen>
     <dimen name="heightDetails">30dp</dimen>
+    <dimen name="sizeTextSwitch">12sp</dimen>
 </resources>
