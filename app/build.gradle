@@ -5,6 +5,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
         applicationId "com.sesi.parkingmeter"
         minSdkVersion 18
         targetSdkVersion 25
