@@ -163,12 +163,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                         } else {
 
                             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-                            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            // MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            MainDrawerActivity.latLng = new LatLng(19.462299, -99.212428);
-                            Log.d("AAA-NOT-NULL", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
-                            addMarkers();
+                            if (isGPSEnabled) {
+                                Location location = locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,);
+                                MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                //   MainDrawerActivity.latLng = new LatLng(19.462299, -99.212428);
+                                Log.d("AAA-NOT-NULL", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
+                                addMarkers();
+                            } else {
+                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                getActivity().startActivity(callGPSSettingIntent);
+                            }
                         }
 
                     }
