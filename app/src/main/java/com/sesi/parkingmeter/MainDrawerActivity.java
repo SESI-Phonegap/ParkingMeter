@@ -1,6 +1,5 @@
 package com.sesi.parkingmeter;
 
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +7,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -27,38 +25,31 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.jobdispatcher.Driver;
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
-import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
-import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.MapFragment;
 import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
-import com.sesi.parkingmeter.utilities.Utils;
+import com.sesi.parkingmeter.utilities.UtilGPS;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+
 public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    private DrawerLayout drawer;
     private LayoutInflater inflater;
     private AlertDialog dialog;
     private Builder builder;
@@ -66,7 +57,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     private int iPreferenceMin;
     public final static int PERMISION_LOCATION = 1002;
     public static LatLng latLng;
-
+    public static UtilGPS sTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +65,19 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         setContentView(R.layout.activity_main_drawer);
 
         MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
-        final String sTime = this.getIntent().getStringExtra("time");
         init();
 
 
     }
 
     public void init() {
+        sTracker = new UtilGPS(this);
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
+        } else {
+            startTracker();
+        }
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -88,7 +85,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         setSupportActionBar(toolbar);
 
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -233,12 +230,9 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-
             case PERMISION_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Location location = new Location(LocationManager.GPS_PROVIDER);
-                    latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    Log.d("AAA-MAIN", "Latitud: " + latLng.latitude + " Long: " + latLng.longitude);
+                   startTracker();
                 } else {
                     Toast.makeText(this, getResources().getString(R.string.msgPermissionDeniedLocation), Toast.LENGTH_LONG).show();
                 }
@@ -248,7 +242,11 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
     @Override
     protected void onDestroy() {
+        if (ReminderUtilities.dispatcher != null) {
+            ReminderUtilities.dispatcher.cancelAll();
+        }
         super.onDestroy();
+
     }
 
     public void sharedSocial(){
@@ -301,4 +299,62 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             }
         }
     }
+
+    /*********************************************
+     * LOCATION OPERATIONS - GPS TRACKING
+     ********************************************/
+
+    /**
+     * Start location tracker
+     */
+    public static void startTracker() {
+        try {
+            if (sTracker != null) {
+                sTracker.startTracking();
+            }
+        } catch (Exception ex) {
+            Log.d("STARTGPS-- ", ex.getMessage());
+        }
+    }
+
+    /**
+     * Stop location tracker
+     */
+    public static void stopTracking() {
+        try {
+            if (sTracker != null) {
+                sTracker.stopUsingGPS();
+            }
+        } catch (Exception ex) {
+            Log.d("STOPGPS--: ", ex.getMessage());
+        }
+
+    }
+
+    /**
+     * Check if possible get the location user
+     *
+     * @return
+     */
+    public static boolean canGetLocation() {
+        try {
+            return (sTracker != null && sTracker.canGetLocation());
+        } catch (Exception e) {
+            Log.e("GETLOCATION--: ", e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Gets the location user
+     *
+     * @return
+     */
+    public static Location getLocation() {
+        if (sTracker != null)
+            return sTracker.getCurrentLocation();
+        else
+            return null;
+    }
+
 }

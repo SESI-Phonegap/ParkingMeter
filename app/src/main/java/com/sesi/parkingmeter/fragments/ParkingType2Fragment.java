@@ -71,7 +71,6 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
     public final static int PERMISION_LOCATION = 1002;
     private static final String FORMAT = "%02d:%02d:%02d";
     public static GoogleMap mMap;
-    private LocationManager locationManager;
     private LocationListener locationListener;
     private Location location;
     private Button btn_inicio, btn_cancelar;
@@ -161,14 +160,17 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                         if (MainDrawerActivity.latLng != null) {
                             Log.d("AAA-", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
                         } else {
-
-                            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-                            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            // MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            MainDrawerActivity.latLng = new LatLng(19.462299, -99.212428);
-                            Log.d("AAA-NOT-NULL", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
-                            addMarkers();
+                            if (MainDrawerActivity.canGetLocation()) {
+                                Location location = MainDrawerActivity.getLocation();
+                                if (location != null) {
+                                    MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                    addMarkers();
+                                }
+                            } else {
+                                Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
+                                /*Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                getActivity().startActivity(callGPSSettingIntent);*/
+                            }
                         }
 
                     }
@@ -235,7 +237,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                     Log.d("AAA-", "" + iMinAlarm);
                     int calMin = min_vence - iMinAlarm;
                     Log.d("AAA-cal-min", "" + calMin);
-                    if (calMin >= 0) {
+                    if (calMin >= TIME_LIMIT) {
                         int secondsStartCount = (int) (TimeUnit.MINUTES.toSeconds(min_vence));
                         int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
                         controlTimer(secondsStartCount);
@@ -244,19 +246,21 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                         btn_inicio.setAlpha(0.7f);
                         btn_cancelar.setEnabled(true);
                         btn_cancelar.setAlpha(1.0f);
+                        switchLocation.setEnabled(false);
                         PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
+
+                        if (mInterstitialAd.isLoaded()) {
+                            mInterstitialAd.show();
+                        } else {
+                            Log.d("TAG", "The interstitial wasn't loaded yet.");
+                        }
+
                     } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
                 }
-                if (mInterstitialAd.isLoaded()) {
-                    mInterstitialAd.show();
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                }
-
                 break;
 
             case R.id.btnCancelarType2:
@@ -362,7 +366,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         });
 
 
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        //locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
 
         locationListener = new LocationListener() {
@@ -401,7 +405,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISION_LOCATION);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+           // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             mMap.clear();
 
 
@@ -410,7 +414,8 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
             } else {
                 bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
             }
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+           // location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            location = MainDrawerActivity.getLocation();
 
             if (location != null) {
                 latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -522,6 +527,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         tvContador.setText(getString(R.string.cero));
         switchLocation.setChecked(false);
         tvDatos.setText("");
+        switchLocation.setEnabled(true);
 
     }
 

@@ -28,26 +28,26 @@ public class CameraReaderActivity extends AppCompatActivity implements SurfaceHo
     private CameraSource cameraSource;
     public final static int PERMISION_CAMERA = 1001;
     private final String SCANING_REGEX = "[0-9]{2}\\:[0-9]{2}";
+    private SurfaceView surfaceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_reader);
-
-        this.setCameraView((SurfaceView) findViewById(R.id.surface_view));
+        surfaceView = (SurfaceView) findViewById(R.id.surface_view);
 
         final TextRecognizer textRecognizer = new TextRecognizer.Builder(this.getApplicationContext()).build();
         if (!textRecognizer.isOperational()) {
             Log.w("MainActivity", "Detector dependencies are not yet available");
         } else {
 
-            this.setCameraSource(new CameraSource.Builder(getApplicationContext(), textRecognizer)
+            this.setCameraSource(new CameraSource.Builder(getApplication(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(1280, 1024)
                     .setRequestedFps(2.0f)
                     .setAutoFocusEnabled(true)
                     .build());
-
+            this.setCameraView(surfaceView);
             this.getCameraView().getHolder().addCallback(this);
             textRecognizer.setProcessor(this);
         }
@@ -78,10 +78,15 @@ public class CameraReaderActivity extends AppCompatActivity implements SurfaceHo
                         new String[]{Manifest.permission.CAMERA},
                         PERMISION_CAMERA);
                 return;
+            } else {
+                this.getCameraSource().start(this.getCameraView().getHolder());
             }
-            this.getCameraSource().start(this.getCameraView().getHolder());
         } catch (final IOException e) {
-            e.printStackTrace();
+            Log.d("CAMERA-", e.getMessage());
+        } catch (RuntimeException ex){
+            Log.d("CAMERA-RUN-",ex.getMessage());
+            Log.d("CAMERA-RUN-",ex.toString());
+            Log.d("CAMERA-RUN-",ex.getLocalizedMessage());
         }
     }
 
@@ -92,7 +97,7 @@ public class CameraReaderActivity extends AppCompatActivity implements SurfaceHo
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        Log.d("SUFACE-DESTROYED","Se destruyo");
     }
 
     @Override
@@ -108,6 +113,7 @@ public class CameraReaderActivity extends AppCompatActivity implements SurfaceHo
                 final TextBlock item = items.valueAt(i);
                 if (null != item && item.getValue().matches("[0-9]{2}\\:[0-9]{2}")) {
                     Log.e("Matches", "Text matches with REGEX " + item.getValue());
+                    this.getCameraSource().stop();
                     final Intent returnIntent = new Intent();
                     returnIntent.putExtra("time", item.getValue());
                     this.setResult(Activity.RESULT_OK, returnIntent);

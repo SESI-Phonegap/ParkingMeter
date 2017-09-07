@@ -18,6 +18,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
@@ -75,7 +76,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private CountDownTimer countTimer;
     private static final String FORMAT = "%02d:%02d:%02d";
     public static GoogleMap mMap;
-    private LocationManager locationManager;
+ //   private LocationManager locationManager;
     private LocationListener locationListener;
     public final static int PERMISION_LOCATION = 1002;
     private LatLng latLng;
@@ -159,25 +160,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                                 PERMISION_LOCATION);
                     } else {
                         if (MainDrawerActivity.latLng != null) {
-                            Log.d("AAA-", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
+
                         } else {
-
-                            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                            boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-                            if (isGPSEnabled) {
-                                Location location = locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,);
-                                MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                //   MainDrawerActivity.latLng = new LatLng(19.462299, -99.212428);
-                                Log.d("AAA-NOT-NULL", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
-                                addMarkers();
+                            if (MainDrawerActivity.canGetLocation()) {
+                                Location location = MainDrawerActivity.getLocation();
+                                if (location != null) {
+                                    MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                    addMarkers();
+                                }
                             } else {
-                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                getActivity().startActivity(callGPSSettingIntent);
+                                Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
+                                /*Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                getActivity().startActivity(callGPSSettingIntent);*/
                             }
                         }
-
                     }
+
                 }
             }
         });
@@ -247,31 +245,37 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     int iMinAlarm = PreferenceUtilities.getPreferenceDefaultMinHour(getContext());
                     Log.d("AAA-", "" + iMinAlarm);
                     int calMin = (min_vence - min_inicial) - iMinAlarm;
+                    int timerMin = (min_vence - min_inicial);
                     Log.d("AAA-cal-min", "" + calMin);
-                    //  if (calMin >= TIME_LIMIT) {
-                    int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
-                    //   updateTimer(secondsStart);
-                    controlTimer(secondsStart);
-                    ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
-                    btn_inicio.setEnabled(false);
-                    btn_inicio.setAlpha(0.7f);
-                    btn_cancelar.setEnabled(true);
-                    btn_cancelar.setAlpha(1.0f);
-                    PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
-                    tidHoraVence.setEnabled(false);
-                    tidHoraVence.setAlpha(0.7f);
-                  /*  } else {
+                    if (calMin >= TIME_LIMIT) {
+
+                        //Segundos para lanzar la alerta
+                        int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
+                        //Segundos para Contador
+                        int secondsContador = (int) (TimeUnit.MINUTES.toSeconds(timerMin));
+                        controlTimer(secondsContador);
+                        ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
+                        btn_inicio.setEnabled(false);
+                        btn_inicio.setAlpha(0.7f);
+                        btn_cancelar.setEnabled(true);
+                        btn_cancelar.setAlpha(1.0f);
+                        PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
+                        tidHoraVence.setEnabled(false);
+                        tidHoraVence.setAlpha(0.7f);
+                        switchLocation.setEnabled(false);
+
+                        if (mInterstitialAd.isLoaded()) {
+                            mInterstitialAd.show();
+                        } else {
+                            Log.d("TAG", "The interstitial wasn't loaded yet.");
+                        }
+
+                    } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
-                    }*/
+                    }
                 } else {
                     Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
                 }
-                if (mInterstitialAd.isLoaded()) {
-                    mInterstitialAd.show();
-                } else {
-                    Log.d("TAG", "The interstitial wasn't loaded yet.");
-                }
-
                 break;
 
             case R.id.btnCancelar:
@@ -288,7 +292,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 break;
 
             case R.id.fab:
-                final Intent cameraActivity = new Intent(this.getContext(), CameraReaderActivity.class);
+                final Intent cameraActivity = new Intent(getContext(), CameraReaderActivity.class);
                 startActivityForResult(cameraActivity, 9999);
                 break;
         }
@@ -488,7 +492,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         });
 
 
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        //locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
 
         locationListener = new LocationListener() {
@@ -555,7 +559,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISION_LOCATION);
         } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
             mMap.clear();
 
 
@@ -564,7 +568,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
             } else {
                 bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
             }
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            location = MainDrawerActivity.getLocation();
 
             if (location != null) {
                 latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -620,6 +624,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         tvContador.setText(getString(R.string.cero));
         switchLocation.setChecked(false);
         tvDatos.setText("");
+        MainDrawerActivity.latLng = null;
 
     }
 }

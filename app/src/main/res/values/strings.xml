@@ -16,7 +16,7 @@
     <string name="cancelar">Cancelar</string>
     <string name="gasto">Gasto</string>
     <string name="manualmente">Introduce los datos manualmente</string>
-    <string name="msgLimiteTiempo">El tiempo es menor al limite de tiempo de la alarma</string>
+    <string name="msgLimiteTiempo">El tiempo es menor al limite de tiempo de 10 Min.</string>
     <string name="msgHoraVencMenor">La hora de vencimiento no puede ser igual o menor a la hora de actual</string>
     <string name="msgPermissionDeniedLocation">Necesita dar permisos de Localizacion</string>
     <string name="switchOn">On</string>
