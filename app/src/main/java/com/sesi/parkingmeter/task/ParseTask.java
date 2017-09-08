@@ -8,7 +8,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sesi.parkingmeter.fragments.HomeFragment;
-import com.sesi.parkingmeter.fragments.MapFragment;
 import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.DirectionsJSONParser;
 

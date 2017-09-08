@@ -14,10 +14,6 @@
             android:id="@+id/nav_alarm"
             android:icon="@drawable/alarm_black"
             android:title="@string/alarma" />
-        <item
-            android:id="@+id/nav_findcar"
-            android:icon="@drawable/map_marker_radius"
-            android:title="@string/findCar" />
 
     </group>
 

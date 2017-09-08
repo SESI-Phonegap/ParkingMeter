@@ -1,9 +1,6 @@
 package com.sesi.parkingmeter.utilities;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
-import com.sesi.parkingmeter.fragments.MapFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
