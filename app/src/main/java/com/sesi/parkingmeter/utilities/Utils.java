@@ -1,23 +1,9 @@
 package com.sesi.parkingmeter.utilities;
 
-
-import android.Manifest;
-import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Camera;
 import android.graphics.Typeface;
-import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.widget.TextView;
-
-import com.sesi.parkingmeter.activities.CameraReaderActivity;
-
-import java.io.IOException;
 import java.util.Calendar;
 
 /**

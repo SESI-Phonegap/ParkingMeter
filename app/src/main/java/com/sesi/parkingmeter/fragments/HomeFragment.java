@@ -43,6 +43,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,8 +53,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
-import com.sesi.parkingmeter.activities.CameraReaderActivity;
 import com.sesi.parkingmeter.task.DownloadTask;
+import com.sesi.parkingmeter.ui.camera.vision.OcrCaptureActivity;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
@@ -76,7 +77,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private CountDownTimer countTimer;
     private static final String FORMAT = "%02d:%02d:%02d";
     public static GoogleMap mMap;
- //   private LocationManager locationManager;
+    //   private LocationManager locationManager;
     private LocationListener locationListener;
     public final static int PERMISION_LOCATION = 1002;
     private LatLng latLng;
@@ -90,7 +91,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private TextView tvDatos;
     private Bitmap bitmapUser;
     private Bitmap bitmapCar;
-
+    private static final int RC_OCR_CAPTURE = 9003;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -292,8 +293,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 break;
 
             case R.id.fab:
-                final Intent cameraActivity = new Intent(getContext(), CameraReaderActivity.class);
-                startActivityForResult(cameraActivity, 9999);
+                Intent cameraActivity = new Intent(getContext(), OcrCaptureActivity.class);
+                cameraActivity.putExtra(OcrCaptureActivity.AutoFocus, true);
+                cameraActivity.putExtra(OcrCaptureActivity.UseFlash, false);
+                startActivityForResult(cameraActivity, RC_OCR_CAPTURE);
                 break;
         }
 
@@ -354,12 +357,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            final String sData = data.getStringExtra("time");
-            Toast.makeText(this.getContext(), sData, Toast.LENGTH_LONG).show();
-            btn_inicio.setEnabled(true);
-            btn_inicio.setAlpha(1);
+        if (requestCode == RC_OCR_CAPTURE) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+                    final String sData = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
+                    Toast.makeText(this.getContext(), sData, Toast.LENGTH_LONG).show();
+                    Log.d("TEXT-HORA-",sData);
+                    btn_inicio.setEnabled(true);
+                    btn_inicio.setAlpha(1);
+                }
+            } else {
+                Toast.makeText(getActivity(),"No se puede leer el ticket.",Toast.LENGTH_LONG).show();
+
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
