@@ -1,4 +1,9 @@
 <resources>
+
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
     <!-- Main Content -->
     <string name="app_name">ParkingMeter</string>
     <string name="action_settings">Settings</string>
@@ -57,7 +62,6 @@
     <string name="banner">ca-app-pub-2449148181464779/5005414441</string>
     <string name="banner_2">ca-app-pub-2449148181464779/3117735242</string>
     <string name="banner_intersticial_2">ca-app-pub-2449148181464779/7547934849</string>
-
 
 
 </resources>

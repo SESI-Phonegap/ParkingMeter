@@ -34,7 +34,6 @@ import android.widget.Toast;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.fragments.HomeFragment;
-import com.sesi.parkingmeter.fragments.MapFragment;
 import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
@@ -130,10 +129,6 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
                 break;
             case R.id.nav_alarm:
                 createDialogConfigAlarm();
-                break;
-
-            case R.id.nav_findcar:
-                changeFragment(MapFragment.newInstance(), R.id.mainFrame, false, false);
                 break;
 
             case R.id.nav_share:
