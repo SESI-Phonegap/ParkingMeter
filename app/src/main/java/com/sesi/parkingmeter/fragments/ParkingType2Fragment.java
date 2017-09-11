@@ -155,7 +155,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                     if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(getActivity(),
                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                MapFragment.PERMISION_LOCATION);
+                                PERMISION_LOCATION);
                     } else {
                         if (MainDrawerActivity.latLng != null) {
                             Log.d("AAA-", "Latitud: " + MainDrawerActivity.latLng.latitude + " Long: " + MainDrawerActivity.latLng.longitude);
