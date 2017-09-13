@@ -248,6 +248,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     int calMin = (min_vence - min_inicial) - iMinAlarm;
                     int timerMin = (min_vence - min_inicial);
                     Log.d("AAA-cal-min", "" + calMin);
+                    Log.d("AAA-Mint",""+timerMin);
                     if (calMin >= TIME_LIMIT) {
 
                         //Segundos para lanzar la alerta
@@ -635,6 +636,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         }
         tvContador.setText(getString(R.string.cero));
         switchLocation.setChecked(false);
+        switchLocation.setEnabled(true);
         tvDatos.setText("");
         MainDrawerActivity.latLng = null;
 
