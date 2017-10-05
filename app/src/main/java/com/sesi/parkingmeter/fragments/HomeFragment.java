@@ -73,7 +73,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     private int minIni, minVence;
     private int min_inicial;
     private static final int TIME_LIMIT = 10;
-    private FloatingActionButton fab;
+   // private FloatingActionButton fab;
     private CountDownTimer countTimer;
     private static final String FORMAT = "%02d:%02d:%02d";
     public static GoogleMap mMap;
@@ -198,8 +198,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         tidHoraVence.setOnClickListener(this);
 
 
-        this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-        this.fab.setOnClickListener(this);
+       // this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+       // this.fab.setOnClickListener(this);
 
         relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetails);
         relativeMap = (RelativeLayout) getActivity().findViewById(R.id.relativeMap);
@@ -293,12 +293,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 showDialogHourVence();
                 break;
 
-            case R.id.fab:
+            /*case R.id.fab:
                 Intent cameraActivity = new Intent(getContext(), OcrCaptureActivity.class);
                 cameraActivity.putExtra(OcrCaptureActivity.AutoFocus, true);
                 cameraActivity.putExtra(OcrCaptureActivity.UseFlash, false);
                 startActivityForResult(cameraActivity, RC_OCR_CAPTURE);
-                break;
+                break; */
         }
 
     }
