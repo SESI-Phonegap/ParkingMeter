@@ -4,4 +4,6 @@
     <dimen name="subtitle">12sp</dimen>
     <dimen name="heightDetails">30dp</dimen>
     <dimen name="sizeTextSwitch">12sp</dimen>
+    <dimen name="sizeTitleSplash">25sp</dimen>
+    <dimen name="heightParkingLogo">120dp</dimen>
 </resources>

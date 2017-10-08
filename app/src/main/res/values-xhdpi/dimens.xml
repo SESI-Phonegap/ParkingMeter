@@ -15,6 +15,8 @@
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="heightDetails">40dp</dimen>
     <dimen name="sizeTextSwitch">18sp</dimen>
+    <dimen name="sizeTitleSplash">25sp</dimen>
+    <dimen name="heightParkingLogo">280dp</dimen>
 
 
     <!-- Dialog Alarm -->

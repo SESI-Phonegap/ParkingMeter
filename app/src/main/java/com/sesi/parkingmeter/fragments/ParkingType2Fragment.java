@@ -231,35 +231,39 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.btnInicioType2:
                 //  int min_inicial = Utils.convertActualHourToMinutes();
-                int min_vence = Integer.parseInt(tidHoraVence.getText().toString());
-                if (0 < min_vence) {
-                    int iMinAlarm = PreferenceUtilities.getPreferenceDefaultMinHour(getContext());
-                    Log.d("AAA-", "" + iMinAlarm);
-                    int calMin = min_vence - iMinAlarm;
-                    Log.d("AAA-cal-min", "" + calMin);
-                    if (calMin >= TIME_LIMIT) {
-                        int secondsStartCount = (int) (TimeUnit.MINUTES.toSeconds(min_vence));
-                        int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
-                        controlTimer(secondsStartCount);
-                        ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
-                        btn_inicio.setEnabled(false);
-                        btn_inicio.setAlpha(0.7f);
-                        btn_cancelar.setEnabled(true);
-                        btn_cancelar.setAlpha(1.0f);
-                        switchLocation.setEnabled(false);
-                        PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
+                if (!tidHoraVence.getText().toString().equals("")) {
+                    int min_vence = Integer.parseInt(tidHoraVence.getText().toString());
+                    if (0 < min_vence) {
+                        int iMinAlarm = PreferenceUtilities.getPreferenceDefaultMinHour(getContext());
+                        Log.d("AAA-", "" + iMinAlarm);
+                        int calMin = min_vence - iMinAlarm;
+                        Log.d("AAA-cal-min", "" + calMin);
+                        if (calMin >= TIME_LIMIT) {
+                            int secondsStartCount = (int) (TimeUnit.MINUTES.toSeconds(min_vence));
+                            int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
+                            controlTimer(secondsStartCount);
+                            ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
+                            btn_inicio.setEnabled(false);
+                            btn_inicio.setAlpha(0.7f);
+                            btn_cancelar.setEnabled(true);
+                            btn_cancelar.setAlpha(1.0f);
+                            switchLocation.setEnabled(false);
+                            PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
 
-                        if (mInterstitialAd.isLoaded()) {
-                            mInterstitialAd.show();
+                            if (mInterstitialAd.isLoaded()) {
+                                mInterstitialAd.show();
+                            } else {
+                                Log.d("TAG", "The interstitial wasn't loaded yet.");
+                            }
+
                         } else {
-                            Log.d("TAG", "The interstitial wasn't loaded yet.");
+                            Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
                         }
-
                     } else {
-                        Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(),getString(R.string.msg_falta_dato),Toast.LENGTH_LONG).show();
                 }
                 break;
 
