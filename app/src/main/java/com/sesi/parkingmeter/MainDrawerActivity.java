@@ -45,7 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainDrawerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
     private LayoutInflater inflater;

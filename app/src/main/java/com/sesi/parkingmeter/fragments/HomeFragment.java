@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
@@ -82,7 +83,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     public final static int PERMISION_LOCATION = 1002;
     private LatLng latLng;
     public static TextView tvDetails;
-    private RelativeLayout relativeLayoutDatos, relativeHora, relativeMap;
+    private RelativeLayout relativeLayoutDatos, relativeMap;
+    private ConstraintLayout relativeHora;
     private Location location;
     private boolean statusHour = false;
     private InterstitialAd mInterstitialAd;
@@ -201,7 +203,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
        // this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
        // this.fab.setOnClickListener(this);
 
-        relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetails);
+        relativeHora = (ConstraintLayout) getActivity().findViewById(R.id.relativeDetails);
         relativeMap = (RelativeLayout) getActivity().findViewById(R.id.relativeMap);
 
         tvDatos = (TextView) getActivity().findViewById(R.id.tvDatos);
@@ -417,55 +419,57 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (!statusHour) {
-                    relativeHora.animate().translationY(-450).alpha(0).setDuration(200).setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
+                if (getActivity().findViewById(R.id.tablet_view) == null) {
+                    if (!statusHour) {
+                        relativeHora.animate().translationY(-450).alpha(0).setDuration(200).setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            relativeHora.setVisibility(View.GONE);
-                        }
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                relativeHora.setVisibility(View.GONE);
+                            }
 
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
 
-                        }
-                    }).start();
-                    // relativeMap.animate().translationY(-300).setDuration(700).start();
-                    //relativeHora.setVisibility(View.GONE);
-                    statusHour = true;
-                } else {
-                    relativeHora.animate().translationY(0).alpha(1).setDuration(200).setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
+                            }
+                        }).start();
+                        // relativeMap.animate().translationY(-300).setDuration(700).start();
+                        //relativeHora.setVisibility(View.GONE);
+                        statusHour = true;
+                    } else {
+                        relativeHora.animate().translationY(0).alpha(1).setDuration(200).setListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            relativeHora.setVisibility(View.VISIBLE);
-                        }
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                relativeHora.setVisibility(View.VISIBLE);
+                            }
 
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
 
-                        }
-                    }).start();
+                            }
+                        }).start();
 
-                    statusHour = false;
+                        statusHour = false;
+                    }
                 }
             }
         });
