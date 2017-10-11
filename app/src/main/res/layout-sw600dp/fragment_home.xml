@@ -203,7 +203,7 @@
                     app:layout_constraintLeft_toLeftOf="parent" />
 
                 <RelativeLayout
-                    android:visibility="visible"
+                    android:visibility="invisible"
                     android:id="@+id/relativeDatos"
                     android:layout_alignParentBottom="true"
                     android:layout_width="0dp"
