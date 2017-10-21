@@ -4,7 +4,6 @@ import android.Manifest;
 import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,20 +12,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,7 +38,6 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,8 +47,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
+import com.sesi.parkingmeter.sync.ParkingReminderFirebaseJobService;
 import com.sesi.parkingmeter.task.DownloadTask;
-import com.sesi.parkingmeter.ui.camera.vision.OcrCaptureActivity;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.Utils;
@@ -64,36 +57,28 @@ import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 
-public class HomeFragment extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener, OnMapReadyCallback {
+public class HomeFragment extends Fragment implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener,SharedPreferences.OnSharedPreferenceChangeListener, OnMapReadyCallback{
 
     private TextView tvContador;
     private TextInputEditText tidHoraVence;
-    private Button btn_inicio, btn_cancelar;
-    private final static String ACTION_HOUR_VENCE = "";
-    private int horaIni, horaVence;
-    private int minIni, minVence;
-    private int min_inicial;
+    private Button btnInicio;
+    private Button btnCancelar;
+    private int horaVence;
+    private int minVence;
     private static final int TIME_LIMIT = 10;
-   // private FloatingActionButton fab;
     private CountDownTimer countTimer;
     private static final String FORMAT = "%02d:%02d:%02d";
     public static GoogleMap mMap;
-    //   private LocationManager locationManager;
-    private LocationListener locationListener;
-    public final static int PERMISION_LOCATION = 1002;
+    public static final int PERMISION_LOCATION = 1002;
     private LatLng latLng;
     public static TextView tvDetails;
-    private RelativeLayout relativeLayoutDatos, relativeMap;
+    private RelativeLayout relativeLayoutDatos;
     private ConstraintLayout relativeHora;
-    private Location location;
     private boolean statusHour = false;
     private InterstitialAd mInterstitialAd;
     private AdView mAdview;
     private SwitchCompat switchLocation;
     private TextView tvDatos;
-    private Bitmap bitmapUser;
-    private Bitmap bitmapCar;
-    private static final int RC_OCR_CAPTURE = 9003;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -104,12 +89,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -129,6 +108,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     }
 
     public void init() {
+        cargaPublicidad();
+        tvContador = (TextView) getActivity().findViewById(R.id.contador);
+        switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
+        switchLocation.setOnCheckedChangeListener(this);
+        btnInicio = (Button) getActivity().findViewById(R.id.btnInicio);
+        btnInicio.setOnClickListener(this);
+        btnCancelar = (Button) getActivity().findViewById(R.id.btnCancelar);
+        btnCancelar.setOnClickListener(this);
+        btnInicio.setEnabled(false);
+        btnInicio.setAlpha(0.7f);
+        btnCancelar.setEnabled(false);
+        btnCancelar.setAlpha(0.7f);
+        tidHoraVence = (TextInputEditText) getActivity().findViewById(R.id.textInputEditTextHoraVence);
+        tidHoraVence.setOnClickListener(this);
+        relativeHora = (ConstraintLayout) getActivity().findViewById(R.id.relativeDetails);
+        tvDatos = (TextView) getActivity().findViewById(R.id.tvDatos);
+        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatos);
+    }
+
+    public void cargaPublicidad(){
         mAdview = (AdView) getActivity().findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdview.loadAd(adRequest);
@@ -151,90 +150,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
             }
 
         });
-        tvContador = (TextView) getActivity().findViewById(R.id.contador);
-        switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
-        switchLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                PERMISION_LOCATION);
-                    } else {
-                        if (MainDrawerActivity.latLng != null) {
-
-                        } else {
-                            if (MainDrawerActivity.canGetLocation()) {
-                                Location location = MainDrawerActivity.getLocation();
-                                if (location != null) {
-                                    MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                    addMarkers();
-                                }
-                            } else {
-                                Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
-                                /*Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                getActivity().startActivity(callGPSSettingIntent);*/
-                            }
-                        }
-                    }
-
-                }
-            }
-        });
-
-        btn_inicio = (Button) getActivity().findViewById(R.id.btnInicio);
-        btn_inicio.setOnClickListener(this);
-
-        btn_cancelar = (Button) getActivity().findViewById(R.id.btnCancelar);
-        btn_cancelar.setOnClickListener(this);
-
-        btn_inicio.setEnabled(false);
-        btn_inicio.setAlpha(0.7f);
-
-        btn_cancelar.setEnabled(false);
-        btn_cancelar.setAlpha(0.7f);
-
-
-        tidHoraVence = (TextInputEditText) getActivity().findViewById(R.id.textInputEditTextHoraVence);
-        tidHoraVence.setOnClickListener(this);
-
-
-       // this.fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-       // this.fab.setOnClickListener(this);
-
-        relativeHora = (ConstraintLayout) getActivity().findViewById(R.id.relativeDetails);
-        relativeMap = (RelativeLayout) getActivity().findViewById(R.id.relativeMap);
-
-        tvDatos = (TextView) getActivity().findViewById(R.id.tvDatos);
-        cancel();
-        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatos);
-
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        btn_cancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
-        btn_cancelar.setAlpha(0.7f);
+        btnCancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
+        btnCancelar.setAlpha(0.7f);
+        addMarkers();
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
+        cancel();
     }
 
     @Override
@@ -242,15 +172,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         switch (v.getId()) {
 
             case R.id.btnInicio:
-                int min_inicial = Utils.convertActualHourToMinutes();
-                int min_vence = Utils.convertHourToMinutes(horaVence, minVence);
-                if (min_inicial < min_vence) {
+                int iMinInicial = Utils.convertActualHourToMinutes();
+                int iMinVence = Utils.convertHourToMinutes(horaVence, minVence);
+                if (iMinInicial < iMinVence) {
                     int iMinAlarm = PreferenceUtilities.getPreferenceDefaultMinHour(getContext());
-                    Log.d("AAA-", "" + iMinAlarm);
-                    int calMin = (min_vence - min_inicial) - iMinAlarm;
-                    int timerMin = (min_vence - min_inicial);
-                    Log.d("AAA-cal-min", "" + calMin);
-                    Log.d("AAA-Mint",""+timerMin);
+                    int calMin = (iMinVence - iMinInicial) - iMinAlarm;
+                    int timerMin = (iMinVence - iMinInicial);
                     if (calMin >= TIME_LIMIT) {
 
                         //Segundos para lanzar la alerta
@@ -259,20 +186,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                         int secondsContador = (int) (TimeUnit.MINUTES.toSeconds(timerMin));
                         controlTimer(secondsContador);
                         ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
-                        btn_inicio.setEnabled(false);
-                        btn_inicio.setAlpha(0.7f);
-                        btn_cancelar.setEnabled(true);
-                        btn_cancelar.setAlpha(1.0f);
+                        btnInicio.setEnabled(false);
+                        btnInicio.setAlpha(0.7f);
+                        btnCancelar.setEnabled(true);
+                        btnCancelar.setAlpha(1.0f);
                         PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
                         tidHoraVence.setEnabled(false);
                         tidHoraVence.setAlpha(0.7f);
                         switchLocation.setEnabled(false);
-
-                        if (mInterstitialAd.isLoaded()) {
-                            mInterstitialAd.show();
-                        } else {
-                            Log.d("TAG", "The interstitial wasn't loaded yet.");
-                        }
+                        showInterstitialAd();
 
                     } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
@@ -284,17 +206,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
             case R.id.btnCancelar:
                 cancel();
-                if (ReminderUtilities.dispatcher != null) {
-                    ReminderUtilities.dispatcher.cancelAll();
-                    tidHoraVence.setEnabled(true);
-                    tidHoraVence.setAlpha(1);
-                }
                 break;
 
             case R.id.textInputEditTextHoraVence:
                 showDialogHourVence();
                 break;
 
+            default:
+                Log.d("No valid option:","Opcion no valida");
+                break;
             /*case R.id.fab:
                 Intent cameraActivity = new Intent(getContext(), OcrCaptureActivity.class);
                 cameraActivity.putExtra(OcrCaptureActivity.AutoFocus, true);
@@ -303,6 +223,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 break; */
         }
 
+    }
+
+    public void showInterstitialAd(){
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
     }
 
 
@@ -317,8 +245,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                 tidHoraVence.setText(selectedHour + ":" + selectedMinute);
                 horaVence = selectedHour;
                 minVence = selectedMinute;
-                btn_inicio.setEnabled(true);
-                btn_inicio.setAlpha(1);
+                btnInicio.setEnabled(true);
+                btnInicio.setAlpha(1);
 
             }
         }, hour, minute, true);
@@ -330,16 +258,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
     public void updateGuiButtonCancel() {
         boolean status = PreferenceUtilities.getStatusButtonCancel(getContext());
         if (status) {
-            btn_cancelar.setAlpha(1.0f);
+            btnCancelar.setAlpha(1.0f);
         } else {
-            btn_cancelar.setAlpha(0.7f);
+            btnCancelar.setAlpha(0.7f);
         }
-        btn_cancelar.setEnabled(status);
+        btnCancelar.setEnabled(status);
 
     }
 
     public void updateGuiTextviewInitalHour() {
-        String hour = PreferenceUtilities.getPreferencesInitialHour(getContext());
+        PreferenceUtilities.getPreferencesInitialHour(getContext());
     }
 
     public void updateGuiTexviewFinalHour() {
@@ -358,31 +286,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_OCR_CAPTURE) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    final String sData = data.getStringExtra(OcrCaptureActivity.TextBlockObject);
-                    Toast.makeText(this.getContext(), sData, Toast.LENGTH_LONG).show();
-                    Log.d("TEXT-HORA-",sData);
-                    btn_inicio.setEnabled(true);
-                    btn_inicio.setAlpha(1);
-                }
-            } else {
-                Toast.makeText(getActivity(),"No se puede leer el ticket.",Toast.LENGTH_LONG).show();
-
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
 
     public void controlTimer(int min) {
         countTimer = new CountDownTimer(min * 1000 + 100, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                String contador = "" + String.format(FORMAT,
+                String contador =  String.format(FORMAT,
                         TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
                         TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
                                 TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
@@ -390,14 +299,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                                 TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished)));
 
                 tvContador.setText(contador);
-                // updateTimer((int) millisUntilFinished / 1000);
+
             }
 
             @Override
             public void onFinish() {
                 tvContador.setText(getString(R.string.cero));
-                btn_cancelar.setEnabled(false);
-                btn_cancelar.setAlpha(0.7f);
+                btnCancelar.setEnabled(false);
+                btnCancelar.setAlpha(0.7f);
                 resetTimer();
             }
         }.start();
@@ -424,7 +333,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                         relativeHora.animate().translationY(-450).alpha(0).setDuration(200).setListener(new Animator.AnimatorListener() {
                             @Override
                             public void onAnimationStart(Animator animation) {
-
+                                //Empty
                             }
 
                             @Override
@@ -434,22 +343,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
                             @Override
                             public void onAnimationCancel(Animator animation) {
-
+                                //Empty
                             }
 
                             @Override
                             public void onAnimationRepeat(Animator animation) {
-
+                                //Empty
                             }
                         }).start();
-                        // relativeMap.animate().translationY(-300).setDuration(700).start();
-                        //relativeHora.setVisibility(View.GONE);
                         statusHour = true;
                     } else {
                         relativeHora.animate().translationY(0).alpha(1).setDuration(200).setListener(new Animator.AnimatorListener() {
                             @Override
                             public void onAnimationStart(Animator animation) {
-
+                                //Empty
                             }
 
                             @Override
@@ -459,12 +366,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
                             @Override
                             public void onAnimationCancel(Animator animation) {
-
+                                //Empty
                             }
 
                             @Override
                             public void onAnimationRepeat(Animator animation) {
-
+                                //Empty
                             }
                         }).start();
 
@@ -483,7 +390,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
                     alphaAnimation.setRepeatMode(1);
                     relativeLayoutDatos.startAnimation(alphaAnimation);
                     relativeLayoutDatos.animate().translationY(280).setDuration(600).start();
-                    // relativeLayoutDatos.setAlpha(0);
+
                 }
             }
         });
@@ -492,6 +399,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
+                //Empty
             }
         });
 
@@ -508,35 +416,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
             }
         });
 
-
-        //locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-                addMarkers();
-            }
-
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-
         addMarkers();
 
 
@@ -544,19 +423,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
     private String obtenerDireccionesURL(LatLng origin, LatLng dest) {
 
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        String sOrigin = "origin=" + origin.latitude + "," + origin.longitude;
 
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        String sDest = "destination=" + dest.latitude + "," + dest.longitude;
 
         String sensor = "sensor=false";
 
-        String parameters = "units=metric&mode=walking&" + str_origin + "&" + str_dest + "&" + sensor;
+        String parameters = "units=metric&mode=walking&" + sOrigin + "&" + sDest + "&" + sensor;
 
         String output = "json";
 
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-        return url;
+        return "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
     }
 
 
@@ -572,67 +449,64 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
 
     public void addMarkers() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISION_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
         } else {
-            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-            mMap.clear();
+           if (null != mMap) {
+                mMap.clear();
+               addUserMarker();
+               addCarMarker();
+            }
+        }
+    }
 
+    public void addUserMarker(){
+        Bitmap bitmapUser;
+        Location location;
+        if (Build.VERSION.SDK_INT >= 21) {
+            bitmapUser = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_human_male));
+        } else {
+            bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
+        }
+        location = MainDrawerActivity.getLocation();
 
+        if (location != null) {
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title("Yo")
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmapUser)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.setMinZoomPreference(15.0f);
+            mMap.setMaxZoomPreference(23.0f);
+        }
+    }
+    public void addCarMarker(){
+        Bitmap bitmapCar;
+        if (MainDrawerActivity.latLng != null && latLng != null) {
             if (Build.VERSION.SDK_INT >= 21) {
-                bitmapUser = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_human_male));
+                bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
             } else {
-                bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
+                bitmapCar = BitmapFactory.decodeResource(getResources(), R.drawable.sedan_car_front);
             }
-            location = MainDrawerActivity.getLocation();
+            relativeLayoutDatos.setVisibility(View.VISIBLE);
+            mMap.addMarker(new MarkerOptions()
+                    .position(MainDrawerActivity.latLng)
+                    .title("Mi Auto")
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
 
-            if (location != null) {
-                latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .title("Yo")
-                        .icon(BitmapDescriptorFactory.fromBitmap(bitmapUser)));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.setMinZoomPreference(15.0f);
-                mMap.setMaxZoomPreference(23.0f);
-            }
-
-            if (MainDrawerActivity.latLng != null && latLng != null) {
-                if (Build.VERSION.SDK_INT >= 21) {
-                    bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
-                } else {
-                    bitmapCar = BitmapFactory.decodeResource(getResources(), R.drawable.sedan_car_front);
-                }
-                relativeLayoutDatos.setVisibility(View.VISIBLE);
-                mMap.addMarker(new MarkerOptions()
-                        .position(MainDrawerActivity.latLng)
-                        .title("Mi Auto")
-                        .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
-
-            /*    mMap.addPolyline(new PolylineOptions()
-                        .add(latLng,MainDrawerActivity.latLng)
-                        .width(5).color(Color.BLUE)
-                        .geodesic(true)
-                        .clickable(true));*/
-
-                String url = obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
-                DownloadTask downloadTask = new DownloadTask();
-                downloadTask.execute(url);
-
-            }
-
+            String url = obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
+            DownloadTask downloadTask = new DownloadTask();
+            downloadTask.execute(url);
 
         }
     }
 
     public void cancel() {
         ReminderUtilities.sInitialized = false;
-        btn_cancelar.setAlpha(0.7f);
-        btn_cancelar.setEnabled(false);
+        btnCancelar.setAlpha(0.7f);
+        btnCancelar.setEnabled(false);
         PreferenceUtilities.changeStatusButtonCancel(getContext(), false);
         PreferenceUtilities.savePreferencesFinalHour(getContext(), getResources().getString(R.string.horaCero));
-        //    PreferenceUtilities.savePreferenceHourIni(this,getResources().getString(R.string.horaCero));
         tidHoraVence.setText(getResources().getString(R.string.horaCero));
         if (countTimer != null && mMap != null) {
             countTimer.cancel();
@@ -644,5 +518,37 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Shar
         tvDatos.setText("");
         MainDrawerActivity.latLng = null;
 
+        if (ReminderUtilities.dispatcher != null) {
+            ReminderUtilities.dispatcher.cancelAll();
+            tidHoraVence.setEnabled(true);
+            tidHoraVence.setAlpha(1);
+        }
+
+        if (null != ParkingReminderFirebaseJobService.mBackgroundTask){
+            ParkingReminderFirebaseJobService.mBackgroundTask.cancel(true);
+            Log.d("TASK CANCEL---","True");
+        }
+
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},PERMISION_LOCATION);
+            } else {
+                if (null == MainDrawerActivity.latLng) {
+                    if (MainDrawerActivity.canGetLocation()) {
+                        Location location = MainDrawerActivity.getLocation();
+                        if (location != null) {
+                            MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            addMarkers();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        }
     }
 }

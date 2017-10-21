@@ -1,0 +1,12 @@
+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(¬ªÉ”8£Ûö“ó+
+Wsquid:S2696"6Make the enclosing method "static" or remove this set.(ÊæÒ¥ùÿÿÿÿ8 Ø¥©ó+
+Wsquid:S2696"6Make the enclosing method "static" or remove this set.(š¼¬àûÿÿÿÿ8 Ø¥©ó+
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ñ¢¸’8 Ø¥©ó+
+"squid:ClassVariableVisibilityCheck"PMake mMap a static final constant or non-public and provide accessors if needed.(…ÅßÌüÿÿÿÿ
+nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(ãÜ›Ø8¹ó°”ó+
+Dsquid:S1444"/Make this "public static tvDetails" field final(äÕŠó
+"squid:ClassVariableVisibilityCheck"UMake tvDetails a static final constant or non-public and provide accessors if needed.(äÕŠó
+Psquid:S2696"6Make the enclosing method "static" or remove this set.(àŠëÈþÿÿÿÿ
+Dsquid:S1444"*Make this "public static mMap" field final(…ÅßÌüÿÿÿÿ
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(Ä­±„8£Ûö“ó+

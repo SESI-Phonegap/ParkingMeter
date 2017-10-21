@@ -10,7 +10,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.VectorDrawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -30,6 +29,9 @@ public class NotificationUtils {
     private static final int ACTION_ALARM_PENDING_INTENT_ID = 1;
     private static final int ACTION_IGNORE_PENDING_INTENT_ID = 14;
 
+    private NotificationUtils(){
+        //Empty
+    }
     public static void remindUserBecauseCharging(Context context) {
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         int smallIcon;
@@ -52,7 +54,7 @@ public class NotificationUtils {
 
                 .setLights(Color.RED, 3000, 3000)
                 .setContentIntent(contentIntent(context))
-                .addAction(FinishParkingAction(context))
+                .addAction(finishParkingAction(context))
                 .addAction(ignoreReminderAction(context))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setAutoCancel(true);
@@ -96,7 +98,7 @@ public class NotificationUtils {
         return ignoreReminderAction;
     }
 
-    private static NotificationCompat.Action FinishParkingAction(Context context) {
+    private static NotificationCompat.Action finishParkingAction(Context context) {
         Intent incrementWaterIntent = new Intent(context, ParkingReminderIntentService.class);
         incrementWaterIntent.setAction(ReminderTask.ACTION_FINISH_PARKING);
 
@@ -111,10 +113,8 @@ public class NotificationUtils {
         } else {
             iIcon = R.drawable.alarm_black_png;
         }
-        NotificationCompat.Action FinishParkingAction = new NotificationCompat.Action(iIcon
-                , "I did it!",
-                ignoreReminderPendingIntent);
-        return FinishParkingAction;
+
+        return new NotificationCompat.Action(iIcon, "I did it!", ignoreReminderPendingIntent);
     }
 
     public static void clearAllNotifications(Context context) {
@@ -144,7 +144,6 @@ public class NotificationUtils {
         } else {
             iIcon = R.drawable.alarm_black_png;
         }
-        Bitmap largeIcon = BitmapFactory.decodeResource(resources, iIcon);
-        return largeIcon;
+        return BitmapFactory.decodeResource(resources, iIcon);
     }
 }

@@ -19,7 +19,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,6 +34,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
+import com.sesi.parkingmeter.utilities.Constants;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.UtilGPS;
@@ -53,7 +53,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     private Builder builder;
     private static final int MAX_MIN = 20;
     private int iPreferenceMin;
-    public final static int PERMISION_LOCATION = 1002;
+    public static final int PERMISION_LOCATION = 1002;
     public static LatLng latLng;
     public static UtilGPS sTracker;
 
@@ -64,7 +64,6 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
         MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
         init();
-
 
     }
 
@@ -88,7 +87,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -133,6 +132,9 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
             case R.id.nav_share:
                 sharedSocial();
                 break;
+            default:
+                Log.d("No valida","Opcion no valida");
+                break;
         }
 
 
@@ -173,7 +175,6 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
             public void onClick(View v) {
 
                 if (switchSound.isChecked() | switchVibrate.isChecked()) {
-                    //   int min = Integer.parseInt(tvMinutos.getText().toString());
                     PreferenceUtilities.savePreferenceDefaultMinHour(v.getContext(), iPreferenceMin);
                     PreferenceUtilities.savePreferenceDefaultVibrate(v.getContext(), switchVibrate.isChecked());
                     PreferenceUtilities.savePreferenceDefaultSound(v.getContext(), switchSound.isChecked());
@@ -204,12 +205,12 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                //Empty
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                //Empty
             }
         });
         builder.setView(view);
@@ -231,6 +232,10 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                     Toast.makeText(this, getResources().getString(R.string.msgPermissionDeniedLocation), Toast.LENGTH_LONG).show();
                 }
                 break;
+
+            default:
+                Log.d("Invalida","Opcion Invalida");
+                break;
         }
     }
 
@@ -251,7 +256,6 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         PackageManager pm = getApplicationContext().getPackageManager();
         List<ResolveInfo> resInfos = pm.queryIntentActivities(shareIntent, 0);
         if (!resInfos.isEmpty()) {
-            System.out.println("Have package");
             for (ResolveInfo resInfo : resInfos) {
                 String packageName = resInfo.activityInfo.packageName;
                 Log.i("Package Name", packageName);
@@ -269,7 +273,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                     Intent intent = new Intent();
 
                     intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                    intent.putExtra("AppName", resInfo.loadLabel(pm).toString());
+                    intent.putExtra(Constants.APPNAME, resInfo.loadLabel(pm).toString());
                     intent.setAction(Intent.ACTION_SEND);
                     intent.setType("text/plain");
                     intent.putExtra(Intent.EXTRA_TEXT, "URL de la APP");

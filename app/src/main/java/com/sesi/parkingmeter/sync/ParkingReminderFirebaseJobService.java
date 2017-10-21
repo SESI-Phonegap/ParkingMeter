@@ -8,7 +8,7 @@ import android.os.AsyncTask;
 
 
 public class ParkingReminderFirebaseJobService extends JobService {
-    private AsyncTask mBackgroundTask;
+    public static AsyncTask mBackgroundTask;
     @Override
     public boolean onStartJob(final JobParameters jobParameters) {
         mBackgroundTask = new AsyncTask() {

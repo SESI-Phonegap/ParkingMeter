@@ -6,13 +6,12 @@ import android.support.design.widget.TextInputEditText;
 import android.widget.TextView;
 import java.util.Calendar;
 
-/**
- * Created by Chris on 17/04/2017.
- */
 
 public class Utils {
 
-    private final static int SIXTY_MINUTES = 60;
+    private Utils(){
+        //EMPTY
+    }
 
     public static void changeRobotoRegular(Context context, TextView textView) {
         Typeface typeface = Typeface.createFromAsset(context.getAssets(), "/Roboto-Regular.ttf");
@@ -50,16 +49,11 @@ public class Utils {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        int result = convertHourToMinutes(hour, minute);
-
-        return result;
+        return convertHourToMinutes(hour, minute);
     }
 
     public static int convertHourToMinutes(int hour, int minutes) {
-
-        int convertMinutes = (hour * SIXTY_MINUTES) + minutes;
-
-        return convertMinutes;
+        return (hour * Constants.SIXTY_MINUTES) + minutes;
     }
 
 

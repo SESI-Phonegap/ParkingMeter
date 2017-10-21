@@ -132,9 +132,8 @@ public class UtilGPS extends Service implements LocationListener {
             if (isGPS || isNetwork) {
                 status = true;
             }
-         //   Log.i("GPS Enabled: " + isGPS + ", Network Enabled: " + isNetwork);
         } catch (Exception ex) {
-           // Log.e("GPSTrackerService::checkLocationService: ", ex);
+            Log.e("GPSTrackerService:", ex.getMessage());
         }
         return status;
     }
@@ -146,28 +145,27 @@ public class UtilGPS extends Service implements LocationListener {
                 this.location = currenLocation;
             }
         } catch (Exception ex) {
-           // Log.e("GPSTrackerService::onLocationChanged ", ex);
+            Log.e("GPSTrackerService:", ex.getMessage());
         }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-     //   Log.d("GPSTrackerService::onProviderDisabled " + provider);
+     //  EMPTY
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-       // Log.d("GPSTrackerService::onProviderEnabled " + provider);
+       // EMPTY
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-
+        //EMPTY
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

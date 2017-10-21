@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sesi.parkingmeter.fragments.HomeFragment;
 import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
@@ -28,7 +27,6 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
 
         JSONObject jObject;
         List<List<HashMap<String, String>>> routes = null;
-        List<List<HashMap<String, String>>> distance = null;
 
         try{
             jObject = new JSONObject(jsonData[0]);
@@ -37,7 +35,7 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
             routes = parser.parse(jObject);
             Log.d("DIST-",DirectionsJSONParser.sDistance);
         }catch(Exception e){
-            e.printStackTrace();
+            Log.d("Exception:",e.getMessage());
         }
         return routes;
     }
@@ -46,10 +44,9 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
     protected void onPostExecute(List<List<HashMap<String, String>>> result) {
         ArrayList<LatLng> points = null;
         PolylineOptions lineOptions = null;
-        MarkerOptions markerOptions = new MarkerOptions();
 
         for(int i=0;i<result.size();i++){
-            points = new ArrayList<LatLng>();
+            points = new ArrayList<>();
             lineOptions = new PolylineOptions();
 
             List<HashMap<String, String>> path = result.get(i);
@@ -59,7 +56,6 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
 
                 double lat = Double.parseDouble(point.get("lat"));
                 double lng = Double.parseDouble(point.get("lng"));
-//                Log.d("AA-",point.get("text"));
                 LatLng position = new LatLng(lat, lng);
 
                 points.add(position);
@@ -70,13 +66,13 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
             lineOptions.color(Color.rgb(0,0,255));
         }
         if(lineOptions!=null) {
-            if (null != HomeFragment.mMap && null != HomeFragment.tvDetails && null != HomeFragment.tvDetails) {
+            if (null != HomeFragment.mMap && null != HomeFragment.tvDetails) {
                 HomeFragment.mMap.addPolyline(lineOptions);
                 HomeFragment.tvDetails.setText(DirectionsJSONParser.sDistance);
                 HomeFragment.tvDetails.append(DirectionsJSONParser.sDuration);
             }
 
-            if (null != ParkingType2Fragment.mMap && null != ParkingType2Fragment.tvDetails && null != ParkingType2Fragment.tvDetails) {
+            if (null != ParkingType2Fragment.mMap && null != ParkingType2Fragment.tvDetails) {
                 ParkingType2Fragment.mMap.addPolyline(lineOptions);
                 ParkingType2Fragment.tvDetails.setText(DirectionsJSONParser.sDistance);
                 ParkingType2Fragment.tvDetails.append(DirectionsJSONParser.sDuration);

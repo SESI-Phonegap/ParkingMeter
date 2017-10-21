@@ -1,0 +1,4 @@
+
+Jsquid:S1444"5Make this "public static mBackgroundTask" field final(Ó¸éÕ
+‡"squid:ClassVariableVisibilityCheck"[Make mBackgroundTask a static final constant or non-public and provide accessors if needed.(Ó¸éÕ
+Psquid:S2696"6Make the enclosing method "static" or remove this set.(ä…ýâýÿÿÿÿ

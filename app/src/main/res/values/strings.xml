@@ -49,7 +49,7 @@
     <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil.Que no te pongan la araña, evita costosas multas. </string>
 
     <!-- Dialog alarm -->
-    <string name="configAlarm">Configuración de alarma</string>
+    <string name="configAlarm">Avisarrme %1$s minutos antes. </string>
     <string name="btn_guardar_dialog_alarm">Guardar</string>
     <string name="msg_check_switch_alert">Al menos una opción debe de estar habilitada (Vibrador o Sonido)</string>
     <string name="tvMinutos">%1$s Min</string>
