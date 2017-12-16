@@ -15,7 +15,7 @@ public class PreferenceUtilities {
     public static final String SAVE_DEFAULT_MIN_ALARM = "save_default_min_alarm";
     private static final boolean DEFAULT_STATUS_BUTTON = false;
     public static final String SAVE_DEFAULT_STATUS_VIBRATE = "save_default_status_vibrate";
-    private static final boolean DEFAULT_STATUS_VIBRATE = true;
+    private static final boolean DEFAULT_STATUS_VIBRATE = false;
     public static final String SAVE_DEFAULT_STATUS_SOUND = "save_default_status_sound";
     private static final boolean DEFAULT_STATUS_SOUND = true;
 

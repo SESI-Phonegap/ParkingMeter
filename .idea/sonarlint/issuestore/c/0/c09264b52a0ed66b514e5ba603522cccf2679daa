@@ -1,10 +1,36 @@
 
-Osquid:S1444".Make this "public static sTracker" field final(üí†çúÿÿÿÿ8û“•ó+
-Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ÙˆÔ³8û“•ó+
-ƒ"squid:ClassVariableVisibilityCheck"RMake latLng a static final constant or non-public and provide accessors if needed.(»šòüıÿÿÿÿ
-lsquid:S1301"KReplace this "switch" statement by "if" statements to increase readability.(×ö³–úÿÿÿÿ8ÂÛû”ó+
-osquid:MaximumInheritanceDepth"<This class has 9 parents which is greater than 5 authorized.(®Å¦ûÿÿÿÿ8›Ø¥©ó+
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(õÎÑ×8ÂÛû”ó+
+lsquid:S1301"KReplace this "switch" statement by "if" statements to increase readability.(×ö³–úÿÿÿÿ8Áãöİô+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ğè¦±8Áãöİô+
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(›äÿéıÿÿÿÿ8Áãöİô+
 Œ"squid:ClassVariableVisibilityCheck"TMake sTracker a static final constant or non-public and provide accessors if needed.(üí†çúÿÿÿÿ8«à‹•ó+
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ÛÿÌ¸8ÂÛû”ó+
-Msquid:S1444",Make this "public static latLng" field final(»šòüıÿÿÿÿ8ÂÛû”ó+
+Z"squid:SwitchLastCaseIsDefaultCheck""Add a default case to this switch.(Ò“ÿšùÿÿÿÿ8Áãöİô+
+osquid:MaximumInheritanceDepth"<This class has 9 parents which is greater than 5 authorized.(´Ú‘ñûÿÿÿÿ8ğı°¨ô+
+Š"squid:ClassVariableVisibilityCheck"WMake sSuscripSku a static final constant or non-public and provide accessors if needed.(¯†£Œ8¥„ÿ‹ô+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(×™·Å8Áãöİô+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ÛÿÌ¸8Áãöİô+
+Š"squid:ClassVariableVisibilityCheck"RMake latLng a static final constant or non-public and provide accessors if needed.(»šòüıÿÿÿÿ8ğı°¨ô+
+"squid:ClassVariableVisibilityCheck"]Make mAutoRenewEnabled a static final constant or non-public and provide accessors if needed.(´„Ú‹8ÕÂ÷‹ô+
+]squid:S1126"AReplace this if-then-else statement by a single return statement.(›ÄÖ»8Áãöİô+
+gsquid:HiddenFieldCheck";Rename "builder" which hides the field declared at line 64.(Şô¯ùÿÿÿÿ8Áãöİô+
+fsquid:HiddenFieldCheck":Rename "dialog" which hides the field declared at line 63.(îÉ‰ùÿÿÿÿ8Áãöİô+
+Qsquid:S1444"0Make this "public static mIsSuscrip" field final(Ìõ‘‰úÿÿÿÿ8ÏÈŠêó+
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(‰¼Æ8Áãöİô+
+"squid:ClassVariableVisibilityCheck"VMake mIsSuscrip a static final constant or non-public and provide accessors if needed.(Ìõ‘‰úÿÿÿÿ8ÏÈŠêó+
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ñÓƒ¼úÿÿÿÿ8Áãöİô+
+zsquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(Ä•ïêúÿÿÿÿ8Áãöİô+
+Osquid:S1444".Make this "public static sTracker" field final(üí†çúÿÿÿÿ8û“•ó+
+nsquid:HiddenFieldCheck"BRename "navigationView" which hides the field declared at line 77.(üûÍøÿÿÿÿ8Áãöİô+
+Wsquid:S2696"6Make the enclosing method "static" or remove this set.(ÉÙÉ¢úÿÿÿÿ8Áãöİô+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ÀØŞå8Áãöİô+
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ÙˆÔ³8Áãöİô+
+Dsquid:S1148"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ8Áãöİô+
+dsquid:S1192"HDefine a constant instead of duplicating this literal "Mensaje" 3 times.(øÎÊê8Áãöİô+
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(›äÿéıÿÿÿÿ8Áãöİô+
+ksquid:S1192"JDefine a constant instead of duplicating this literal "Mensaje: " 3 times.(ùÙàÍüÿÿÿÿ8Áãöİô+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ªƒ‹æ8Áãöİô+
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(–“Åıÿÿÿÿ8àè®àô+
+_squid:S2583"CChange this condition so that it does not always evaluate to "true"(ÑğÌó8Áãöİô+
+Msquid:S1444",Make this "public static latLng" field final(»šòüıÿÿÿÿ8ğı°¨ô+
+ysquid:S1450"]Remove the "navigationView" field and declare it as a local variable in the relevant methods.(‰Ë”ë8ğı°¨ô+
+lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(›äÿéıÿÿÿÿ8Áãöİô+
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(õÎÑ×8Áãöİô+

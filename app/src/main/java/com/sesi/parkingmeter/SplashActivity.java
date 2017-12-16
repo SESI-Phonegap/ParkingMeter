@@ -25,5 +25,6 @@ public class SplashActivity extends BaseActivity {
     public void openMainActivity(){
         Intent intent = new Intent(this,MainDrawerActivity.class);
         startActivity(intent);
+        finish();
     }
 }

@@ -1,12 +1,15 @@
 
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(¬ªÉ”8£Ûö“ó+
-Wsquid:S2696"6Make the enclosing method "static" or remove this set.(ÊæÒ¥ùÿÿÿÿ8 Ø¥©ó+
-Wsquid:S2696"6Make the enclosing method "static" or remove this set.(š¼¬àûÿÿÿÿ8 Ø¥©ó+
-Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ñ¢¸’8 Ø¥©ó+
-"squid:ClassVariableVisibilityCheck"PMake mMap a static final constant or non-public and provide accessors if needed.(…ÅßÌüÿÿÿÿ
-nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(ãÜ›Ø8¹ó°”ó+
-Dsquid:S1444"/Make this "public static tvDetails" field final(äÕŠó
-"squid:ClassVariableVisibilityCheck"UMake tvDetails a static final constant or non-public and provide accessors if needed.(äÕŠó
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ñ¢¸’8ûÇ’êó+
 Psquid:S2696"6Make the enclosing method "static" or remove this set.(àŠëÈþÿÿÿÿ
+"squid:ClassVariableVisibilityCheck"UMake tvDetails a static final constant or non-public and provide accessors if needed.(äÕŠó
+Dsquid:S1444"/Make this "public static tvDetails" field final(äÕŠó
+gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(¬ªÉ”8ûÇ’êó+
+"squid:ClassVariableVisibilityCheck"PMake mMap a static final constant or non-public and provide accessors if needed.(…ÅßÌüÿÿÿÿ
 Dsquid:S1444"*Make this "public static mMap" field final(…ÅßÌüÿÿÿÿ
-Rsquid:S2696"6Make the enclosing method "static" or remove this set.(Ä­±„8£Ûö“ó+
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ñ¢¸’8Ôßßßô+
+Wsquid:S2696"6Make the enclosing method "static" or remove this set.(ÊæÒ¥ùÿÿÿÿ8ûÇ’êó+
+nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 32 to the 15 allowed.(ãÜ›Ø8ûÇ’êó+
+Rsquid:S2696"6Make the enclosing method "static" or remove this set.(Ä­±„8ûÇ’êó+
+Wsquid:S2696"6Make the enclosing method "static" or remove this set.(š¼¬àûÿÿÿÿ8ûÇ’êó+
+Wsquid:S2696"6Make the enclosing method "static" or remove this set.(àÆâ™ùÿÿÿÿ8ß§àáô+
+osquid:UselessImportCheck"FRemove this unused import 'com.sesi.parkingmeter.utilities.Constants'.(ãüèÍ8žž²õ+

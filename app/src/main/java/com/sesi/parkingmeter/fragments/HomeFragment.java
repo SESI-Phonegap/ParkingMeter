@@ -49,12 +49,17 @@ import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.sync.ParkingReminderFirebaseJobService;
 import com.sesi.parkingmeter.task.DownloadTask;
+import com.sesi.parkingmeter.utilities.Constants;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
+import com.sesi.parkingmeter.utilities.UtilGPS;
+import com.sesi.parkingmeter.utilities.UtilNetwork;
 import com.sesi.parkingmeter.utilities.Utils;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+
+import static com.sesi.parkingmeter.MainDrawerActivity.startTracker;
 
 
 public class HomeFragment extends Fragment implements View.OnClickListener, SwitchCompat.OnCheckedChangeListener,SharedPreferences.OnSharedPreferenceChangeListener, OnMapReadyCallback{
@@ -65,7 +70,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
     private Button btnCancelar;
     private int horaVence;
     private int minVence;
-    private static final int TIME_LIMIT = 10;
+    private static final int TIME_LIMIT = 5;
     private CountDownTimer countTimer;
     private static final String FORMAT = "%02d:%02d:%02d";
     public static GoogleMap mMap;
@@ -108,7 +113,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
     }
 
     public void init() {
-        cargaPublicidad();
+        if (!MainDrawerActivity.mIsSuscrip){
+            cargaPublicidad();
+        }
+
         tvContador = (TextView) getActivity().findViewById(R.id.contador);
         switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocation);
         switchLocation.setOnCheckedChangeListener(this);
@@ -158,7 +166,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
         super.onResume();
         btnCancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
         btnCancelar.setAlpha(0.7f);
-        addMarkers();
+        if (null != MainDrawerActivity.latLng) {
+            addMarkers();
+        }
     }
 
     @Override
@@ -194,8 +204,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
                         tidHoraVence.setEnabled(false);
                         tidHoraVence.setAlpha(0.7f);
                         switchLocation.setEnabled(false);
-                        showInterstitialAd();
 
+                        if (!MainDrawerActivity.mIsSuscrip){
+                            showInterstitialAd();
+                        }
                     } else {
                         Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
                     }
@@ -421,22 +433,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
 
     }
 
-    private String obtenerDireccionesURL(LatLng origin, LatLng dest) {
-
-        String sOrigin = "origin=" + origin.latitude + "," + origin.longitude;
-
-        String sDest = "destination=" + dest.latitude + "," + dest.longitude;
-
-        String sensor = "sensor=false";
-
-        String parameters = "units=metric&mode=walking&" + sOrigin + "&" + sDest + "&" + sensor;
-
-        String output = "json";
-
-        return "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-    }
-
-
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
@@ -494,7 +490,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
                     .title("Mi Auto")
                     .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
 
-            String url = obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
+            String url = Utils.obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
 
@@ -502,6 +498,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
     }
 
     public void cancel() {
+        if (ReminderUtilities.dispatcher != null) {
+            ReminderUtilities.dispatcher.cancelAll();
+        }
         ReminderUtilities.sInitialized = false;
         btnCancelar.setAlpha(0.7f);
         btnCancelar.setEnabled(false);
@@ -534,21 +533,38 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Swit
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},PERMISION_LOCATION);
-            } else {
-                if (null == MainDrawerActivity.latLng) {
-                    if (MainDrawerActivity.canGetLocation()) {
-                        Location location = MainDrawerActivity.getLocation();
-                        if (location != null) {
-                            MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            addMarkers();
+            if (UtilNetwork.isOnline(getActivity())) {
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
+                } else {
+                    if (null == MainDrawerActivity.latLng) {
+                        if (MainDrawerActivity.canGetLocation()) {
+                            Location location = MainDrawerActivity.getLocation();
+                            if (location != null) {
+                                MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                addMarkers();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), getString(R.string.noGps), Toast.LENGTH_LONG).show();
+                            switchLocation.setChecked(false);
+                            MainDrawerActivity.sTracker = new UtilGPS(getActivity());
+                            if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
+                            } else {
+                                startTracker();
+                            }
+
                         }
-                    } else {
-                        Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
                     }
                 }
+            } else {
+                Toast.makeText(getActivity(),getString(R.string.noInternet),Toast.LENGTH_LONG).show();
+                switchLocation.setChecked(false);
             }
+        } else {
+            mMap.clear();
+            tvDetails.setText("");
+            MainDrawerActivity.latLng = null;
         }
     }
 }

@@ -30,6 +30,9 @@
     <string name="switchText">Ubicación del coche</string>
 
 
+    <string name="noInternet">Debes de tener acceso a internet para utilizar esta función.</string>
+    <string name="noGps">Activa tu localización para activar esta opción.</string>
+
     <string name="title_activity_main_drawer">MainDrawerActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -48,6 +51,13 @@
     <string name="charging_reminder_notification_title">! Hora de ir por tu automóvil !</string>
     <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil.Que no te pongan la araña, evita costosas multas. </string>
 
+    <!-- Suscripcion -->
+    <string name="selectSuscrip">Selecciona tu período de suscripción. \n Elimina la publicidad y personaliza tu alarma.</string>
+    <string name="Meses6">Suscripción por 6 meses</string>
+    <string name="Meses12">Suscripción por 12 meses</string>
+    <string name="reactivaSuscrip">Reactiva tu suscripción</string>
+    <string name="cambiaSuscrip">Cambia tu suscripción, Selecciona tu nueva suscripción</string>
+    <string name="continuar">Continuar</string>
     <!-- Dialog alarm -->
     <string name="configAlarm">Avisarrme %1$s minutos antes. </string>
     <string name="btn_guardar_dialog_alarm">Guardar</string>

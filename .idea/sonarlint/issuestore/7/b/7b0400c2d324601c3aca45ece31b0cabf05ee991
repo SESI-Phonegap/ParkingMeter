@@ -1,5 +1,5 @@
 
-Gsquid:S1444"2Make this "public static sInitialized" field final(É”É…
 ‡"squid:ClassVariableVisibilityCheck"VMake dispatcher a static final constant or non-public and provide accessors if needed.(­„ìïùÿÿÿÿ
-Jsquid:S1444"0Make this "public static dispatcher" field final(­„ìïùÿÿÿÿ
 „"squid:ClassVariableVisibilityCheck"XMake sInitialized a static final constant or non-public and provide accessors if needed.(É”É…
+Gsquid:S1444"2Make this "public static sInitialized" field final(É”É…
+Jsquid:S1444"0Make this "public static dispatcher" field final(­„ìïùÿÿÿÿ

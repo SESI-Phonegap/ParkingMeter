@@ -54,8 +54,8 @@ public class NotificationUtils {
 
                 .setLights(Color.RED, 3000, 3000)
                 .setContentIntent(contentIntent(context))
-                .addAction(finishParkingAction(context))
-                .addAction(ignoreReminderAction(context))
+               // .addAction(finishParkingAction(context))
+              //  .addAction(ignoreReminderAction(context))
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setAutoCancel(true);
 

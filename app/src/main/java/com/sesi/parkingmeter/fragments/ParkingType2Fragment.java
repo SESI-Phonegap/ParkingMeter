@@ -44,15 +44,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sesi.parkingmeter.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
+import com.sesi.parkingmeter.sync.ParkingReminderFirebaseJobService;
 import com.sesi.parkingmeter.task.DownloadTask;
 import com.sesi.parkingmeter.utilities.Constants;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
+import com.sesi.parkingmeter.utilities.UtilNetwork;
+import com.sesi.parkingmeter.utilities.Utils;
 
 import java.util.concurrent.TimeUnit;
 
 
-public class ParkingType2Fragment extends Fragment implements View.OnClickListener, OnMapReadyCallback,SwitchCompat.OnCheckedChangeListener {
+public class ParkingType2Fragment extends Fragment implements View.OnClickListener, OnMapReadyCallback, SwitchCompat.OnCheckedChangeListener {
     private InterstitialAd mInterstitialAd;
     private AdView mAdview;
     private LatLng latLng;
@@ -71,7 +74,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
     private RelativeLayout relativeHora;
     private boolean statusHour = false;
     public static TextView tvDetails;
-    private static final int TIME_LIMIT = 10;
+    private static final int TIME_LIMIT = 5;
 
     public ParkingType2Fragment() {
         // Required empty public constructor
@@ -101,34 +104,29 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
     }
 
     public void init() {
-        cargarPublicidad();
+        if (!MainDrawerActivity.mIsSuscrip) {
+            cargarPublicidad();
+        }
         tvContador = (TextView) getActivity().findViewById(R.id.contadorType2);
         switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocationType2);
         switchLocation.setOnCheckedChangeListener(this);
         btnInicio = (Button) getActivity().findViewById(R.id.btnInicioType2);
         btnInicio.setOnClickListener(this);
-
         btnCancelar = (Button) getActivity().findViewById(R.id.btnCancelarType2);
         btnCancelar.setOnClickListener(this);
-
         btnInicio.setEnabled(false);
         btnInicio.setAlpha(0.7f);
-
         btnCancelar.setEnabled(false);
         btnCancelar.setAlpha(0.7f);
-
         tidHoraVence = (TextInputEditText) getActivity().findViewById(R.id.textInputEditTextHoraVenceType2);
         tidHoraVence.setOnClickListener(this);
-
         relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetailsType2);
-
         tvDatos = (TextView) getActivity().findViewById(R.id.tvDatosType2);
-
         tidHoraVence.addTextChangedListener(textWatcher);
-        cancel();
+      //  cancel();
     }
 
-    public void cargarPublicidad(){
+    public void cargarPublicidad() {
         mAdview = (AdView) getActivity().findViewById(R.id.adViewType2);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdview.loadAd(adRequest);
@@ -158,7 +156,9 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         super.onResume();
         btnCancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
         btnCancelar.setAlpha(0.7f);
-        addMarkers();
+        if (null != MainDrawerActivity.latLng) {
+            addMarkers();
+        }
     }
 
     @Override
@@ -177,7 +177,9 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                             ReminderUtilities.scheduleChargingReminder(getContext(), secondsStart, secondsStart);
                             enableButtonsStartTime();
                             PreferenceUtilities.changeStatusButtonCancel(getContext(), true);
-                            showInterstitialAd();
+                            if (!MainDrawerActivity.mIsSuscrip) {
+                                showInterstitialAd();
+                            }
 
                         } else {
                             Toast.makeText(getContext(), getResources().getString(R.string.msgLimiteTiempo), Toast.LENGTH_LONG).show();
@@ -186,7 +188,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                         Toast.makeText(getContext(), getResources().getString(R.string.msgHoraVencMenor), Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getContext(),getString(R.string.msg_falta_dato),Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.msg_falta_dato), Toast.LENGTH_LONG).show();
                 }
                 break;
 
@@ -194,25 +196,27 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                 cancel();
                 break;
             default:
-                Log.d("Invalida","Opcion Invalida");
+                Log.d("Invalida", "Opcion Invalida");
                 break;
         }
     }
 
-    public void showInterstitialAd(){
+    public void showInterstitialAd() {
         if (mInterstitialAd.isLoaded()) {
             mInterstitialAd.show();
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
         }
     }
-    public void enableButtonsStartTime(){
+
+    public void enableButtonsStartTime() {
         btnInicio.setEnabled(false);
         btnInicio.setAlpha(0.7f);
         btnCancelar.setEnabled(true);
         btnCancelar.setAlpha(1.0f);
         switchLocation.setEnabled(false);
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -313,7 +317,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         }
     }
 
-    public void addUserMarker(){
+    public void addUserMarker() {
         Bitmap bitmapUser;
         if (Build.VERSION.SDK_INT >= 21) {
             bitmapUser = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_human_male));
@@ -333,7 +337,8 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
             mMap.setMaxZoomPreference(23.0f);
         }
     }
-    public void addCarMarker(){
+
+    public void addCarMarker() {
         if (MainDrawerActivity.latLng != null) {
             Bitmap bitmapCar;
             if (Build.VERSION.SDK_INT >= 21) {
@@ -351,7 +356,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                         .width(5).color(Color.BLUE)
                         .geodesic(true)
                         .clickable(true));*/
-            String url = obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
+            String url = Utils.obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
             DownloadTask downloadTask = new DownloadTask();
             downloadTask.execute(url);
 
@@ -398,13 +403,6 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         countTimer.cancel();
     }
 
-    private String obtenerDireccionesURL(LatLng origin, LatLng dest) {
-        String sOrigin = "origin=" + origin.latitude + "," + origin.longitude;
-        String sDest = "destination=" + dest.latitude + "," + dest.longitude;
-        String parameters = Constants.UNITS + sOrigin + "&" + sDest + "&" + Constants.SENSOR_FALSE;
-        return Constants.URL_GOOGLE_MAPS_API + Constants.JSON_TYPE + "?" + parameters;
-    }
-
     public void cancel() {
         if (ReminderUtilities.dispatcher != null) {
             ReminderUtilities.dispatcher.cancelAll();
@@ -423,6 +421,18 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         switchLocation.setChecked(false);
         tvDatos.setText("");
         switchLocation.setEnabled(true);
+        MainDrawerActivity.latLng = null;
+
+        if (ReminderUtilities.dispatcher != null) {
+            ReminderUtilities.dispatcher.cancelAll();
+            tidHoraVence.setEnabled(true);
+            tidHoraVence.setAlpha(1);
+        }
+
+        if (null != ParkingReminderFirebaseJobService.mBackgroundTask){
+            ParkingReminderFirebaseJobService.mBackgroundTask.cancel(true);
+            Log.d("TASK CANCEL---","True");
+        }
 
     }
 
@@ -449,23 +459,32 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.PERMISION_LOCATION);
-            } else {
-                if (MainDrawerActivity.latLng == null) {
-                    if (MainDrawerActivity.canGetLocation()) {
-                        Location location = MainDrawerActivity.getLocation();
-                        if (location != null) {
-                            MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            addMarkers();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
+            if (UtilNetwork.isOnline(getActivity())) {
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.PERMISION_LOCATION);
+                } else {
+                    if (MainDrawerActivity.latLng == null) {
+                        if (MainDrawerActivity.canGetLocation()) {
+                            Location location = MainDrawerActivity.getLocation();
+                            if (location != null) {
+                                MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                addMarkers();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
                                 /*Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 getActivity().startActivity(callGPSSettingIntent);*/
+                        }
                     }
                 }
+            } else {
+                Toast.makeText(getActivity(), getString(R.string.noInternet), Toast.LENGTH_LONG).show();
+                switchLocation.setChecked(false);
             }
+        } else {
+            mMap.clear();
+            tvDetails.setText("");
+            MainDrawerActivity.latLng = null;
         }
     }
 }
