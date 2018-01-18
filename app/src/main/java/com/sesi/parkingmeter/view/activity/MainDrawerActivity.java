@@ -1,10 +1,9 @@
-package com.sesi.parkingmeter;
+package com.sesi.parkingmeter.view.activity;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.ColorDrawable;
@@ -36,13 +35,14 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
+import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.billing.IabBroadcastReceiver;
 import com.sesi.parkingmeter.billing.IabHelper;
 import com.sesi.parkingmeter.billing.IabResult;
 import com.sesi.parkingmeter.billing.Inventory;
 import com.sesi.parkingmeter.billing.Purchase;
-import com.sesi.parkingmeter.fragments.HomeFragment;
-import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
+import com.sesi.parkingmeter.view.fragments.HomeFragment;
+import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.Constants;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
@@ -66,7 +66,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     private int iPreferenceMin;
     public static final int PERMISION_LOCATION = 1002;
     public static LatLng latLng;
-    public static UtilGPS sTracker;
     public static boolean mIsSuscrip = false;
     public boolean mAutoRenewEnabled = false;
     public String sSuscripSku = "";
@@ -98,22 +97,13 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     public void init() {
 
         startBilling();
-        sTracker = new UtilGPS(this);
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
-        } else {
-            startTracker();
-        }
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -125,7 +115,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
 
         changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
         iPreferenceMin = PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext());
-
 
     }
 
@@ -357,26 +346,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         dialog.show();
     }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case PERMISION_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startTracker();
-                } else {
-                    Toast.makeText(this, getResources().getString(R.string.msgPermissionDeniedLocation), Toast.LENGTH_LONG).show();
-                }
-                break;
-
-            default:
-                Log.d("Invalida", "Opcion Invalida");
-                break;
-        }
-    }
-
     @Override
     protected void onDestroy() {
         if (ReminderUtilities.dispatcher != null) {
@@ -577,62 +546,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         //menu.findItem(R.id.nav_alarm).setVisible(isSuscrip);
         menu.findItem(R.id.nav_alarm).setVisible(true);
 
-    }
-    /*********************************************
-     * LOCATION OPERATIONS - GPS TRACKING
-     ********************************************/
-
-    /**
-     * Start location tracker
-     */
-    public static void startTracker() {
-        try {
-            if (sTracker != null) {
-                sTracker.startTracking();
-            }
-        } catch (Exception ex) {
-            Log.d("STARTGPS-- ", ex.getMessage());
-        }
-    }
-
-    /**
-     * Stop location tracker
-     */
-    public static void stopTracking() {
-        try {
-            if (sTracker != null) {
-                sTracker.stopUsingGPS();
-            }
-        } catch (Exception ex) {
-            Log.d("STOPGPS--: ", ex.getMessage());
-        }
-
-    }
-
-    /**
-     * Check if possible get the location user
-     *
-     * @return
-     */
-    public static boolean canGetLocation() {
-        try {
-            return (sTracker != null && sTracker.canGetLocation());
-        } catch (Exception e) {
-            Log.e("GETLOCATION--: ", e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * Gets the location user
-     *
-     * @return
-     */
-    public static Location getLocation() {
-        if (sTracker != null)
-            return sTracker.getCurrentLocation();
-        else
-            return null;
     }
 
 

@@ -16,7 +16,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.sesi.parkingmeter.MainDrawerActivity;
+import com.sesi.parkingmeter.view.activity.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.sync.ParkingReminderIntentService;
 import com.sesi.parkingmeter.sync.ReminderTask;

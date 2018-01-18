@@ -6,6 +6,9 @@ package com.sesi.parkingmeter.task;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
+
+import com.google.android.gms.maps.GoogleMap;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,6 +18,14 @@ import java.net.URL;
 
 
 public class DownloadTask extends AsyncTask<String, Void, String> {
+
+    private TextView tvDetails;
+    private GoogleMap googleMap;
+
+    public DownloadTask(TextView tvDetails, GoogleMap googleMap){
+        this.tvDetails = tvDetails;
+        this.googleMap = googleMap;
+    }
 
     @Override
     protected String doInBackground(String... url2) {
@@ -43,7 +54,7 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        ParserTask parserTask = new ParserTask();
+        ParserTask parserTask = new ParserTask(tvDetails,googleMap);
 
         parserTask.execute(result);
     }

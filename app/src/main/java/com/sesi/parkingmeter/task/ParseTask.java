@@ -3,11 +3,13 @@ package com.sesi.parkingmeter.task;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.sesi.parkingmeter.fragments.HomeFragment;
-import com.sesi.parkingmeter.fragments.ParkingType2Fragment;
+import com.sesi.parkingmeter.view.fragments.HomeFragment;
+import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.DirectionsJSONParser;
 
 import org.json.JSONObject;
@@ -21,6 +23,14 @@ import java.util.List;
  */
 
 class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>> > {
+
+    private TextView tvDetails;
+    private GoogleMap googleMap;
+
+    public ParserTask(TextView tvDetails, GoogleMap googleMap){
+        this.tvDetails = tvDetails;
+        this.googleMap = googleMap;
+    }
 
     @Override
     protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
@@ -45,28 +55,36 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
         ArrayList<LatLng> points = null;
         PolylineOptions lineOptions = null;
 
-        for(int i=0;i<result.size();i++){
-            points = new ArrayList<>();
-            lineOptions = new PolylineOptions();
+        if (null != result) {
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList<>();
+                lineOptions = new PolylineOptions();
 
-            List<HashMap<String, String>> path = result.get(i);
+                List<HashMap<String, String>> path = result.get(i);
 
-            for(int j=0;j<path.size();j++){
-                HashMap<String,String> point = path.get(j);
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
 
-                double lat = Double.parseDouble(point.get("lat"));
-                double lng = Double.parseDouble(point.get("lng"));
-                LatLng position = new LatLng(lat, lng);
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
 
-                points.add(position);
+                    points.add(position);
+                }
+
+                lineOptions.addAll(points);
+                lineOptions.width(9);
+                lineOptions.color(Color.rgb(0, 0, 255));
             }
 
-            lineOptions.addAll(points);
-            lineOptions.width(9);
-            lineOptions.color(Color.rgb(0,0,255));
         }
         if(lineOptions!=null) {
-            if (null != HomeFragment.mMap && null != HomeFragment.tvDetails) {
+
+            this.tvDetails.setText(DirectionsJSONParser.sDistance);
+            this.tvDetails.append(DirectionsJSONParser.sDuration);
+            this.googleMap.addPolyline(lineOptions);
+
+      /*      if (null != HomeFragment.mMap && null != HomeFragment.tvDetails) {
                 HomeFragment.mMap.addPolyline(lineOptions);
                 HomeFragment.tvDetails.setText(DirectionsJSONParser.sDistance);
                 HomeFragment.tvDetails.append(DirectionsJSONParser.sDuration);
@@ -77,7 +95,7 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
                 ParkingType2Fragment.tvDetails.setText(DirectionsJSONParser.sDistance);
                 ParkingType2Fragment.tvDetails.append(DirectionsJSONParser.sDuration);
             }
-
+*/
         }
     }
 }

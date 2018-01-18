@@ -1,8 +1,10 @@
-package com.sesi.parkingmeter;
+package com.sesi.parkingmeter.view.activity;
 
 
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
+
+import com.sesi.parkingmeter.R;
 
 public class BaseActivity extends AppCompatActivity{
 

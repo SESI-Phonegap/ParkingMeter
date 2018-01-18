@@ -1,4 +1,4 @@
-package com.sesi.parkingmeter.fragments;
+package com.sesi.parkingmeter.view.fragments;
 
 import android.Manifest;
 import android.animation.Animator;
@@ -42,7 +42,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.sesi.parkingmeter.MainDrawerActivity;
+import com.sesi.parkingmeter.utilities.Gps;
+import com.sesi.parkingmeter.utilities.UtilGPS;
+import com.sesi.parkingmeter.view.activity.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.sync.ParkingReminderFirebaseJobService;
 import com.sesi.parkingmeter.task.DownloadTask;
@@ -55,7 +57,7 @@ import com.sesi.parkingmeter.utilities.Utils;
 import java.util.concurrent.TimeUnit;
 
 
-public class ParkingType2Fragment extends Fragment implements View.OnClickListener, OnMapReadyCallback, SwitchCompat.OnCheckedChangeListener {
+public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickListener, OnMapReadyCallback, SwitchCompat.OnCheckedChangeListener {
     private InterstitialAd mInterstitialAd;
     private AdView mAdview;
     private LatLng latLng;
@@ -75,6 +77,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
     private boolean statusHour = false;
     public static TextView tvDetails;
     private static final int TIME_LIMIT = 5;
+    private UtilGPS sTracker;
 
     public ParkingType2Fragment() {
         // Required empty public constructor
@@ -107,22 +110,23 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         if (!MainDrawerActivity.mIsSuscrip) {
             cargarPublicidad();
         }
-        tvContador = (TextView) getActivity().findViewById(R.id.contadorType2);
-        switchLocation = (SwitchCompat) getActivity().findViewById(R.id.switchLocationType2);
+        tvContador = getActivity().findViewById(R.id.contadorType2);
+        switchLocation = getActivity().findViewById(R.id.switchLocationType2);
         switchLocation.setOnCheckedChangeListener(this);
-        btnInicio = (Button) getActivity().findViewById(R.id.btnInicioType2);
+        btnInicio = getActivity().findViewById(R.id.btnInicioType2);
         btnInicio.setOnClickListener(this);
-        btnCancelar = (Button) getActivity().findViewById(R.id.btnCancelarType2);
+        btnCancelar = getActivity().findViewById(R.id.btnCancelarType2);
         btnCancelar.setOnClickListener(this);
         btnInicio.setEnabled(false);
         btnInicio.setAlpha(0.7f);
         btnCancelar.setEnabled(false);
         btnCancelar.setAlpha(0.7f);
-        tidHoraVence = (TextInputEditText) getActivity().findViewById(R.id.textInputEditTextHoraVenceType2);
+        tidHoraVence = getActivity().findViewById(R.id.textInputEditTextHoraVenceType2);
         tidHoraVence.setOnClickListener(this);
-        relativeHora = (RelativeLayout) getActivity().findViewById(R.id.relativeDetailsType2);
-        tvDatos = (TextView) getActivity().findViewById(R.id.tvDatosType2);
+        relativeHora = getActivity().findViewById(R.id.relativeDetailsType2);
+        tvDatos = getActivity().findViewById(R.id.tvDatosType2);
         tidHoraVence.addTextChangedListener(textWatcher);
+        sTracker = new UtilGPS(getContext());
       //  cancel();
     }
 
@@ -324,7 +328,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
         } else {
             bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
         }
-        Location location = MainDrawerActivity.getLocation();
+        Location location = getLocation();
 
         if (location != null) {
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -357,7 +361,7 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                         .geodesic(true)
                         .clickable(true));*/
             String url = Utils.obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
-            DownloadTask downloadTask = new DownloadTask();
+            DownloadTask downloadTask = new DownloadTask(tvDetails,mMap);
             downloadTask.execute(url);
 
         }
@@ -464,8 +468,8 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.PERMISION_LOCATION);
                 } else {
                     if (MainDrawerActivity.latLng == null) {
-                        if (MainDrawerActivity.canGetLocation()) {
-                            Location location = MainDrawerActivity.getLocation();
+                        if (canGetLocation()) {
+                            Location location = getLocation();
                             if (location != null) {
                                 MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 addMarkers();
@@ -486,5 +490,45 @@ public class ParkingType2Fragment extends Fragment implements View.OnClickListen
             tvDetails.setText("");
             MainDrawerActivity.latLng = null;
         }
+    }
+
+    @Override
+    public void startTracker() {
+        try {
+            if (sTracker != null) {
+                sTracker.startTracking();
+            }
+        } catch (Exception ex) {
+            Log.d("STARTGPS-- ", ex.getMessage());
+        }
+    }
+
+    @Override
+    public void stopTracking() {
+        try {
+            if (sTracker != null) {
+                sTracker.stopUsingGPS();
+            }
+        } catch (Exception ex) {
+            Log.d("STOPGPS--: ", ex.getMessage());
+        }
+    }
+
+    @Override
+    public boolean canGetLocation() {
+        try {
+            return (sTracker != null && sTracker.canGetLocation());
+        } catch (Exception e) {
+            Log.e("GETLOCATION--: ", e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public Location getLocation() {
+        if (sTracker != null)
+            return sTracker.getCurrentLocation();
+        else
+            return null;
     }
 }
