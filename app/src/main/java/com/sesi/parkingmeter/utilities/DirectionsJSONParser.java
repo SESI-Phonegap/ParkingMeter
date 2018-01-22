@@ -43,8 +43,8 @@ public class DirectionsJSONParser {
                         String polyline = "";
                         polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
                         List<LatLng> list = decodePoly(polyline);
-                        sDistance = (String)((JSONObject)((JSONObject)jSteps.get(0)).get("distance")).get("text")+ " ";
-                        sDuration = (String)((JSONObject)((JSONObject)jSteps.get(0)).get("duration")).get("text")+ " ";
+                        sDistance = ((JSONObject)((JSONObject)jSteps.get(0)).get("distance")).get("text")+ " ";
+                        sDuration = ((JSONObject)((JSONObject)jSteps.get(0)).get("duration")).get("text")+ " ";
                         for(int l=0;l<list.size();l++){
                             HashMap<String, String> hm = new HashMap<>();
                             hm.put("lat", Double.toString((list.get(l)).latitude) );

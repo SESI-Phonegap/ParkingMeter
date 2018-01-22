@@ -74,6 +74,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     public static GoogleMap mMap;
     public static final int PERMISION_LOCATION = 1002;
     private LatLng latLng;
+    private LatLng vehicleLatLng;
     public  TextView tvDetails;
     private RelativeLayout relativeLayoutDatos;
     private ConstraintLayout relativeHora;
@@ -173,7 +174,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         super.onResume();
         btnCancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
         btnCancelar.setAlpha(0.7f);
-        if (null != MainDrawerActivity.latLng) {
+        if (null != vehicleLatLng) {
             addMarkers();
         }
     }
@@ -486,7 +487,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     }
     public void addCarMarker(){
         Bitmap bitmapCar;
-        if (MainDrawerActivity.latLng != null && latLng != null) {
+        if (vehicleLatLng != null && latLng != null) {
             if (Build.VERSION.SDK_INT >= 21) {
                 bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
             } else {
@@ -494,11 +495,11 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
             }
             relativeLayoutDatos.setVisibility(View.VISIBLE);
             mMap.addMarker(new MarkerOptions()
-                    .position(MainDrawerActivity.latLng)
+                    .position(vehicleLatLng)
                     .title("Mi Auto")
                     .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
 
-            String url = Utils.obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
+            String url = Utils.obtenerDireccionesURL(latLng,vehicleLatLng);
             DownloadTask downloadTask = new DownloadTask(tvDetails,mMap);
             downloadTask.execute(url);
 
@@ -523,7 +524,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         switchLocation.setChecked(false);
         switchLocation.setEnabled(true);
         tvDatos.setText("");
-        MainDrawerActivity.latLng = null;
+        vehicleLatLng = null;
 
         if (ReminderUtilities.dispatcher != null) {
             ReminderUtilities.dispatcher.cancelAll();
@@ -545,11 +546,11 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
                 } else {
-                    if (null == MainDrawerActivity.latLng) {
+                    if (null == vehicleLatLng) {
                         if (canGetLocation()) {
                             Location location = getLocation();
                             if (location != null) {
-                                MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                vehicleLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 addMarkers();
                             }
                         } else {
@@ -573,7 +574,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         } else {
             mMap.clear();
             tvDetails.setText("");
-            MainDrawerActivity.latLng = null;
+            vehicleLatLng = null;
         }
     }
 

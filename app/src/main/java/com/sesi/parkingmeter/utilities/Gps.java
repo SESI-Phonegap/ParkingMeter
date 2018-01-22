@@ -5,12 +5,8 @@ import android.location.Location;
 
 public interface Gps {
 
-    /*********************************************
-     * LOCATION OPERATIONS - GPS TRACKING
-     ********************************************/
-
     /**
-     * Start location tracker
+     * Start location tracker LOCATION OPERATIONS - GPS TRACKING
      */
 
     void startTracker();

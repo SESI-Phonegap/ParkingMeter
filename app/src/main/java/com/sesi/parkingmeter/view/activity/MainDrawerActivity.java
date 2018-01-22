@@ -1,18 +1,10 @@
 package com.sesi.parkingmeter.view.activity;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -34,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.billing.IabBroadcastReceiver;
 import com.sesi.parkingmeter.billing.IabHelper;
@@ -46,13 +37,9 @@ import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.Constants;
 import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
-import com.sesi.parkingmeter.utilities.UtilGPS;
 import com.sesi.parkingmeter.utilities.UtilNetwork;
 import com.sesi.parkingmeter.utilities.Utils;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -64,8 +51,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     private Builder builder;
     private static final int MAX_MIN = 20;
     private int iPreferenceMin;
-    public static final int PERMISION_LOCATION = 1002;
-    public static LatLng latLng;
     public static boolean mIsSuscrip = false;
     public boolean mAutoRenewEnabled = false;
     public String sSuscripSku = "";
@@ -73,7 +58,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     private String sSecondChoiceSku = "";
     // Used to select between purchasing gas on a monthly or yearly basis
     String mSelectedSubscriptionPeriod = "";
-    private NavigationView navigationView;
     // The helper object
     IabHelper mHelper;
 
@@ -100,17 +84,17 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
@@ -121,11 +105,9 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
-          //  super.onBackPressed();
         }
     }
 
@@ -148,7 +130,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
                 break;
 
             case R.id.nav_share:
-                sharedSocial();
+                Utils.sharedSocial(this);
                 break;
 
             case R.id.nav_compras:
@@ -160,7 +142,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         }
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -280,16 +262,16 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     public void createDialogConfigAlarm() {
         final View view = inflater.inflate(R.layout.dialog_alarm_preferences, null);
 
-        final SwitchCompat switchVibrate = (SwitchCompat) view.findViewById(R.id.switchVibrador);
+        final SwitchCompat switchVibrate = view.findViewById(R.id.switchVibrador);
         switchVibrate.setChecked(PreferenceUtilities.getPreferenceDefaultVibrate(getApplicationContext()));
-        final SwitchCompat switchSound = (SwitchCompat) view.findViewById(R.id.switchSonido);
-        final TextView tvTitle = (TextView) view.findViewById(R.id.dialogAlarmTitle);
+        final SwitchCompat switchSound = view.findViewById(R.id.switchSonido);
+        final TextView tvTitle = view.findViewById(R.id.dialogAlarmTitle);
         tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
         switchSound.setChecked(PreferenceUtilities.getPreferenceDefaultSound(getApplicationContext()));
 
-        final TextView tvMinutos = (TextView) view.findViewById(R.id.textViewMin);
+        final TextView tvMinutos = view.findViewById(R.id.textViewMin);
         tvMinutos.setText(String.valueOf(iPreferenceMin));
-        Button btnContinuar = (Button) view.findViewById(R.id.btn_guardar_dialog_alarm);
+        Button btnContinuar = view.findViewById(R.id.btn_guardar_dialog_alarm);
         btnContinuar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -305,26 +287,26 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
             }
         });
 
-        SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarAlarm);
+        SeekBar seekBar = view.findViewById(R.id.seekBarAlarm);
         seekBar.setMax(MAX_MIN);
         seekBar.setProgress(iPreferenceMin);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (progress <= 5){
-                    tvMinutos.setText("5");
+                    tvMinutos.setText(getString(R.string.cinco));
                     iPreferenceMin = 5;
                     tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
                 } else if (progress > 5 && progress <= 10) {
-                    tvMinutos.setText("10");
+                    tvMinutos.setText(getString(R.string.dies));
                     iPreferenceMin = 10;
                     tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
                 } else if (progress > 10 && progress <= 15) {
-                    tvMinutos.setText("15");
+                    tvMinutos.setText(getString(R.string.quince));
                     iPreferenceMin = 15;
                     tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
                 } else if (progress > 15 && progress <= 20) {
-                    tvMinutos.setText("20");
+                    tvMinutos.setText(getString(R.string.veinte));
                     iPreferenceMin = 20;
                     tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
                 }
@@ -363,55 +345,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
 
     }
 
-    public void sharedSocial() {
-        List<Intent> targetShareIntents = new ArrayList<>();
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        PackageManager pm = getApplicationContext().getPackageManager();
-        List<ResolveInfo> resInfos = pm.queryIntentActivities(shareIntent, 0);
-        if (!resInfos.isEmpty()) {
-            for (ResolveInfo resInfo : resInfos) {
-                String packageName = resInfo.activityInfo.packageName;
-                Log.i("Package Name", packageName);
 
-/*         if (packageName.contains("com.twitter.android") || packageName.contains("com.facebook.katana")
-                 || packageName.contains("com.whatsapp") || packageName.contains("com.google.android.apps.plus")
-                 || packageName.contains("com.google.android.talk") || packageName.contains("com.slack")
-                 || packageName.contains("com.google.android.gm") || packageName.contains("com.facebook.orca")
-                 || packageName.contains("com.yahoo.mobile") || packageName.contains("com.skype.raider")
-                 || packageName.contains("com.android.mms")|| packageName.contains("com.linkedin.android")
-                 || packageName.contains("com.google.android.apps.messaging")) {*/
-                if (packageName.contains("com.twitter.android") || packageName.contains("com.facebook.katana")
-                        || packageName.contains("com.whatsapp")
-                        || packageName.contains("com.google.android.apps.plus")) {
-                    Intent intent = new Intent();
-
-                    intent.setComponent(new ComponentName(packageName, resInfo.activityInfo.name));
-                    intent.putExtra(Constants.APPNAME, resInfo.loadLabel(pm).toString());
-                    intent.setAction(Intent.ACTION_SEND);
-                    intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, Constants.URL_PLAYSTORE_APP);
-                    intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.compartir));
-                    intent.setPackage(packageName);
-                    targetShareIntents.add(intent);
-                }
-            }
-            if (!targetShareIntents.isEmpty()) {
-                Collections.sort(targetShareIntents, new Comparator<Intent>() {
-                    @Override
-                    public int compare(Intent o1, Intent o2) {
-                        return o1.getStringExtra("AppName").compareTo(o2.getStringExtra("AppName"));
-                    }
-                });
-                Intent chooserIntent = Intent.createChooser(targetShareIntents.remove(0), "Select app to share");
-                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetShareIntents.toArray(new Parcelable[]{}));
-                startActivity(chooserIntent);
-            } else {
-                Toast.makeText(getApplicationContext(), "No app to share.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 
     public void startBilling() {
         String key = Utils.genPK();
@@ -507,11 +441,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     public boolean verifyDeveloperPayload(Purchase p) {
         String payload = p.getDeveloperPayload();
 
-        if (payload.equals(Constants.SKU_MONTHLY) || payload.equals(Constants.SKU_YEARLY)) {
-            return true;
-        } else {
-            return false;
-        }
+        return payload.equals(Constants.SKU_MONTHLY) || payload.equals(Constants.SKU_YEARLY);
     }
 
 
@@ -541,7 +471,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
 
 
     public void updateUi(boolean isSuscrip) {
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         //menu.findItem(R.id.nav_alarm).setVisible(isSuscrip);
         menu.findItem(R.id.nav_alarm).setVisible(true);
@@ -572,7 +502,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
                         && !sSuscripSku.equals(mSelectedSubscriptionPeriod)) {
                     // The user currently has a valid subscription, any purchase action is going to
                     // replace that subscription
-                    oldSkus = new ArrayList<String>();
+                    oldSkus = new ArrayList<>();
                     oldSkus.add(sSuscripSku);
                 }
                 try {

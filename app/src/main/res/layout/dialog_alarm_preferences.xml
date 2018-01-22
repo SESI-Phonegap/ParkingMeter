@@ -5,94 +5,89 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:layout_width="304dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/custom_dialog"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.100000024">
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp">
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/dialogAlarmTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/marginTop"
+            android:text="@string/configAlarm"
+            android:textAlignment="center"
+            android:textSize="@dimen/size_title_dialog_alarm"
+            android:textStyle="bold" />
+
+        <SeekBar
+            android:id="@+id/seekBarAlarm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_dialog">
+            android:layout_below="@id/dialogAlarmTitle"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/marginTop" />
 
 
-            <TextView
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="@dimen/marginTop"
-                android:id="@+id/dialogAlarmTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="@string/configAlarm"
-                android:textAlignment="center"
-                android:textSize="@dimen/size_title_dialog_alarm"
-                android:textStyle="bold" />
+        <TextView
+            android:id="@+id/textViewMin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/seekBarAlarm"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/marginTop"
+            android:text=""
+            android:textSize="@dimen/size_textview_min_dialog_alarm"
+            android:textStyle="bold" />
 
-            <SeekBar
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:id="@+id/seekBarAlarm"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/dialogAlarmTitle"
-                android:layout_marginTop="@dimen/marginTop" />
-
-
-            <TextView
-                android:id="@+id/textViewMin"
-                android:layout_marginTop="@dimen/marginTop"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/seekBarAlarm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textStyle="bold"
-                android:textSize="@dimen/size_textview_min_dialog_alarm"/>
-
-            <android.support.v7.widget.SwitchCompat
-                android:layout_below="@id/textViewMin"
-                android:id="@+id/switchVibrador"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vibrador"
-                app:switchPadding="@dimen/marginStartEnd"
-                android:layout_alignParentEnd="true"
-                android:paddingEnd="20dp"
-                android:layout_marginTop="@dimen/marginTop"/>
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switchVibrador"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/textViewMin"
+            android:layout_marginTop="@dimen/marginTop"
+            android:paddingEnd="20dp"
+            android:paddingStart="0dp"
+            android:text="@string/vibrador"
+            app:switchPadding="@dimen/marginStartEnd" />
 
 
-            <android.support.v7.widget.SwitchCompat
-                android:id="@+id/switchSonido"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/switchVibrador"
-                android:text="Sonido"
-                android:layout_below="@id/switchVibrador"
-                app:switchPadding="@dimen/marginStartEnd"
-                android:paddingEnd="20dp"/>
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switchSonido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/switchVibrador"
+            android:layout_below="@id/switchVibrador"
+            android:paddingEnd="20dp"
+            android:paddingStart="0dp"
+            android:text="@string/sonido"
+            app:switchPadding="@dimen/marginStartEnd" />
 
-            <Button
-                android:id="@+id/btn_guardar_dialog_alarm"
-                android:layout_centerHorizontal="true"
-                android:layout_marginStart="@dimen/marginStartEndDialog"
-                android:layout_marginEnd="@dimen/marginStartEndDialog"
-                android:layout_marginTop="@dimen/marginTop"
-                android:layout_marginBottom="@dimen/marginTopBtn"
-                android:layout_below="@id/switchSonido"
-                android:layout_width="@dimen/size_button_dialog_alarm"
-                android:layout_height="30dp"
-                android:background="@drawable/custom_button"
-                android:text="@string/btn_guardar_dialog_alarm"
-                android:textSize="@dimen/size_text_button_dialog_alarm"
-                android:textStyle="normal"
-                android:textColor="@android:color/white"
-                />
-
-        </RelativeLayout>
+        <Button
+            android:id="@+id/btn_guardar_dialog_alarm"
+            android:layout_width="@dimen/size_button_dialog_alarm"
+            android:layout_height="30dp"
+            android:layout_below="@id/switchSonido"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/marginTopBtn"
+            android:layout_marginEnd="@dimen/marginStartEndDialog"
+            android:layout_marginStart="@dimen/marginStartEndDialog"
+            android:layout_marginTop="@dimen/marginTop"
+            android:background="@drawable/custom_button"
+            android:text="@string/btn_guardar_dialog_alarm"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/size_text_button_dialog_alarm"
+            android:textStyle="normal" />
 
 
     </RelativeLayout>

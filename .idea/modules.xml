@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ParkingMeter.iml" filepath="$PROJECT_DIR$/ParkingMeter.iml" />
-      <module fileurl="file://C:\Users\GONZCH\Desktop\SESI\ParkingMeter\ParkingMeter.iml" filepath="C:\Users\GONZCH\Desktop\SESI\ParkingMeter\ParkingMeter.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\GONZCH\Desktop\SESI\ParkingMeter\app\app.iml" filepath="C:\Users\GONZCH\Desktop\SESI\ParkingMeter\app\app.iml" />
     </modules>
   </component>
 </project>

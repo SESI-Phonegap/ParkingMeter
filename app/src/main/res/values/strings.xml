@@ -1,50 +1,43 @@
 <resources>
 
-    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
-    <string name="ok">OK</string>
-    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
-    <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
     <!-- Main Content -->
     <string name="app_name">Parquimetro MX</string>
-    <string name="action_settings">Settings</string>
     <string name="cero">00:00:00</string>
-    <string name="fecha">Fecha</string>
-    <string name="fechaDefault">12/04/2017</string>
-    <string name="horaDefault">13:00</string>
     <string name="horaCero">00:00</string>
-    <string name="ceroMinutes"></string>
-    <string name="horadepago">Hora actual</string>
-    <string name="vence">Vence:</string>
     <string name="Horavencimiento">Hora</string>
     <string name="minutes">Minutos</string>
     <string name="iniciar">Iniciar</string>
     <string name="cancelar">Cancelar</string>
-    <string name="gasto">Gasto</string>
-    <string name="manualmente">Introduce los datos manualmente</string>
     <string name="msgLimiteTiempo">El tiempo es menor al limite de tiempo de 10 Min.</string>
     <string name="msgHoraVencMenor">La hora de vencimiento no puede ser igual o menor a la hora de actual</string>
     <string name="msgPermissionDeniedLocation">Necesita dar permisos de Localizacion</string>
     <string name="msg_falta_dato">Introduce un valor valido</string>
-    <string name="switchOn">On</string>
-    <string name="switchOff">Off</string>
     <string name="switchText">Ubicación del coche</string>
+    <string name="descripLogo">Logo</string>
+    <string name="vibrador">Vibrador</string>
+    <string name="sonido">Sonido</string>
+    <string name="distancia">Distancia</string>
 
+
+    <string name="cinco">5</string>
+    <string name="dies">10</string>
+    <string name="quince">15</string>
+    <string name="veinte">20</string>
 
     <string name="noInternet">Debes de tener acceso a internet para utilizar esta función.</string>
     <string name="noGps">Activa tu localización para activar esta opción.</string>
 
-    <string name="title_activity_main_drawer">MainDrawerActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Menu Navigation Drawer-->
-    <string name="home">Inicio</string>
     <string name="parking1">Tipo 1</string>
     <string name="parking2">Tipo 2</string>
     <string name="alarma">Alarma</string>
-    <string name="findCar">Encontrar Carro</string>
+    <string name="compras">Compras</string>
     <string name="compartir">Compartir</string>
+    <string name="cuentaleAmigo">Cuentale a un amigo</string>
 
 
     <!-- Notification -->
@@ -59,13 +52,10 @@
     <string name="cambiaSuscrip">Cambia tu suscripción, Selecciona tu nueva suscripción</string>
     <string name="continuar">Continuar</string>
     <!-- Dialog alarm -->
-    <string name="configAlarm">Avisarrme %1$s minutos antes. </string>
+    <string name="configAlarm">Avisarme %1$s minutos antes. </string>
     <string name="btn_guardar_dialog_alarm">Guardar</string>
     <string name="msg_check_switch_alert">Al menos una opción debe de estar habilitada (Vibrador o Sonido)</string>
-    <string name="tvMinutos">%1$s Min</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- AdMob -->
 

@@ -17,11 +17,11 @@
         <item
             android:id="@+id/nav_compras"
             android:icon="@drawable/store"
-            android:title="Compras"/>
+            android:title="@string/compras"/>
 
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/cuentaleAmigo">
         <menu>
             <item
                 android:id="@+id/nav_share"

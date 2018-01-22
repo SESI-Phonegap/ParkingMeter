@@ -8,8 +8,6 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.sesi.parkingmeter.view.fragments.HomeFragment;
-import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.DirectionsJSONParser;
 
 import org.json.JSONObject;
@@ -17,10 +15,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-/**
- * Created by Chris on 16/05/2017.
- */
 
 class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>> > {
 

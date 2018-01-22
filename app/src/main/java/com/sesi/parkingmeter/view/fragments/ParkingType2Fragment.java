@@ -54,6 +54,7 @@ import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.UtilNetwork;
 import com.sesi.parkingmeter.utilities.Utils;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
@@ -61,6 +62,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
     private InterstitialAd mInterstitialAd;
     private AdView mAdview;
     private LatLng latLng;
+    private LatLng vehicleLatLng;
     private TextView tvContador;
     private SwitchCompat switchLocation;
     private TextView tvDatos;
@@ -131,7 +133,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
     }
 
     public void cargarPublicidad() {
-        mAdview = (AdView) getActivity().findViewById(R.id.adViewType2);
+        mAdview = getActivity().findViewById(R.id.adViewType2);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdview.loadAd(adRequest);
         mAdview.setAdListener(new AdListener() {
@@ -160,9 +162,15 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         super.onResume();
         btnCancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
         btnCancelar.setAlpha(0.7f);
-        if (null != MainDrawerActivity.latLng) {
+        if (null != vehicleLatLng) {
             addMarkers();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cancel();
     }
 
     @Override
@@ -224,8 +232,8 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        relativeLayoutDatos = (RelativeLayout) getActivity().findViewById(R.id.relativeDatosType2);
-        tvDetails = (TextView) getActivity().findViewById(R.id.tvDatosType2);
+        relativeLayoutDatos = getActivity().findViewById(R.id.relativeDatosType2);
+        tvDetails = getActivity().findViewById(R.id.tvDatosType2);
         mMap = googleMap;
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -343,7 +351,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
     }
 
     public void addCarMarker() {
-        if (MainDrawerActivity.latLng != null) {
+        if (vehicleLatLng != null) {
             Bitmap bitmapCar;
             if (Build.VERSION.SDK_INT >= 21) {
                 bitmapCar = getBitmap((VectorDrawable) getActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
@@ -351,16 +359,16 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
                 bitmapCar = BitmapFactory.decodeResource(getResources(), R.drawable.sedan_car_front);
             }
             mMap.addMarker(new MarkerOptions()
-                    .position(MainDrawerActivity.latLng)
+                    .position(vehicleLatLng)
                     .title("Mi Auto")
                     .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
 
             /*    mMap.addPolyline(new PolylineOptions()
-                        .add(latLng,MainDrawerActivity.latLng)
+                        .add(latLng,vehichleLatLng)
                         .width(5).color(Color.BLUE)
                         .geodesic(true)
                         .clickable(true));*/
-            String url = Utils.obtenerDireccionesURL(latLng, MainDrawerActivity.latLng);
+            String url = Utils.obtenerDireccionesURL(latLng, vehicleLatLng);
             DownloadTask downloadTask = new DownloadTask(tvDetails,mMap);
             downloadTask.execute(url);
 
@@ -381,7 +389,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         countTimer = new CountDownTimer(min * 1000 + 100, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                String contador = "" + String.format(FORMAT,
+                String contador = "" + String.format(Locale.US,FORMAT,
                         TimeUnit.MILLISECONDS.toHours(millisUntilFinished),
                         TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
                                 TimeUnit.MILLISECONDS.toHours(millisUntilFinished)),
@@ -416,7 +424,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         btnCancelar.setEnabled(false);
         PreferenceUtilities.changeStatusButtonCancel(getContext(), false);
         PreferenceUtilities.savePreferencesFinalHour(getContext(), getResources().getString(R.string.horaCero));
-        tidHoraVence.setText(getResources().getString(R.string.ceroMinutes));
+        tidHoraVence.setText("");
         if (countTimer != null && mMap != null) {
             countTimer.cancel();
             mMap.clear();
@@ -425,7 +433,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         switchLocation.setChecked(false);
         tvDatos.setText("");
         switchLocation.setEnabled(true);
-        MainDrawerActivity.latLng = null;
+        vehicleLatLng = null;
 
         if (ReminderUtilities.dispatcher != null) {
             ReminderUtilities.dispatcher.cancelAll();
@@ -467,11 +475,11 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.PERMISION_LOCATION);
                 } else {
-                    if (MainDrawerActivity.latLng == null) {
+                    if (vehicleLatLng == null) {
                         if (canGetLocation()) {
                             Location location = getLocation();
                             if (location != null) {
-                                MainDrawerActivity.latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                vehicleLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 addMarkers();
                             }
                         } else {
@@ -488,7 +496,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         } else {
             mMap.clear();
             tvDetails.setText("");
-            MainDrawerActivity.latLng = null;
+            vehicleLatLng = null;
         }
     }
 

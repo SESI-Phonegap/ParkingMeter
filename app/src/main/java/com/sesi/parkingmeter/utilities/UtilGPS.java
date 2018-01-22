@@ -108,7 +108,7 @@ public class UtilGPS extends Service implements LocationListener {
     /**
      * Get current location
      *
-     * @return
+     * @return Location
      */
     public synchronized Location getCurrentLocation() {
         return location;
