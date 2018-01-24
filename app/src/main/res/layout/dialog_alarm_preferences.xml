@@ -49,29 +49,67 @@
             android:textSize="@dimen/size_textview_min_dialog_alarm"
             android:textStyle="bold" />
 
+        <View
+            android:id="@+id/separador1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/textViewMin"
+            android:layout_marginTop="@dimen/marginTop"
+            android:background="@android:color/darker_gray"
+            />
+
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/switchVibrador"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/textViewMin"
+            android:layout_below="@id/separador1"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/marginTop"
-            android:paddingEnd="20dp"
-            android:paddingStart="0dp"
             android:text="@string/vibrador"
             app:switchPadding="@dimen/marginStartEnd" />
 
+        <View
+            android:id="@+id/separador2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/switchVibrador"
+            android:layout_marginTop="@dimen/marginTop"
+            android:background="@android:color/darker_gray"
+            />
+
+        <Button
+            android:id="@+id/btn_sound"
+            android:layout_width="35dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/separador2"
+            android:background="@drawable/custom_button"
+            android:layout_marginStart="5dp"
+            android:drawableTop="@drawable/ic_music_white_24dp"
+            android:textStyle="normal"
+            android:layout_marginTop="5dp"/>
+
+        <TextView
+            android:id="@+id/tvSound"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/sizeTextSwitch"
+            android:layout_below="@id/separador2"
+            android:layout_toEndOf="@id/btn_sound"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"/>
 
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/switchSonido"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/switchVibrador"
             android:layout_below="@id/switchVibrador"
-            android:paddingEnd="20dp"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="10dp"
             android:paddingStart="0dp"
             android:text="@string/sonido"
-            app:switchPadding="@dimen/marginStartEnd" />
+            app:switchPadding="@dimen/marginStartEnd"
+            android:layout_marginTop="@dimen/marginTop"/>
 
         <Button
             android:id="@+id/btn_guardar_dialog_alarm"

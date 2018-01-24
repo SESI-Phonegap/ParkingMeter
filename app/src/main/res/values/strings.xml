@@ -55,7 +55,8 @@
     <string name="configAlarm">Avisarme %1$s minutos antes. </string>
     <string name="btn_guardar_dialog_alarm">Guardar</string>
     <string name="msg_check_switch_alert">Al menos una opción debe de estar habilitada (Vibrador o Sonido)</string>
-
+    <string name="titleSound">Selecciona un tono</string>
+    <string name="tono">Tono</string>
 
     <!-- AdMob -->
 

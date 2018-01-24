@@ -60,7 +60,7 @@ public class NotificationUtils {
                 .setAutoCancel(true);
 
         if (PreferenceUtilities.getPreferenceDefaultSound(context)) {
-            notificationBuilder.setSound(uri);
+            notificationBuilder.setSound(PreferenceUtilities.getUriSoundSelected(context));
         }
         if (PreferenceUtilities.getPreferenceDefaultVibrate(context)) {
             notificationBuilder.setVibrate(new long[]{1000, 3000, 1000, 3000, 1000});
@@ -127,6 +127,7 @@ public class NotificationUtils {
 
         Intent startActivityIntent = new Intent(context, MainDrawerActivity.class);
         startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        //startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
 
         return PendingIntent.getActivity(
                 context,

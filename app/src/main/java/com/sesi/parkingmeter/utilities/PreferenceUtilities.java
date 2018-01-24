@@ -2,7 +2,11 @@ package com.sesi.parkingmeter.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+
+import java.io.File;
 
 
 public class PreferenceUtilities {
@@ -18,6 +22,8 @@ public class PreferenceUtilities {
     private static final boolean DEFAULT_STATUS_VIBRATE = false;
     public static final String SAVE_DEFAULT_STATUS_SOUND = "save_default_status_sound";
     private static final boolean DEFAULT_STATUS_SOUND = true;
+    private static final String SAVE_SELECTED_SOUND = "save_selected_sound";
+    private static final Uri DEFAULT_SOUND = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
     private PreferenceUtilities(){
         //EMPTY
@@ -94,6 +100,26 @@ public class PreferenceUtilities {
     public static boolean getPreferenceDefaultSound(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(SAVE_DEFAULT_STATUS_SOUND, DEFAULT_STATUS_SOUND);
+    }
+
+    public static void saveUriSoundSelected(Context context, String path){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(SAVE_SELECTED_SOUND,path);
+        editor.apply();
+    }
+
+    public static Uri getUriSoundSelected(Context context){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String sPath = prefs.getString(SAVE_SELECTED_SOUND,DEFAULT_SOUND.toString());
+      //  Uri uriSound = Uri.parse(prefs.getString(SAVE_SELECTED_SOUND,DEFAULT_SOUND.toString()));
+        File file = new File(sPath);
+        if (file.exists()){
+            return Uri.fromFile(file);
+        }else {
+            return DEFAULT_SOUND;
+        }
     }
 
 

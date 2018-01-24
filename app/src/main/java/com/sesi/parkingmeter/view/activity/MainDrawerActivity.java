@@ -1,10 +1,16 @@
 package com.sesi.parkingmeter.view.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -32,6 +38,9 @@ import com.sesi.parkingmeter.billing.IabHelper;
 import com.sesi.parkingmeter.billing.IabResult;
 import com.sesi.parkingmeter.billing.Inventory;
 import com.sesi.parkingmeter.billing.Purchase;
+import com.sesi.parkingmeter.billing.SkuDetails;
+import com.sesi.parkingmeter.model.Suscriptions;
+import com.sesi.parkingmeter.utilities.SoundGallery;
 import com.sesi.parkingmeter.view.fragments.HomeFragment;
 import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.utilities.Constants;
@@ -39,6 +48,8 @@ import com.sesi.parkingmeter.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.utilities.UtilNetwork;
 import com.sesi.parkingmeter.utilities.Utils;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +71,10 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     String mSelectedSubscriptionPeriod = "";
     // The helper object
     IabHelper mHelper;
+    private SoundGallery soundGallery;
+    private List<Suscriptions> lstSuscriptions;
 
+    private static final int ID_SOUND = 999;
     // Provides purchase notification while this app is running
     IabBroadcastReceiver mBroadcastReceiver;
 
@@ -99,7 +113,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
 
         changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
         iPreferenceMin = PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext());
-
+        soundGallery = new SoundGallery(getApplicationContext());
     }
 
 
@@ -155,7 +169,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         }
 
         if (mIsSuscrip) {
-            complain("No need! You're subscribed to infinite gas. Isn't that awesome?");
+            complain("No need! You're subscribed. Isn't that awesome?");
             return;
         }
 
@@ -259,6 +273,21 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         transaction.commit();
     }
 
+    private void openGallery() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 999);
+
+            } else {
+                startActivityForResult(soundGallery.openGalleryIntent(), ID_SOUND);
+            }
+        } else {
+            startActivityForResult(soundGallery.openGalleryIntent(), ID_SOUND);
+        }
+
+    }
+
     public void createDialogConfigAlarm() {
         final View view = inflater.inflate(R.layout.dialog_alarm_preferences, null);
 
@@ -272,6 +301,19 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         final TextView tvMinutos = view.findViewById(R.id.textViewMin);
         tvMinutos.setText(String.valueOf(iPreferenceMin));
         Button btnContinuar = view.findViewById(R.id.btn_guardar_dialog_alarm);
+        Button btnTono = view.findViewById(R.id.btn_sound);
+
+        TextView tvSound = view.findViewById(R.id.tvSound);
+        String path = PreferenceUtilities.getUriSoundSelected(this).getPath();
+        File file = new File(path);
+        tvSound.setText(file.getName());
+        btnTono.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGallery();
+            }
+        });
+
         btnContinuar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -404,12 +446,15 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
                 return;
             }
 
+            lstSuscriptions = new ArrayList<>();
             Log.d("Mensaje", "Query inventory was successful.");
 
             Purchase pSuscripMonthly = inventory.getPurchase(Constants.SKU_MONTHLY);
             Purchase pSuscripYearly = inventory.getPurchase(Constants.SKU_YEARLY);
-
-
+            SkuDetails detailspMonthly = inventory.getSkuDetails(Constants.SKU_MONTHLY);
+            SkuDetails detailsYearly = inventory.getSkuDetails(Constants.SKU_YEARLY);
+            lstSuscriptions.add(new Suscriptions(detailspMonthly.getSku(),detailspMonthly.getTitle(),detailspMonthly.getDescription(),detailspMonthly.getPrice(),detailspMonthly.getPriceCurrencyCode()));
+            lstSuscriptions.add(new Suscriptions(detailsYearly.getSku(),detailsYearly.getTitle(),detailsYearly.getDescription(),detailsYearly.getPrice(),detailsYearly.getPriceCurrencyCode()));
             if (pSuscripMonthly != null && pSuscripMonthly.isAutoRenewing()) {
                 Log.d("Inventario:", pSuscripMonthly.getSku());
                 sSuscripSku = Constants.SKU_MONTHLY;
@@ -526,4 +571,16 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     }
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK){
+
+            if(requestCode == ID_SOUND){
+                Uri uri = data.getData();
+                soundGallery.setSoundUri(uri);
+                PreferenceUtilities.saveUriSoundSelected(this,soundGallery.getPath());
+            }
+        }
+    }
 }
