@@ -26,10 +26,10 @@
         </activity>
 
         <service
-            android:name=".sync.ParkingReminderIntentService"
+            android:name=".jobservice.ParkingReminderIntentService"
             android:exported="false" />
         <service
-            android:name=".sync.ParkingReminderFirebaseJobService"
+            android:name=".jobservice.ParkingReminderFirebaseJobService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />

@@ -33,21 +33,21 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 import com.sesi.parkingmeter.R;
-import com.sesi.parkingmeter.billing.IabBroadcastReceiver;
-import com.sesi.parkingmeter.billing.IabHelper;
-import com.sesi.parkingmeter.billing.IabResult;
-import com.sesi.parkingmeter.billing.Inventory;
-import com.sesi.parkingmeter.billing.Purchase;
-import com.sesi.parkingmeter.billing.SkuDetails;
-import com.sesi.parkingmeter.model.Suscriptions;
-import com.sesi.parkingmeter.utilities.SoundGallery;
+import com.sesi.parkingmeter.data.api.billing.IabBroadcastReceiver;
+import com.sesi.parkingmeter.data.api.billing.IabHelper;
+import com.sesi.parkingmeter.data.api.billing.IabResult;
+import com.sesi.parkingmeter.data.api.billing.Inventory;
+import com.sesi.parkingmeter.data.api.billing.Purchase;
+import com.sesi.parkingmeter.data.api.billing.SkuDetails;
+import com.sesi.parkingmeter.data.model.Suscriptions;
+import com.sesi.parkingmeter.view.utilities.SoundGallery;
 import com.sesi.parkingmeter.view.fragments.HomeFragment;
 import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
-import com.sesi.parkingmeter.utilities.Constants;
-import com.sesi.parkingmeter.utilities.PreferenceUtilities;
-import com.sesi.parkingmeter.utilities.ReminderUtilities;
-import com.sesi.parkingmeter.utilities.UtilNetwork;
-import com.sesi.parkingmeter.utilities.Utils;
+import com.sesi.parkingmeter.view.utilities.Constants;
+import com.sesi.parkingmeter.view.utilities.PreferenceUtilities;
+import com.sesi.parkingmeter.view.utilities.ReminderUtilities;
+import com.sesi.parkingmeter.view.utilities.UtilNetwork;
+import com.sesi.parkingmeter.view.utilities.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -289,7 +289,7 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
     }
 
     public void createDialogConfigAlarm() {
-        final View view = inflater.inflate(R.layout.dialog_alarm_preferences, null);
+        final View view = inflater.inflate(R.layout.dialog_alarm, null);
 
         final SwitchCompat switchVibrate = view.findViewById(R.id.switchVibrador);
         switchVibrate.setChecked(PreferenceUtilities.getPreferenceDefaultVibrate(getApplicationContext()));
