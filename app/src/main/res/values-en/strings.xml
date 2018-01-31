@@ -1,4 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+    <!-- Main Content -->
+    <string name="app_name">Parquimetro MX</string>
+    <string name="cero">00:00:00</string>
+    <string name="horaCero">00:00</string>
+    <string name="Horavencimiento">Hour</string>
+    <string name="minutes">Minutes</string>
+    <string name="iniciar">Start</string>
+    <string name="cancelar">Cancel</string>
+    <string name="msgLimiteTiempo">The time is less than the time limit set.</string>
+    <string name="msgHoraVencMenor">The expiration time can not be equal to or less than the current time</string>
+    <string name="msgPermissionDeniedLocation">You need to give location permission.</string>
+    <string name="msg_falta_dato">Enter a valid value</string>
+    <string name="switchText">Car location</string>
+    <string name="descripLogo">Logo</string>
+    <string name="vibrador">Vibrator</string>
+    <string name="sonido">Sound</string>
+    <string name="distancia">Distance</string>
+
+
+    <string name="cinco">5</string>
+    <string name="dies">10</string>
+    <string name="quince">15</string>
+    <string name="veinte">20</string>
+
+    <string name="noInternet">You must have access to the internet to use this feature.</string>
+    <string name="noGps">Activate your location to activate this option.</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Menu Navigation Drawer-->
+    <string name="parking1">Type 1</string>
+    <string name="parking2">Type 2</string>
+    <string name="alarma">Alarma</string>
+    <string name="compras">Purchases</string>
+    <string name="compartir">Share</string>
+    <string name="cuentaleAmigo">Tell a friend</string>
+
+
+    <!-- Notification -->
+    <string name="charging_reminder_notification_title">! Time to go for your car !</string>
+    <string name="charging_reminder_notification_body">Its time to go for your car. Avoid expensive fines.</string>
+
+    <!-- Suscripcion -->
+    <string name="selectSuscrip">Select your subscription period. \n Remove advertising and customize your alarm.</string>
+    <string name="Meses6">Subscription for 6 months</string>
+    <string name="Meses12">Subscription for 12 months</string>
+    <string name="reactivaSuscrip">Reactivate your subscription</string>
+    <string name="cambiaSuscrip">Change your subscription, Select your new subscription</string>
+    <string name="continuar">Continue</string>
+    <!-- Dialog alarm -->
+    <string name="configAlarm">Notify me %1$s minutes before. </string>
+    <string name="btn_guardar_dialog_alarm">Save</string>
+    <string name="msg_check_switch_alert">At least one option must be enabled (Vibrator or Sound)</string>
+    <string name="titleSound">Select a tone</string>
+    <string name="tono">Tone</string>
+
+    <!-- AdMob -->
+
+    <string name="banner_ad_unit_id">ca-app-pub-2449148181464779~1658655246</string>
+    <string name="banner_intersticial">ca-app-pub-2449148181464779/7425987245</string>
+    <string name="banner">ca-app-pub-2449148181464779/5005414441</string>
+    <string name="banner_2">ca-app-pub-2449148181464779/3117735242</string>
+    <string name="banner_intersticial_2">ca-app-pub-2449148181464779/7547934849</string>
+
+    <!-- Splash -->
 </resources>
