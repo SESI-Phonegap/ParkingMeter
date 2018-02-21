@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,7 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainDrawerActivity extends BaseActivity implements DialogInterface.OnClickListener, IabBroadcastReceiver.IabBroadcastListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainDrawerActivity extends BaseActivity implements IabBroadcastReceiver.IabBroadcastListener, NavigationView.OnNavigationItemSelectedListener {
 
 
     private LayoutInflater inflater;
@@ -204,13 +205,15 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
             titleResId = R.string.cambiaSuscrip;
         }
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+   /*     android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setTitle(titleResId)
-                .setSingleChoiceItems(options, 0 /* checkedItem */, this)
+                .setSingleChoiceItems(options, 0 , this)
                 .setPositiveButton(R.string.continuar, this)
                 .setNegativeButton(R.string.cancelar, this);
         android.app.AlertDialog dialog = builder.create();
         dialog.show();
+        */
+        createDialogCompras();
 /*
            String payload = "";
 
@@ -255,6 +258,72 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
             }
         }
     };
+
+    public void createDialogCompras(){
+        final View view = inflater.inflate(R.layout.dialog_compras, null);
+        RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
+        Button btnSuscribir = view.findViewById(R.id.btn_comprar);
+        Button btnCancel = view.findViewById(R.id.btn_cancel);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.rb_seis:
+                        mSelectedSubscriptionPeriod = sFirstChoiceSku;
+                        break;
+
+                    case R.id.rb_doce:
+                        mSelectedSubscriptionPeriod = sSecondChoiceSku;
+                        break;
+                }
+            }
+        });
+
+        btnSuscribir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String payload = "";
+                if (TextUtils.isEmpty(mSelectedSubscriptionPeriod)) {
+                    // The user has not changed from the default selection
+                    mSelectedSubscriptionPeriod = sFirstChoiceSku;
+                }
+                List<String> oldSkus = null;
+                if (!TextUtils.isEmpty(sSuscripSku)
+                        && !sSuscripSku.equals(mSelectedSubscriptionPeriod)) {
+                    // The user currently has a valid subscription, any purchase action is going to
+                    // replace that subscription
+                    oldSkus = new ArrayList<>();
+                    oldSkus.add(sSuscripSku);
+                }
+                try {
+                    mHelper.launchPurchaseFlow(getParent(), mSelectedSubscriptionPeriod, IabHelper.ITEM_TYPE_SUBS,
+                            oldSkus, Constants.RC_REQUEST, mPurchaseFinishedListener, payload);
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                    complain("Error launching purchase flow. Another async operation in progress.");
+                    // setWaitScreen(false);
+                }
+                mSelectedSubscriptionPeriod = "";
+                sFirstChoiceSku = "";
+                sSecondChoiceSku = "";
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // There are only four buttons, this should not happen
+                Log.e("Mensaje: ", "Unknown button clicked in subscription dialog: " );
+                dialog.dismiss();
+            }
+        });
+
+        builder.setView(view);
+        dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
+
+    }
 
     public void changeFragment(Fragment fragment, int resource, boolean isRoot, boolean backStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -520,53 +589,6 @@ public class MainDrawerActivity extends BaseActivity implements DialogInterface.
         Menu menu = navigationView.getMenu();
         //menu.findItem(R.id.nav_alarm).setVisible(isSuscrip);
         menu.findItem(R.id.nav_alarm).setVisible(true);
-
-    }
-
-
-    @Override
-    public void onClick(DialogInterface dialog, int id) {
-
-        switch (id) {
-            case 0:
-                mSelectedSubscriptionPeriod = sFirstChoiceSku;
-                break;
-
-            case 1:
-                mSelectedSubscriptionPeriod = sSecondChoiceSku;
-                break;
-
-            case DialogInterface.BUTTON_POSITIVE:
-                String payload = "";
-                if (TextUtils.isEmpty(mSelectedSubscriptionPeriod)) {
-                    // The user has not changed from the default selection
-                    mSelectedSubscriptionPeriod = sFirstChoiceSku;
-                }
-                List<String> oldSkus = null;
-                if (!TextUtils.isEmpty(sSuscripSku)
-                        && !sSuscripSku.equals(mSelectedSubscriptionPeriod)) {
-                    // The user currently has a valid subscription, any purchase action is going to
-                    // replace that subscription
-                    oldSkus = new ArrayList<>();
-                    oldSkus.add(sSuscripSku);
-                }
-                try {
-                    mHelper.launchPurchaseFlow(this, mSelectedSubscriptionPeriod, IabHelper.ITEM_TYPE_SUBS,
-                            oldSkus, Constants.RC_REQUEST, mPurchaseFinishedListener, payload);
-                } catch (IabHelper.IabAsyncInProgressException e) {
-                    complain("Error launching purchase flow. Another async operation in progress.");
-                    // setWaitScreen(false);
-                }
-                mSelectedSubscriptionPeriod = "";
-                sFirstChoiceSku = "";
-                sSecondChoiceSku = "";
-                break;
-
-            case DialogInterface.BUTTON_NEGATIVE:
-                // There are only four buttons, this should not happen
-                Log.e("Mensaje: ", "Unknown button clicked in subscription dialog: " + id);
-                break;
-        }
 
     }
 
