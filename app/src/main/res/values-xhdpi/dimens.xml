@@ -22,4 +22,6 @@
     <dimen name="size_textview_min_dialog_alarm">25sp</dimen>
     <dimen name="size_text_button_dialog_alarm">15sp</dimen>
     <dimen name="size_button_dialog_alarm">180dp</dimen>
+
+    <dimen name="size_title_dialog_descrip">19sp</dimen>
 </resources>

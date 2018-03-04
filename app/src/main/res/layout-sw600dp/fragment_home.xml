@@ -201,6 +201,17 @@
                     app:layout_constraintBottom_toTopOf="@+id/relativeDatos"
                     app:layout_constraintLeft_toLeftOf="parent" />
 
+                <ImageView
+                    android:id="@+id/img_publi_no_internet"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:visibility="gone"
+                    android:src="@drawable/sedan_car_front"
+                    app:layout_constraintBottom_toTopOf="@+id/relativeDatos"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="8dp"
+                    />
+
                 <RelativeLayout
                     android:visibility="invisible"
                     android:id="@+id/relativeDatos"

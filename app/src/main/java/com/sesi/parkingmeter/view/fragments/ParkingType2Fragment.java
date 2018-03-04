@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -133,28 +134,34 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
     }
 
     public void cargarPublicidad() {
-        mAdview = getActivity().findViewById(R.id.adViewType2);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdview.loadAd(adRequest);
-        mAdview.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                // Load the next interstitial.
-                mAdview.loadAd(new AdRequest.Builder().build());
-            }
-        });
+        if (UtilNetwork.isOnline(getActivity())) {
+            mAdview = getActivity().findViewById(R.id.adViewType2);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdview.loadAd(adRequest);
+            mAdview.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    // Load the next interstitial.
+                    mAdview.loadAd(new AdRequest.Builder().build());
+                }
+            });
 
-        mInterstitialAd = new InterstitialAd(getActivity());
-        mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial_2));
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                // Load the next interstitial.
-                mInterstitialAd.loadAd(new AdRequest.Builder().build());
-            }
+            mInterstitialAd = new InterstitialAd(getActivity());
+            mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial_2));
+            mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    // Load the next interstitial.
+                    mInterstitialAd.loadAd(new AdRequest.Builder().build());
+                }
 
-        });
+            });
+        }else {
+            ImageView imgPubli = getActivity().findViewById(R.id.img_publi_no_internet);
+            imgPubli.setVisibility(View.VISIBLE);
+
+        }
     }
 
     @Override

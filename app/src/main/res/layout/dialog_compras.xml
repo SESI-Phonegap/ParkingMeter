@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@drawable/custom_dialog">
 
     <TextView
@@ -15,79 +14,27 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/compras"
+        android:textColor="@android:color/black"
         android:textSize="@dimen/size_title_dialog_alarm"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RadioGroup
-        android:id="@+id/radioGroup"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
-
-        <RadioButton
-            android:id="@+id/rb_seis"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:textAlignment="center"
-            android:text="6 meses" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
-
-        <RadioButton
-            android:id="@+id/rb_doce"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_width="match_parent"
-            android:textAlignment="center"
-            android:layout_height="40dp"
-            android:text="12 meses" />
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/btn_comprar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/custom_button"
-        android:paddingEnd="10dp"
-        android:paddingStart="10dp"
-        android:text="@string/btn_suscribir"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/size_text_button_dialog_alarm"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_cancel"
-        app:layout_constraintHorizontal_bias="0.85"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-    <Button
-        android:id="@+id/btn_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/custom_button"
-        android:paddingEnd="10dp"
-        android:paddingStart="10dp"
-        android:text="@string/cancelar"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/size_text_button_dialog_alarm"
-        app:layout_constraintBaseline_toBaselineOf="@+id/btn_comprar"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

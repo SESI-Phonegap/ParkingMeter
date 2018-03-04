@@ -69,4 +69,14 @@
     <!-- Splash -->
 
     <string name="btn_suscribir">Subscribe</string>
+
+    <string name="descripcion">Description</string>
+    <string name="precio">Price</string>
+    <string name="nodisponible">Not available</string>
+    <string name="graciasMsj">Thank you for subscribing to ParkingMeter!</string>
+    <string name="alert_already_purchased">Item is already purchased</string>
+    <string name="button_own">Own</string>
+    <string name="button_change">Change</string>
+    <string name="header_inapp">One-time deals</string>
+    <string name="header_subscriptions">Subscriptions</string>
 </resources>

@@ -2,13 +2,14 @@ package com.sesi.parkingmeter.view.activity;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -18,84 +19,85 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.ads.MobileAds;
 import com.sesi.parkingmeter.R;
-import com.sesi.parkingmeter.data.api.billing.IabBroadcastReceiver;
-import com.sesi.parkingmeter.data.api.billing.IabHelper;
-import com.sesi.parkingmeter.data.api.billing.IabResult;
-import com.sesi.parkingmeter.data.api.billing.Inventory;
-import com.sesi.parkingmeter.data.api.billing.Purchase;
-import com.sesi.parkingmeter.data.api.billing.SkuDetails;
+import com.sesi.parkingmeter.data.api.billing.BillingManager;
+import com.sesi.parkingmeter.data.api.billing.BillingProvider;
 import com.sesi.parkingmeter.data.model.Suscriptions;
+import com.sesi.parkingmeter.view.adapter.CardsWithHeadersDecoration;
+import com.sesi.parkingmeter.view.adapter.SkuRowData;
+import com.sesi.parkingmeter.view.adapter.SkusAdapter;
+import com.sesi.parkingmeter.view.adapter.UiManager;
 import com.sesi.parkingmeter.view.utilities.SoundGallery;
 import com.sesi.parkingmeter.view.fragments.HomeFragment;
 import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
-import com.sesi.parkingmeter.view.utilities.Constants;
 import com.sesi.parkingmeter.view.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.view.utilities.ReminderUtilities;
-import com.sesi.parkingmeter.view.utilities.UtilNetwork;
 import com.sesi.parkingmeter.view.utilities.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sesi.parkingmeter.data.api.billing.BillingManager.BILLING_MANAGER_NOT_INITIALIZED;
 
-public class MainDrawerActivity extends BaseActivity implements IabBroadcastReceiver.IabBroadcastListener, NavigationView.OnNavigationItemSelectedListener {
+
+public class MainDrawerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BillingProvider {
 
 
+    private static final String MONTH_SKU = "suscrip_meses";
+    private static final String ANO_SKU = "suscrip_ano";
     private LayoutInflater inflater;
     private AlertDialog dialog;
     private Builder builder;
     private static final int MAX_MIN = 20;
     private int iPreferenceMin;
     public static boolean mIsSuscrip = false;
-    public boolean mAutoRenewEnabled = false;
-    public String sSuscripSku = "";
-    private String sFirstChoiceSku = "";
-    private String sSecondChoiceSku = "";
-    // Used to select between purchasing gas on a monthly or yearly basis
-    String mSelectedSubscriptionPeriod = "";
-    // The helper object
-    IabHelper mHelper;
     private SoundGallery soundGallery;
     private List<Suscriptions> lstSuscriptions;
-
+    private BillingManager mBillingManager;
+    private BillingProvider mBillingProvider;
+    private boolean mGoldMonthly;
+    private boolean mGoldYearly;
+    private UpdateListener mUpdateListener;
     private static final int ID_SOUND = 999;
-    // Provides purchase notification while this app is running
-    IabBroadcastReceiver mBroadcastReceiver;
+    private SkusAdapter mAdapter;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
 
-        if (UtilNetwork.isOnline(this)) {
-            MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
-            init();
-        } else {
-            Toast.makeText(this,"Necesitas conexion a internet",Toast.LENGTH_LONG).show();
-        }
+        MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
+        init();
+
 
     }
 
     public void init() {
 
-        startBilling();
+        mUpdateListener = new UpdateListener();
+        // Create and initialize BillingManager which talks to BillingLibrary
+        mBillingManager = new BillingManager(this, mUpdateListener);
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -149,7 +151,14 @@ public class MainDrawerActivity extends BaseActivity implements IabBroadcastRece
                 break;
 
             case R.id.nav_compras:
-                suscripcion();
+                if (mBillingManager != null
+                        && mBillingManager.getBillingClientResponseCode()
+                        > BILLING_MANAGER_NOT_INITIALIZED) {
+                    //mAcquireFragment.onManagerReady(this);
+                    onManagerReady(this);
+                    createDialogCompras();
+                }
+
                 break;
             default:
                 Log.d("No valida", "Opcion no valida");
@@ -162,168 +171,6 @@ public class MainDrawerActivity extends BaseActivity implements IabBroadcastRece
         return true;
     }
 
-    public void suscripcion() {
-
-        if (!mHelper.subscriptionsSupported()) {
-            complain("Subscriptions not supported on your device yet. Sorry!");
-            return;
-        }
-
-        if (mIsSuscrip) {
-            complain("No need! You're subscribed. Isn't that awesome?");
-            return;
-        }
-
-        CharSequence[] options;
-        if (!mIsSuscrip || !mAutoRenewEnabled) {
-            // Both subscription options should be available
-            options = new CharSequence[2];
-            options[0] = getString(R.string.Meses6);
-            options[1] = getString(R.string.Meses12);
-            sFirstChoiceSku = Constants.SKU_MONTHLY;
-            sSecondChoiceSku = Constants.SKU_YEARLY;
-        } else {
-            // This is the subscription upgrade/downgrade path, so only one option is valid
-            options = new CharSequence[1];
-            if (sSuscripSku.equals(Constants.SKU_MONTHLY)) {
-                // Give the option to upgrade to yearly
-                options[0] = getString(R.string.Meses12);
-                sFirstChoiceSku = Constants.SKU_YEARLY;
-            } else {
-                // Give the option to downgrade to monthly
-                options[0] = getString(R.string.Meses6);
-                sFirstChoiceSku = Constants.SKU_MONTHLY;
-            }
-            sSecondChoiceSku = "";
-        }
-        int titleResId;
-        if (!mIsSuscrip) {
-            titleResId = R.string.selectSuscrip;
-        } else if (!mAutoRenewEnabled) {
-            titleResId = R.string.reactivaSuscrip;
-        } else {
-            titleResId = R.string.cambiaSuscrip;
-        }
-
-   /*     android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle(titleResId)
-                .setSingleChoiceItems(options, 0 , this)
-                .setPositiveButton(R.string.continuar, this)
-                .setNegativeButton(R.string.cancelar, this);
-        android.app.AlertDialog dialog = builder.create();
-        dialog.show();
-        */
-        createDialogCompras();
-/*
-           String payload = "";
-
-        try {
-            mHelper.launchPurchaseFlow(this, Constants.SKU_SUSCRIP, Constants.RC_REQUEST,
-                    mPurchaseFinishedListener, payload);
-        } catch (IabHelper.IabAsyncInProgressException e) {
-            complain("Error launching purchase flow. Another async operation in progress.");
-           // setWaitScreen(false);
-        }*/
-    }
-
-    // Callback for when a purchase is finished
-    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
-        public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-            //  Log.d(TAG, "Purchase finished: " + result + ", purchase: " + purchase);
-
-            // if we were disposed of in the meantime, quit.
-            if (mHelper == null) {
-                return;
-            }
-
-            if (result.isFailure()) {
-                complain("Error purchasing: " + result);
-                //  setWaitScreen(false);
-                return;
-            }
-            if (!verifyDeveloperPayload(purchase)) {
-                complain("Error purchasing. Authenticity verification failed.");
-                // setWaitScreen(false);
-                return;
-            }
-
-            if (purchase.getSku().equals(Constants.SKU_SUSCRIP)) {
-                // bought the infinite gas subscription
-                Log.d("Mensaje: ", "Suscrito.");
-                alert("Thank you for subscribing to infinite gas!");
-                mIsSuscrip = true;
-                mAutoRenewEnabled = purchase.isAutoRenewing();
-                sSuscripSku = purchase.getSku();
-                updateUi(mIsSuscrip);
-            }
-        }
-    };
-
-    public void createDialogCompras(){
-        final View view = inflater.inflate(R.layout.dialog_compras, null);
-        RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
-        Button btnSuscribir = view.findViewById(R.id.btn_comprar);
-        Button btnCancel = view.findViewById(R.id.btn_cancel);
-
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
-                    case R.id.rb_seis:
-                        mSelectedSubscriptionPeriod = sFirstChoiceSku;
-                        break;
-
-                    case R.id.rb_doce:
-                        mSelectedSubscriptionPeriod = sSecondChoiceSku;
-                        break;
-                }
-            }
-        });
-
-        btnSuscribir.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String payload = "";
-                if (TextUtils.isEmpty(mSelectedSubscriptionPeriod)) {
-                    // The user has not changed from the default selection
-                    mSelectedSubscriptionPeriod = sFirstChoiceSku;
-                }
-                List<String> oldSkus = null;
-                if (!TextUtils.isEmpty(sSuscripSku)
-                        && !sSuscripSku.equals(mSelectedSubscriptionPeriod)) {
-                    // The user currently has a valid subscription, any purchase action is going to
-                    // replace that subscription
-                    oldSkus = new ArrayList<>();
-                    oldSkus.add(sSuscripSku);
-                }
-                try {
-                    mHelper.launchPurchaseFlow(getParent(), mSelectedSubscriptionPeriod, IabHelper.ITEM_TYPE_SUBS,
-                            oldSkus, Constants.RC_REQUEST, mPurchaseFinishedListener, payload);
-                } catch (IabHelper.IabAsyncInProgressException e) {
-                    complain("Error launching purchase flow. Another async operation in progress.");
-                    // setWaitScreen(false);
-                }
-                mSelectedSubscriptionPeriod = "";
-                sFirstChoiceSku = "";
-                sSecondChoiceSku = "";
-            }
-        });
-
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // There are only four buttons, this should not happen
-                Log.e("Mensaje: ", "Unknown button clicked in subscription dialog: " );
-                dialog.dismiss();
-            }
-        });
-
-        builder.setView(view);
-        dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.show();
-
-    }
 
     public void changeFragment(Fragment fragment, int resource, boolean isRoot, boolean backStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -364,11 +211,11 @@ public class MainDrawerActivity extends BaseActivity implements IabBroadcastRece
         switchVibrate.setChecked(PreferenceUtilities.getPreferenceDefaultVibrate(getApplicationContext()));
         final SwitchCompat switchSound = view.findViewById(R.id.switchSonido);
         final TextView tvTitle = view.findViewById(R.id.dialogAlarmTitle);
-        tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
+        tvTitle.setText(getString(R.string.configAlarm, String.valueOf(iPreferenceMin)));
         switchSound.setChecked(PreferenceUtilities.getPreferenceDefaultSound(getApplicationContext()));
 
         final TextView tvMinutos = view.findViewById(R.id.textViewMin);
-        tvMinutos.setText(String.valueOf(iPreferenceMin));
+        tvMinutos.setText(String.valueOf(PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext())));
         Button btnContinuar = view.findViewById(R.id.btn_guardar_dialog_alarm);
         Button btnTono = view.findViewById(R.id.btn_sound);
 
@@ -400,26 +247,26 @@ public class MainDrawerActivity extends BaseActivity implements IabBroadcastRece
 
         SeekBar seekBar = view.findViewById(R.id.seekBarAlarm);
         seekBar.setMax(MAX_MIN);
-        seekBar.setProgress(iPreferenceMin);
+        seekBar.setProgress(PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext()));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress <= 5){
+                if (progress <= 5) {
                     tvMinutos.setText(getString(R.string.cinco));
                     iPreferenceMin = 5;
-                    tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
+                    tvTitle.setText(getString(R.string.configAlarm, String.valueOf(iPreferenceMin)));
                 } else if (progress > 5 && progress <= 10) {
                     tvMinutos.setText(getString(R.string.dies));
                     iPreferenceMin = 10;
-                    tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
+                    tvTitle.setText(getString(R.string.configAlarm, String.valueOf(iPreferenceMin)));
                 } else if (progress > 10 && progress <= 15) {
                     tvMinutos.setText(getString(R.string.quince));
                     iPreferenceMin = 15;
-                    tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
+                    tvTitle.setText(getString(R.string.configAlarm, String.valueOf(iPreferenceMin)));
                 } else if (progress > 15 && progress <= 20) {
                     tvMinutos.setText(getString(R.string.veinte));
                     iPreferenceMin = 20;
-                    tvTitle.setText(getString(R.string.configAlarm,String.valueOf(iPreferenceMin)));
+                    tvTitle.setText(getString(R.string.configAlarm, String.valueOf(iPreferenceMin)));
                 }
             }
 
@@ -444,134 +291,14 @@ public class MainDrawerActivity extends BaseActivity implements IabBroadcastRece
         if (ReminderUtilities.dispatcher != null) {
             ReminderUtilities.dispatcher.cancelAll();
         }
-        if (mHelper != null) {
-            try {
-                mHelper.dispose();
-            } catch (IabHelper.IabAsyncInProgressException e) {
-                e.printStackTrace();
-            }
-        }
-        mHelper = null;
+
         super.onDestroy();
 
     }
 
 
-
-    public void startBilling() {
-        String key = Utils.genPK();
-        mHelper = new IabHelper(this, key);
-        // enable debug logging (for a production application, you should set this to false).
-        mHelper.enableDebugLogging(true);
-
-        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            public void onIabSetupFinished(IabResult result) {
-                //   Log.d(TAG, "Setup finished.");
-
-                if (!result.isSuccess()) {
-                    // Oh noes, there was a problem.
-                    complain("Problem setting up in-app billing: " + result);
-                    return;
-                } else {
-                    Log.d("Mensaje:", "In-app Billing is set up OK");
-                }
-
-                // Have we been disposed of in the meantime? If so, quit.
-                if (mHelper == null) return;
-
-                // Important: Dynamically register for broadcast messages about updated purchases.
-                // We register the receiver here instead of as a <receiver> in the Manifest
-                // because we always call getPurchases() at startup, so therefore we can ignore
-                // any broadcasts sent while the app isn't running.
-                // Note: registering this listener in an Activity is a bad idea, but is done here
-                // because this is a SAMPLE. Regardless, the receiver must be registered after
-                // IabHelper is setup, but before first call to getPurchases().
-        /*        mBroadcastReceiver = new IabBroadcastReceiver(MainDrawerActivity.this);
-                IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
-                registerReceiver(mBroadcastReceiver, broadcastFilter);*/
-
-
-                // IAB is fully set up. Now, let's get an inventory of stuff we own.
-                Log.d("Mensaje", "Setup successful. Querying inventory.");
-                try {
-                    mHelper.queryInventoryAsync(mGotInventoryListener);
-                } catch (IabHelper.IabAsyncInProgressException e) {
-                    complain("Error querying inventory. Another async operation in progress.");
-                    Log.d("Error:", e.getMessage());
-                }
-            }
-        });
-    }
-
-    // Listener that's called when we finish querying the items and subscriptions we own
-    IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-            // Have we been disposed of in the meantime? If so, quit.
-            if (mHelper == null) return;
-
-            // Is it a failure?
-            if (result.isFailure()) {
-                complain("Failed to query inventory: " + result);
-                return;
-            }
-
-            lstSuscriptions = new ArrayList<>();
-            Log.d("Mensaje", "Query inventory was successful.");
-
-            Purchase pSuscripMonthly = inventory.getPurchase(Constants.SKU_MONTHLY);
-            Purchase pSuscripYearly = inventory.getPurchase(Constants.SKU_YEARLY);
-            SkuDetails detailspMonthly = inventory.getSkuDetails(Constants.SKU_MONTHLY);
-            SkuDetails detailsYearly = inventory.getSkuDetails(Constants.SKU_YEARLY);
-            lstSuscriptions.add(new Suscriptions(detailspMonthly.getSku(),detailspMonthly.getTitle(),detailspMonthly.getDescription(),detailspMonthly.getPrice(),detailspMonthly.getPriceCurrencyCode()));
-            lstSuscriptions.add(new Suscriptions(detailsYearly.getSku(),detailsYearly.getTitle(),detailsYearly.getDescription(),detailsYearly.getPrice(),detailsYearly.getPriceCurrencyCode()));
-            if (pSuscripMonthly != null && pSuscripMonthly.isAutoRenewing()) {
-                Log.d("Inventario:", pSuscripMonthly.getSku());
-                sSuscripSku = Constants.SKU_MONTHLY;
-                mAutoRenewEnabled = true;
-            } else if (pSuscripYearly != null && pSuscripYearly.isAutoRenewing()) {
-                Log.d("Inventario:", pSuscripYearly.getSku());
-                sSuscripSku = Constants.SKU_YEARLY;
-                mAutoRenewEnabled = true;
-            } else {
-                sSuscripSku = "";
-                mAutoRenewEnabled = false;
-            }
-
-            // The user is subscribed if either subscription exists, even if neither is auto
-            // renewing
-            mIsSuscrip = (pSuscripMonthly != null && verifyDeveloperPayload(pSuscripMonthly))
-                    || (pSuscripYearly != null && verifyDeveloperPayload(pSuscripYearly));
-            Log.d("Mensaje: ", "User " + (mIsSuscrip ? "HAS" : "DOES NOT HAVE")
-                    + " infinite gas subscription.");
-
-            updateUi(mIsSuscrip);
-
-        }
-    };
-
-    /**
-     * Verifies the developer payload of a purchase.
-     */
-    public boolean verifyDeveloperPayload(Purchase p) {
-        String payload = p.getDeveloperPayload();
-
-        return payload.equals(Constants.SKU_MONTHLY) || payload.equals(Constants.SKU_YEARLY);
-    }
-
-
-    @Override
-    public void receivedBroadcast() {
-        // Received a broadcast notification that the inventory of items has changed
-        Log.d("Mensaje", "Received broadcast notification. Querying inventory.");
-        try {
-            mHelper.queryInventoryAsync(mGotInventoryListener);
-        } catch (IabHelper.IabAsyncInProgressException e) {
-            complain("Error querying inventory. Another async operation in progress.");
-        }
-    }
-
     void complain(String message) {
-        Log.e("Error", "**** TrivialDrive Error: " + message);
+        Log.e("Error", "**** ParkingMeter Error: " + message);
         alert("Error: " + message);
     }
 
@@ -596,13 +323,210 @@ public class MainDrawerActivity extends BaseActivity implements IabBroadcastRece
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK){
+        if (resultCode == RESULT_OK) {
 
-            if(requestCode == ID_SOUND){
+            if (requestCode == ID_SOUND) {
                 Uri uri = data.getData();
                 soundGallery.setSoundUri(uri);
-                PreferenceUtilities.saveUriSoundSelected(this,soundGallery.getPath());
+                PreferenceUtilities.saveUriSoundSelected(this, soundGallery.getPath());
             }
+        }
+    }
+
+    public void onManagerReady(BillingProvider billingProvider) {
+        mBillingProvider = billingProvider;
+
+    }
+
+    public void createDialogCompras() {
+
+        final View view = inflater.inflate(R.layout.dialog_compras, null);
+        TextView tvTitle = view.findViewById(R.id.textView2);
+        mRecyclerView = view.findViewById(R.id.list);
+
+        setWaitScreen(true);
+
+        builder.setView(view);
+        dialog = builder.create();
+        //dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        dialog.show();
+        querySkuDetails();
+
+
+    }
+
+
+    /**
+     * Queries for in-app and subscriptions SKU details and updates an adapter with new data
+     */
+    private void querySkuDetails() {
+        long startTime = System.currentTimeMillis();
+
+        Log.d("TAG", "querySkuDetails() got subscriptions and inApp SKU details lists for: "
+                + (System.currentTimeMillis() - startTime) + "ms");
+
+        if (!this.isFinishing()) {
+            final List<SkuRowData> dataList = new ArrayList<>();
+            mAdapter = new SkusAdapter();
+            final UiManager uiManager = createUiManager(mAdapter, mBillingProvider);
+            mAdapter.setUiManager(uiManager);
+            // Filling the list with all the data to render subscription rows
+            List<String> subscriptionsSkus = uiManager.getDelegatesFactory()
+                    .getSkuList(BillingClient.SkuType.SUBS);
+            addSkuRows(dataList, subscriptionsSkus, BillingClient.SkuType.SUBS, new Runnable() {
+                @Override
+                public void run() {
+                    // Once we added all the subscription items, fill the in-app items rows below
+                    List<String> inAppSkus = uiManager.getDelegatesFactory()
+                            .getSkuList(BillingClient.SkuType.INAPP);
+                    addSkuRows(dataList, inAppSkus, BillingClient.SkuType.INAPP, null);
+                }
+            });
+        }
+    }
+
+    private void addSkuRows(final List<SkuRowData> inList, List<String> skusList,
+                            final @BillingClient.SkuType String billingType, final Runnable executeWhenFinished) {
+
+        mBillingProvider.getBillingManager().querySkuDetailsAsync(billingType, skusList,
+                new SkuDetailsResponseListener() {
+                    @Override
+                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+
+                        if (responseCode != BillingClient.BillingResponse.OK) {
+                            Log.w("TAG", "Unsuccessful query for type: " + billingType
+                                    + ". Error code: " + responseCode);
+                        } else if (skuDetailsList != null
+                                && skuDetailsList.size() > 0) {
+                            // If we successfully got SKUs, add a header in front of the row
+                            @StringRes int stringRes = (billingType == BillingClient.SkuType.INAPP)
+                                    ? R.string.header_inapp : R.string.header_subscriptions;
+                            inList.add(new SkuRowData(getString(stringRes)));
+                            // Then fill all the other rows
+                            for (SkuDetails details : skuDetailsList) {
+                                Log.i("TAG", "Adding sku: " + details);
+                                inList.add(new SkuRowData(details, SkusAdapter.TYPE_NORMAL,
+                                        billingType));
+                            }
+
+                            if (inList.size() == 0) {
+                                displayAnErrorIfNeeded();
+                            } else {
+                                if (mRecyclerView.getAdapter() == null) {
+                                    mRecyclerView.setAdapter(mAdapter);
+                                    Resources res = getApplicationContext().getResources();
+                                    mRecyclerView.addItemDecoration(new CardsWithHeadersDecoration(
+                                            mAdapter, (int) res.getDimension(R.dimen.header_gap),
+                                            (int) res.getDimension(R.dimen.row_gap)));
+                                    mRecyclerView.setLayoutManager(
+                                            new LinearLayoutManager(getApplicationContext()));
+                                }
+
+                                mAdapter.updateData(inList);
+                                setWaitScreen(false);
+                            }
+
+                        }
+
+                        if (executeWhenFinished != null) {
+                            executeWhenFinished.run();
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Enables or disables "please wait" screen.
+     */
+    private void setWaitScreen(boolean set) {
+        mRecyclerView.setVisibility(set ? View.GONE : View.VISIBLE);
+    }
+
+    private void displayAnErrorIfNeeded() {
+        if (this.isFinishing()) {
+            Log.i("TAG", "No need to show an error - activity is finishing already");
+            return;
+        }
+    }
+
+    protected UiManager createUiManager(SkusAdapter adapter, BillingProvider provider) {
+        return new UiManager(adapter, provider);
+    }
+
+    @Override
+    public BillingManager getBillingManager() {
+        return mBillingManager;
+    }
+
+    @Override
+    public boolean isSixMonthlySubscribed() {
+        return mGoldMonthly;
+    }
+
+    @Override
+    public boolean isTankFull() {
+        return false;
+    }
+
+    @Override
+    public boolean isYearlySubscribed() {
+        return mGoldYearly;
+    }
+
+
+    /**
+     * Handler to billing updates
+     */
+    private class UpdateListener implements BillingManager.BillingUpdatesListener {
+        @Override
+        public void onBillingClientSetupFinished() {
+            onManagerReady(MainDrawerActivity.this);
+        }
+
+        @Override
+        public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+            Log.d("TAG", "Consumption finished. Purchase token: " + token + ", result: " + result);
+
+            // Note: We know this is the SKU_GAS, because it's the only one we consume, so we don't
+            // check if token corresponding to the expected sku was consumed.
+            // If you have more than one sku, you probably need to validate that the token matches
+            // the SKU you expect.
+            // It could be done by maintaining a map (updating it every time you call consumeAsync)
+            // of all tokens into SKUs which were scheduled to be consumed and then looking through
+            // it here to check which SKU corresponds to a consumed token.
+            if (result == BillingClient.BillingResponse.OK) {
+                // Successfully consumed, so we apply the effects of the item in our
+                // game world's logic, which in our case means filling the gas tank a bit
+                Log.d("TAG", "Consumption successful. Provisioning.");
+                //mTank = mTank == TANK_MAX ? TANK_MAX : mTank + 1;
+                //   saveData();
+                //     mActivity.alert(R.string.alert_fill_gas, mTank);
+            } else {
+                //  mActivity.alert(R.string.alert_error_consuming, result);
+            }
+
+            //  mActivity.showRefreshedUi();
+            Log.d("TAG", "End consumption flow.");
+        }
+
+        @Override
+        public void onPurchasesUpdated(List<Purchase> purchaseList) {
+            mGoldMonthly = false;
+            mGoldYearly = false;
+
+            for (Purchase purchase : purchaseList) {
+                switch (purchase.getSku()) {
+
+                    case MONTH_SKU:
+                        mGoldMonthly = true;
+                        break;
+                    case ANO_SKU:
+                        mGoldYearly = true;
+                        break;
+                }
+            }
+
+            // mActivity.showRefreshedUi();
         }
     }
 }
