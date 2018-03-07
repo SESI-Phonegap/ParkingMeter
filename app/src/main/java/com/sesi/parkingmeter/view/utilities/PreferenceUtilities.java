@@ -53,12 +53,7 @@ public class PreferenceUtilities {
         return prefs.getString(SAVE_FINAL_HOUR, DEFAULT_FINAL_HOUR);
     }
 
-    public static void savePreferenceHourIni(Context context, String hour) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(SAVE_INITIAL_HOUR, hour);
-        editor.apply();
-    }
+
 
     public static String getPreferencesInitialHour(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

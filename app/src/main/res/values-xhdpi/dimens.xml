@@ -4,7 +4,7 @@
     <dimen name="subtitle">18sp</dimen>
     <dimen name="marginStartEnd">20dp</dimen>
     <dimen name="marginTop">30dp</dimen>
-    <dimen name="marginTopBtn">20dp</dimen>
+
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -17,11 +17,11 @@
 
 
     <!-- Dialog Alarm -->
-    <dimen name="marginStartEndDialog">5dp</dimen>
+
     <dimen name="size_title_dialog_alarm">22sp</dimen>
     <dimen name="size_textview_min_dialog_alarm">25sp</dimen>
     <dimen name="size_text_button_dialog_alarm">15sp</dimen>
     <dimen name="size_button_dialog_alarm">180dp</dimen>
 
-    <dimen name="size_title_dialog_descrip">19sp</dimen>
+
 </resources>

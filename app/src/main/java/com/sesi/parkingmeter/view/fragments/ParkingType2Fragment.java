@@ -130,7 +130,11 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         tvDatos = getActivity().findViewById(R.id.tvDatosType2);
         tidHoraVence.addTextChangedListener(textWatcher);
         sTracker = new UtilGPS(getContext());
-      //  cancel();
+        if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, Constants.PERMISION_LOCATION);
+        } else {
+            startTracker();
+        }
     }
 
     public void cargarPublicidad() {
@@ -246,6 +250,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                if (getActivity().findViewById(R.id.tablet_view) == null) {
                 if (!statusHour) {
                     relativeHora.animate().translationY(-450).alpha(0).setDuration(200).setListener(new Animator.AnimatorListener() {
                         @Override
@@ -294,6 +299,7 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
 
                     statusHour = false;
                 }
+            }
             }
         });
 
@@ -491,6 +497,14 @@ public class ParkingType2Fragment extends Fragment implements Gps,View.OnClickLi
                             }
                         } else {
                             Toast.makeText(getActivity(), "Activa tu localización para activar esta opción.", Toast.LENGTH_LONG).show();
+                            switchLocation.setChecked(false);
+
+                            sTracker = new UtilGPS(getActivity());
+                            if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, Constants.PERMISION_LOCATION);
+                            } else {
+                                startTracker();
+                            }
                                 /*Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 getActivity().startActivity(callGPSSettingIntent);*/
                         }

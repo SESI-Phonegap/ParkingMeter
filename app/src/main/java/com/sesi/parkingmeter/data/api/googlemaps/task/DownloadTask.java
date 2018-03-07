@@ -31,7 +31,7 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
             URL url = new URL(url2[0]);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            String line = "";
+            String line;
 
             while ((line = bufferedReader.readLine()) != null) {
                 sbData.append(line);

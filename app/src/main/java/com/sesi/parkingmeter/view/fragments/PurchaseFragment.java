@@ -2,8 +2,9 @@ package com.sesi.parkingmeter.view.fragments;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.net.Uri;
+
 import android.os.Bundle;
+
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.SkuDetails;
@@ -29,19 +32,17 @@ import java.util.List;
 
 public class PurchaseFragment extends Fragment {
 
+    private static final String TAG = "PurchaseFragment";
     private BillingProvider mBillingProvider;
+    private SkusAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private TextView mErrorTextView;
+    private ProgressBar progressBar;
+
     public PurchaseFragment() {
         // Required empty public constructor
     }
 
-
-    public static PurchaseFragment newInstance() {
-        PurchaseFragment fragment = new PurchaseFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,20 +52,46 @@ public class PurchaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_purchase, container, false);
-        init();
+        return inflater.inflate(R.layout.fragment_purchase, container, false);
 
-        // Inflate the layout for this fragment
-        return root;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        init();
     }
 
     public void init(){
         mRecyclerView = getActivity().findViewById(R.id.list);
+        mErrorTextView = getActivity().findViewById(R.id.error_textview);
+        progressBar = getActivity().findViewById(R.id.progressBarPurchase);
+
         if (mBillingProvider != null) {
             handleManagerAndUiReady();
         }
     }
 
+    /**
+     * Refreshes this fragment's UI
+     */
+    public void refreshUI() {
+        Log.d(TAG, "Looks like purchases list might have been updated - refreshing the UI");
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Notifies the fragment that billing manager is ready and provides a BillingProviders
+     * instance to access it
+     */
+    public void onManagerReady(BillingProvider billingProvider) {
+        mBillingProvider = billingProvider;
+        if (mRecyclerView != null) {
+            handleManagerAndUiReady();
+        }
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -81,7 +108,7 @@ public class PurchaseFragment extends Fragment {
      */
     private void handleManagerAndUiReady() {
         // If Billing Manager was successfully initialized - start querying for SKUs
-       // setWaitScreen(true);
+        setWaitScreen(true);
         querySkuDetails();
     }
     /**
@@ -142,12 +169,12 @@ public class PurchaseFragment extends Fragment {
                             } else {
                                 if (mRecyclerView.getAdapter() == null) {
                                     mRecyclerView.setAdapter(mAdapter);
-                                    Resources res = getApplicationContext().getResources();
+                                    Resources res = getActivity().getResources();
                                     mRecyclerView.addItemDecoration(new CardsWithHeadersDecoration(
                                             mAdapter, (int) res.getDimension(R.dimen.header_gap),
                                             (int) res.getDimension(R.dimen.row_gap)));
                                     mRecyclerView.setLayoutManager(
-                                            new LinearLayoutManager(getApplicationContext()));
+                                            new LinearLayoutManager(getActivity()));
                                 }
 
                                 mAdapter.updateData(inList);
@@ -163,5 +190,42 @@ public class PurchaseFragment extends Fragment {
                 });
     }
 
+    private void displayAnErrorIfNeeded() {
+        if (getActivity() == null || getActivity().isFinishing()) {
+            Log.i("TAG", "No need to show an error - activity is finishing already");
+            return;
+        }
+
+       // mLoadingView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(View.VISIBLE);
+        int billingResponseCode = mBillingProvider.getBillingManager()
+                .getBillingClientResponseCode();
+
+        switch (billingResponseCode) {
+            case BillingClient.BillingResponse.OK:
+                // If manager was connected successfully, then show no SKUs error
+                mErrorTextView.setText(getText(R.string.error_no_skus));
+                break;
+            case BillingClient.BillingResponse.BILLING_UNAVAILABLE:
+                mErrorTextView.setText(getText(R.string.error_billing_unavailable));
+                break;
+            default:
+                mErrorTextView.setText(getText(R.string.error_billing_default));
+        }
+
+    }
+
+    protected UiManager createUiManager(SkusAdapter adapter, BillingProvider provider) {
+        return new UiManager(adapter, provider);
+    }
+
+    /**
+     * Enables or disables "please wait" screen.
+     */
+    private void setWaitScreen(boolean set) {
+        mRecyclerView.setVisibility(set ? View.GONE : View.VISIBLE);
+        progressBar.setVisibility(set ? View.VISIBLE : View.GONE );
+
+    }
 
 }

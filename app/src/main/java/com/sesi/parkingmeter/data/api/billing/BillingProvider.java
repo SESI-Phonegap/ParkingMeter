@@ -23,7 +23,6 @@ package com.sesi.parkingmeter.data.api.billing;
 public interface BillingProvider {
     BillingManager getBillingManager();
     boolean isSixMonthlySubscribed();
-    boolean isTankFull();
     boolean isYearlySubscribed();
 }
 

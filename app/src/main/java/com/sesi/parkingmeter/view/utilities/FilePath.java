@@ -119,11 +119,12 @@ public class FilePath {
         String path = "";
         String[] proj = { MediaStore.Images.Media.DATA };
         Cursor cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
-        int column_index
-                = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        path = cursor.getString(column_index);
-        cursor.close();
+        if (cursor != null) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            path = cursor.getString(column_index);
+            cursor.close();
+        }
         return path;
     }
 

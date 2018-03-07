@@ -44,19 +44,12 @@
     <string name="charging_reminder_notification_title">! Hora de ir por tu automóvil !</string>
     <string name="charging_reminder_notification_body">Es hora de ir por tu automóvil.Que no te pongan la araña, evita costosas multas. </string>
 
-    <!-- Suscripcion -->
-    <string name="selectSuscrip">Selecciona tu período de suscripción. \n Elimina la publicidad y personaliza tu alarma.</string>
-    <string name="Meses6">Suscripción por 6 meses</string>
-    <string name="Meses12">Suscripción por 12 meses</string>
-    <string name="reactivaSuscrip">Reactiva tu suscripción</string>
-    <string name="cambiaSuscrip">Cambia tu suscripción, Selecciona tu nueva suscripción</string>
-    <string name="continuar">Continuar</string>
     <!-- Dialog alarm -->
     <string name="configAlarm">Avisarme %1$s minutos antes. </string>
     <string name="btn_guardar_dialog_alarm">Guardar</string>
     <string name="msg_check_switch_alert">Al menos una opción debe de estar habilitada (Vibrador o Sonido)</string>
     <string name="titleSound">Selecciona un tono</string>
-    <string name="tono">Tono</string>
+
 
     <!-- AdMob -->
 
@@ -70,16 +63,21 @@
 
     <string name="btn_suscribir">Suscribirse</string>
     <string name="descripcion">Descripción</string>
-    <string name="precio">Precio</string>
-    <string name="nodisponible">No disponible</string>
-    <string name="graciasMsj">Gracias por suscribirte a ParkingMeter!</string>
+
+
+
     <string name="alert_already_purchased">El artículo ya está comprado</string>
     <string name="button_own">Lo tienes</string>
-    <string name="button_change">Cambiar</string>
+    <string name="button_change">Cambiar</string>s
     <string name="header_inapp">Compras</string>
     <string name="header_subscriptions">Suscripciones</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="error_no_skus">No encontramos ningún SKU para mostrar&#8230; Compruebe su internet
+         conexión</string>
+    <string name="error_billing_unavailable">La facturación no está disponible. Asegúrate de que tu aplicación Google Play
+         está configurado correctamente</string>
+    <string name="error_billing_default">La facturación no está disponible. Por favor revisa tu dispositivo.</string>
+
 
 </resources>

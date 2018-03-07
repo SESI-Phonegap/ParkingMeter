@@ -4,12 +4,13 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.drawable.ColorDrawable;
+
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -19,33 +20,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.ads.MobileAds;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.data.api.billing.BillingManager;
 import com.sesi.parkingmeter.data.api.billing.BillingProvider;
-import com.sesi.parkingmeter.data.model.Suscriptions;
-import com.sesi.parkingmeter.view.adapter.CardsWithHeadersDecoration;
-import com.sesi.parkingmeter.view.adapter.SkuRowData;
-import com.sesi.parkingmeter.view.adapter.SkusAdapter;
-import com.sesi.parkingmeter.view.adapter.UiManager;
+import com.sesi.parkingmeter.view.fragments.PurchaseFragment;
 import com.sesi.parkingmeter.view.utilities.SoundGallery;
 import com.sesi.parkingmeter.view.fragments.HomeFragment;
 import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
@@ -54,7 +47,6 @@ import com.sesi.parkingmeter.view.utilities.ReminderUtilities;
 import com.sesi.parkingmeter.view.utilities.Utils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.sesi.parkingmeter.data.api.billing.BillingManager.BILLING_MANAGER_NOT_INITIALIZED;
@@ -63,6 +55,8 @@ import static com.sesi.parkingmeter.data.api.billing.BillingManager.BILLING_MANA
 public class MainDrawerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BillingProvider {
 
 
+    // Debug tag, for logging
+    private static final String TAG = "MainDrawerActivity";
     private static final String MONTH_SKU = "suscrip_meses";
     private static final String ANO_SKU = "suscrip_ano";
     private LayoutInflater inflater;
@@ -72,15 +66,14 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     private int iPreferenceMin;
     public static boolean mIsSuscrip = false;
     private SoundGallery soundGallery;
-    private List<Suscriptions> lstSuscriptions;
     private BillingManager mBillingManager;
-    private BillingProvider mBillingProvider;
     private boolean mGoldMonthly;
     private boolean mGoldYearly;
-    private UpdateListener mUpdateListener;
     private static final int ID_SOUND = 999;
-    private SkusAdapter mAdapter;
-    private RecyclerView mRecyclerView;
+    private ImageView imageViewIcon;
+    private PurchaseFragment fPurchaseFragment;
+    // Tag for a dialog that allows us to find it when screen was rotated
+    private static final String DIALOG_TAG = "dialog";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +83,21 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
         init();
 
+        // Try to restore dialog fragment if we were showing it prior to screen rotation
+        if (savedInstanceState != null) {
+            fPurchaseFragment = (PurchaseFragment) getSupportFragmentManager()
+                    .findFragmentByTag(DIALOG_TAG);
+        }
+
 
     }
 
     public void init() {
 
-        mUpdateListener = new UpdateListener();
+        UpdateListener mUpdateListener = new UpdateListener();
         // Create and initialize BillingManager which talks to BillingLibrary
-        mBillingManager = new BillingManager(this, mUpdateListener);
+        mBillingManager = new BillingManager(this, mUpdateListener);;
+        imageViewIcon = findViewById(R.id.imageView);
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -131,7 +131,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -151,14 +151,18 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                 break;
 
             case R.id.nav_compras:
+
+                if (fPurchaseFragment == null) {
+                    fPurchaseFragment = new PurchaseFragment();
+                }
                 if (mBillingManager != null
                         && mBillingManager.getBillingClientResponseCode()
                         > BILLING_MANAGER_NOT_INITIALIZED) {
                     //mAcquireFragment.onManagerReady(this);
-                    onManagerReady(this);
-                    createDialogCompras();
+                    fPurchaseFragment.onManagerReady(this);
+                   // createDialogCompras();
+                    changeFragment(fPurchaseFragment,R.id.mainFrame, false, false);
                 }
-
                 break;
             default:
                 Log.d("No valida", "Opcion no valida");
@@ -282,7 +286,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         });
         builder.setView(view);
         dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+      //  dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.show();
     }
 
@@ -295,30 +299,6 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         super.onDestroy();
 
     }
-
-
-    void complain(String message) {
-        Log.e("Error", "**** ParkingMeter Error: " + message);
-        alert("Error: " + message);
-    }
-
-    void alert(String message) {
-        android.app.AlertDialog.Builder bld = new android.app.AlertDialog.Builder(this);
-        bld.setMessage(message);
-        bld.setNeutralButton("OK", null);
-        Log.d("Error", "Showing alert dialog: " + message);
-        bld.create().show();
-    }
-
-
-    public void updateUi(boolean isSuscrip) {
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        //menu.findItem(R.id.nav_alarm).setVisible(isSuscrip);
-        menu.findItem(R.id.nav_alarm).setVisible(true);
-
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -333,124 +313,30 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         }
     }
 
-    public void onManagerReady(BillingProvider billingProvider) {
-        mBillingProvider = billingProvider;
-
-    }
-
-    public void createDialogCompras() {
-
-        final View view = inflater.inflate(R.layout.dialog_compras, null);
-        TextView tvTitle = view.findViewById(R.id.textView2);
-        mRecyclerView = view.findViewById(R.id.list);
-
-        setWaitScreen(true);
-
-        builder.setView(view);
-        dialog = builder.create();
-        //dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.show();
-        querySkuDetails();
-
-
-    }
-
 
     /**
-     * Queries for in-app and subscriptions SKU details and updates an adapter with new data
+     * Remove loading spinner and refresh the UI
      */
-    private void querySkuDetails() {
-        long startTime = System.currentTimeMillis();
-
-        Log.d("TAG", "querySkuDetails() got subscriptions and inApp SKU details lists for: "
-                + (System.currentTimeMillis() - startTime) + "ms");
-
-        if (!this.isFinishing()) {
-            final List<SkuRowData> dataList = new ArrayList<>();
-            mAdapter = new SkusAdapter();
-            final UiManager uiManager = createUiManager(mAdapter, mBillingProvider);
-            mAdapter.setUiManager(uiManager);
-            // Filling the list with all the data to render subscription rows
-            List<String> subscriptionsSkus = uiManager.getDelegatesFactory()
-                    .getSkuList(BillingClient.SkuType.SUBS);
-            addSkuRows(dataList, subscriptionsSkus, BillingClient.SkuType.SUBS, new Runnable() {
-                @Override
-                public void run() {
-                    // Once we added all the subscription items, fill the in-app items rows below
-                    List<String> inAppSkus = uiManager.getDelegatesFactory()
-                            .getSkuList(BillingClient.SkuType.INAPP);
-                    addSkuRows(dataList, inAppSkus, BillingClient.SkuType.INAPP, null);
-                }
-            });
+    public void showRefreshedUi() {
+       // setWaitScreen(false);
+        updateUi();
+        if (fPurchaseFragment != null) {
+            fPurchaseFragment.refreshUI();
         }
     }
 
-    private void addSkuRows(final List<SkuRowData> inList, List<String> skusList,
-                            final @BillingClient.SkuType String billingType, final Runnable executeWhenFinished) {
-
-        mBillingProvider.getBillingManager().querySkuDetailsAsync(billingType, skusList,
-                new SkuDetailsResponseListener() {
-                    @Override
-                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-
-                        if (responseCode != BillingClient.BillingResponse.OK) {
-                            Log.w("TAG", "Unsuccessful query for type: " + billingType
-                                    + ". Error code: " + responseCode);
-                        } else if (skuDetailsList != null
-                                && skuDetailsList.size() > 0) {
-                            // If we successfully got SKUs, add a header in front of the row
-                            @StringRes int stringRes = (billingType == BillingClient.SkuType.INAPP)
-                                    ? R.string.header_inapp : R.string.header_subscriptions;
-                            inList.add(new SkuRowData(getString(stringRes)));
-                            // Then fill all the other rows
-                            for (SkuDetails details : skuDetailsList) {
-                                Log.i("TAG", "Adding sku: " + details);
-                                inList.add(new SkuRowData(details, SkusAdapter.TYPE_NORMAL,
-                                        billingType));
-                            }
-
-                            if (inList.size() == 0) {
-                                displayAnErrorIfNeeded();
-                            } else {
-                                if (mRecyclerView.getAdapter() == null) {
-                                    mRecyclerView.setAdapter(mAdapter);
-                                    Resources res = getApplicationContext().getResources();
-                                    mRecyclerView.addItemDecoration(new CardsWithHeadersDecoration(
-                                            mAdapter, (int) res.getDimension(R.dimen.header_gap),
-                                            (int) res.getDimension(R.dimen.row_gap)));
-                                    mRecyclerView.setLayoutManager(
-                                            new LinearLayoutManager(getApplicationContext()));
-                                }
-
-                                mAdapter.updateData(inList);
-                                setWaitScreen(false);
-                            }
-
-                        }
-
-                        if (executeWhenFinished != null) {
-                            executeWhenFinished.run();
-                        }
-                    }
-                });
-    }
-
     /**
-     * Enables or disables "please wait" screen.
+     * Update UI to reflect model
      */
-    private void setWaitScreen(boolean set) {
-        mRecyclerView.setVisibility(set ? View.GONE : View.VISIBLE);
-    }
+    @UiThread
+    private void updateUi() {
+        Log.d(TAG, "Updating the UI. Thread: " + Thread.currentThread().getName());
 
-    private void displayAnErrorIfNeeded() {
-        if (this.isFinishing()) {
-            Log.i("TAG", "No need to show an error - activity is finishing already");
-            return;
+        if (isSixMonthlySubscribed()) {
+            imageViewIcon.setImageDrawable(this.getResources().getDrawable(R.drawable.coin_month));
+        } else if (isYearlySubscribed()){
+            imageViewIcon.setImageDrawable(this.getResources().getDrawable(R.drawable.coin_year));
         }
-    }
-
-    protected UiManager createUiManager(SkusAdapter adapter, BillingProvider provider) {
-        return new UiManager(adapter, provider);
     }
 
     @Override
@@ -463,10 +349,6 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         return mGoldMonthly;
     }
 
-    @Override
-    public boolean isTankFull() {
-        return false;
-    }
 
     @Override
     public boolean isYearlySubscribed() {
@@ -480,7 +362,8 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     private class UpdateListener implements BillingManager.BillingUpdatesListener {
         @Override
         public void onBillingClientSetupFinished() {
-            onManagerReady(MainDrawerActivity.this);
+            if (null != fPurchaseFragment)
+            fPurchaseFragment.onManagerReady(MainDrawerActivity.this);
         }
 
         @Override
@@ -503,9 +386,10 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                 //     mActivity.alert(R.string.alert_fill_gas, mTank);
             } else {
                 //  mActivity.alert(R.string.alert_error_consuming, result);
+                Log.d("TAG", "Error consumption");
             }
 
-            //  mActivity.showRefreshedUi();
+            showRefreshedUi();
             Log.d("TAG", "End consumption flow.");
         }
 
@@ -519,9 +403,11 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
                     case MONTH_SKU:
                         mGoldMonthly = true;
+                        mIsSuscrip = true;
                         break;
                     case ANO_SKU:
                         mGoldYearly = true;
+                        mIsSuscrip = true;
                         break;
                 }
             }

@@ -46,7 +46,7 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
 
     @Override
     protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-        ArrayList<LatLng> points = null;
+        ArrayList<LatLng> points;
         PolylineOptions lineOptions = null;
 
         if (null != result) {

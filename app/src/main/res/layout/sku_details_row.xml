@@ -51,7 +51,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/single_padding"
-                android:layout_marginLeft="@dimen/single_padding"
                 android:textColor="@color/colorAccent"
                 android:textSize="@dimen/sku_details_row_text_size"
                 android:textStyle="bold" />
@@ -65,6 +64,7 @@
             android:layout_marginTop="@dimen/single_padding">
 
             <ImageView
+                android:contentDescription="@string/descripcion"
                 android:id="@+id/sku_icon"
                 android:gravity="start"
                 android:layout_width="wrap_content"
@@ -73,7 +73,6 @@
             <TextView
                 android:id="@+id/description"
                 android:layout_marginStart="@dimen/single_padding"
-                android:layout_marginLeft="@dimen/single_padding"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/sku_details_row_description_text_size"

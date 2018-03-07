@@ -13,10 +13,6 @@ public class Constants {
     public static final String PK_R400 = "xs5kPMAcJL9MpdisETNP95s6yDkfMieXIAEH+vSbFga7KODwef1lad93KtiPg+oXVSn4l0hdrEGnK8y";
     public static final String PK_R600 = "BTywJI4Pje8n9qWHXR9HLOdhUDLHMTkQC9lN0hpBeC1ArFlc4MAbUhOL1iRt7rSwIDAQAB";
     public static final int PERMISION_LOCATION = 1002;
-    public static final int RC_REQUEST = 10001;
-    public static final String SKU_SUSCRIP = "suscrip";
-    public static final String SKU_MONTHLY = "suscrip_meses";
-    public static final String SKU_YEARLY = "suscrip_ano";
     public static final String URL_PLAYSTORE_APP = "Descarga esta util app \n https://play.google.com/store/apps/details?id=com.sesi.parkingmeter";
     private Constants(){
         //EMPTY

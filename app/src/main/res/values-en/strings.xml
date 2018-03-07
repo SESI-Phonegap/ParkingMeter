@@ -44,19 +44,13 @@
     <string name="charging_reminder_notification_title">! Time to go for your car !</string>
     <string name="charging_reminder_notification_body">Its time to go for your car. Avoid expensive fines.</string>
 
-    <!-- Suscripcion -->
-    <string name="selectSuscrip">Select your subscription period. \n Remove advertising and customize your alarm.</string>
-    <string name="Meses6">Subscription for 6 months</string>
-    <string name="Meses12">Subscription for 12 months</string>
-    <string name="reactivaSuscrip">Reactivate your subscription</string>
-    <string name="cambiaSuscrip">Change your subscription, Select your new subscription</string>
-    <string name="continuar">Continue</string>
+
     <!-- Dialog alarm -->
     <string name="configAlarm">Notify me %1$s minutes before. </string>
     <string name="btn_guardar_dialog_alarm">Save</string>
     <string name="msg_check_switch_alert">At least one option must be enabled (Vibrator or Sound)</string>
     <string name="titleSound">Select a tone</string>
-    <string name="tono">Tone</string>
+
 
     <!-- AdMob -->
 
@@ -71,12 +65,18 @@
     <string name="btn_suscribir">Subscribe</string>
 
     <string name="descripcion">Description</string>
-    <string name="precio">Price</string>
-    <string name="nodisponible">Not available</string>
-    <string name="graciasMsj">Thank you for subscribing to ParkingMeter!</string>
+
+
+
     <string name="alert_already_purchased">Item is already purchased</string>
     <string name="button_own">Own</string>
     <string name="button_change">Change</string>
     <string name="header_inapp">One-time deals</string>
     <string name="header_subscriptions">Subscriptions</string>
+    <string name="error_no_skus">We didn\'t find any SKUs to display&#8230; Check your internet
+        connection and make sure your Google Developer Console was setup correctly.</string>
+    <string name="error_billing_unavailable">Billing unavailable. Make sure your Google Play app
+        is setup correctly</string>
+    <string name="error_billing_default">Billing unavailable. Please check your device.</string>
+
 </resources>

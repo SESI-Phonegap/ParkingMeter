@@ -22,9 +22,9 @@ public class DirectionsJSONParser {
     public List<List<HashMap<String,String>>> parse(JSONObject jObject){
 
         List<List<HashMap<String, String>>> routes = new ArrayList<>() ;
-        JSONArray jRoutes = null;
-        JSONArray jLegs = null;
-        JSONArray jSteps = null;
+        JSONArray jRoutes;
+        JSONArray jLegs;
+        JSONArray jSteps;
 
         try {
 
@@ -34,13 +34,13 @@ public class DirectionsJSONParser {
 
             for(int i=0;i<jRoutes.length();i++){
                 jLegs = ( (JSONObject)jRoutes.get(i)).getJSONArray("legs");
-                List path = new ArrayList<HashMap<String, String>>();
+                List<HashMap<String, String>> path = new ArrayList<>();
 
                 for(int j=0;j<jLegs.length();j++){
                     jSteps = ( (JSONObject)jLegs.get(j)).getJSONArray("steps");
 
                     for(int k=0;k<jSteps.length();k++){
-                        String polyline = "";
+                        String polyline;
                         polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
                         List<LatLng> list = decodePoly(polyline);
                         sDistance = ((JSONObject)((JSONObject)jSteps.get(0)).get("distance")).get("text")+ " ";

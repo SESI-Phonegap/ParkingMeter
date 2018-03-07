@@ -10,8 +10,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,14 +31,14 @@ public class NotificationUtils {
         //Empty
     }
     public static void remindUserBecauseCharging(Context context) {
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         int smallIcon;
         if (Build.VERSION.SDK_INT >= 21) {
             smallIcon = R.drawable.alarm;
         } else {
             smallIcon = R.drawable.alarm_png;
         }
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,"MY_CH")
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(smallIcon)
                 .setLargeIcon(largeIcon(context))
@@ -70,8 +68,9 @@ public class NotificationUtils {
 
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID, notificationBuilder.build());
-
+        if (null != notificationManager) {
+            notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID, notificationBuilder.build());
+        }
         ReminderUtilities.dispatcher.cancelAll();
 
     }
@@ -120,7 +119,9 @@ public class NotificationUtils {
     public static void clearAllNotifications(Context context) {
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
+        if (null != notificationManager) {
+            notificationManager.cancelAll();
+        }
     }
 
     public static PendingIntent contentIntent(Context context) {
