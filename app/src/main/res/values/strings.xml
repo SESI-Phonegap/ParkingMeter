@@ -18,6 +18,11 @@
     <string name="sonido">Sonido</string>
     <string name="distancia">Distancia</string>
 
+    <string name="facebook_app_id">484673925349795</string>
+    <string name="fb_login_protocol_scheme">fb[484673925349795]</string>
+
+
+    <string name="msj_dialog_data">Seleciona el formato que desea introducir.</string>
 
     <string name="cinco">5</string>
     <string name="dies">10</string>
@@ -32,7 +37,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Menu Navigation Drawer-->
-    <string name="parking1">Tipo 1</string>
+    <string name="parking1">Parquimetro</string>
     <string name="parking2">Tipo 2</string>
     <string name="alarma">Alarma</string>
     <string name="compras">Compras</string>
@@ -58,6 +63,7 @@
     <string name="banner">ca-app-pub-2449148181464779/5005414441</string>
     <string name="banner_2">ca-app-pub-2449148181464779/3117735242</string>
     <string name="banner_intersticial_2">ca-app-pub-2449148181464779/7547934849</string>
+    <string name="banner_intersticial2019">ca-app-pub-2449148181464779/3052148916</string>
 
     <!-- Splash -->
 
@@ -79,5 +85,8 @@
          está configurado correctamente</string>
     <string name="error_billing_default">La facturación no está disponible. Por favor revisa tu dispositivo.</string>
 
+    <!-- Dialog Munitos -->
+    <string name="dialog_title_minutos">Introduce los minutos</string>
+    <string name="btnAceptar">Aceptar</string>
 
 </resources>

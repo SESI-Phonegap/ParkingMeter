@@ -2,6 +2,7 @@ package com.sesi.parkingmeter.view.utilities;
 
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,10 +15,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
-import com.sesi.parkingmeter.view.activity.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
-import com.sesi.parkingmeter.jobservice.ParkingReminderIntentService;
-import com.sesi.parkingmeter.jobservice.ReminderTask;
 
 
 public class NotificationUtils {
@@ -65,16 +63,34 @@ public class NotificationUtils {
         }
 
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        notificationBuilder.setChannelId("Channel_1");
 
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel("Channel_1","Notificacion",NotificationManager.IMPORTANCE_HIGH);
+            channel.setLightColor(Color.BLUE);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.enableVibration(true);
+            channel.enableLights(true);
+            if (PreferenceUtilities.getPreferenceDefaultSound(context)) {
+                channel.setSound(PreferenceUtilities.getUriSoundSelected(context),null);
+            }
+            if (PreferenceUtilities.getPreferenceDefaultVibrate(context)) {
+                channel.setVibrationPattern(new long[]{1000, 3000, 1000, 3000, 1000});
+            }
+            notificationManager.createNotificationChannel(channel);
+        }
+
         if (null != notificationManager) {
             notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID, notificationBuilder.build());
         }
-        ReminderUtilities.dispatcher.cancelAll();
+
+
 
     }
-
+/*
     private static NotificationCompat.Action ignoreReminderAction(Context context) {
         Intent ignoreReminderIntent = new Intent(context, ParkingReminderIntentService.class);
         ignoreReminderIntent.setAction(ReminderTask.ACTION_DISMISS_NOTIFICATION);
@@ -114,7 +130,7 @@ public class NotificationUtils {
         }
 
         return new NotificationCompat.Action(iIcon, "I did it!", ignoreReminderPendingIntent);
-    }
+    } */
 
     public static void clearAllNotifications(Context context) {
         NotificationManager notificationManager = (NotificationManager)
@@ -126,15 +142,18 @@ public class NotificationUtils {
 
     public static PendingIntent contentIntent(Context context) {
 
-        Intent startActivityIntent = new Intent(context, MainDrawerActivity.class);
+       Intent startActivityIntent = new Intent();
+
         startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         //startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
 
-        return PendingIntent.getActivity(
+
+       return PendingIntent.getActivity(
                 context,
                 ALARM_REMINDER_PENDING_INTENT_ID,
                 startActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                0);
+
     }
 
     public static Bitmap largeIcon(Context context) {

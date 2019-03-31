@@ -84,11 +84,6 @@ class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,Str
                 HomeFragment.tvDetails.append(DirectionsJSONParser.sDuration);
             }
 
-            if (null != ParkingType2Fragment.mMap && null != ParkingType2Fragment.tvDetails) {
-                ParkingType2Fragment.mMap.addPolyline(lineOptions);
-                ParkingType2Fragment.tvDetails.setText(DirectionsJSONParser.sDistance);
-                ParkingType2Fragment.tvDetails.append(DirectionsJSONParser.sDuration);
-            }
 */
         }
     }

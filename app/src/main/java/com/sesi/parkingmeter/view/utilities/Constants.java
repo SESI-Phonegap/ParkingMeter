@@ -1,6 +1,8 @@
 package com.sesi.parkingmeter.view.utilities;
 
-public class Constants {
+import com.sesi.parkingmeter.BuildConfig;
+
+public  class Constants {
 
     public static final String APPNAME = "AppName";
     public static final String URL_GOOGLE_MAPS_API = "https://maps.googleapis.com/maps/api/directions/";
@@ -14,6 +16,8 @@ public class Constants {
     public static final String PK_R600 = "BTywJI4Pje8n9qWHXR9HLOdhUDLHMTkQC9lN0hpBeC1ArFlc4MAbUhOL1iRt7rSwIDAQAB";
     public static final int PERMISION_LOCATION = 1002;
     public static final String URL_PLAYSTORE_APP = "Descarga esta util app \n https://play.google.com/store/apps/details?id=com.sesi.parkingmeter";
+    public static final String WORK_DURATION_KEY = BuildConfig.APPLICATION_ID +"WORK_DURATION_KEY";
+
     private Constants(){
         //EMPTY
     }

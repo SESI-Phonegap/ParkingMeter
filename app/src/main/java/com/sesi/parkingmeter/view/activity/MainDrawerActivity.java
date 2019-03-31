@@ -1,6 +1,7 @@
 package com.sesi.parkingmeter.view.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -34,6 +35,10 @@ import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.data.api.billing.BillingManager;
@@ -41,13 +46,13 @@ import com.sesi.parkingmeter.data.api.billing.BillingProvider;
 import com.sesi.parkingmeter.view.fragments.PurchaseFragment;
 import com.sesi.parkingmeter.view.utilities.SoundGallery;
 import com.sesi.parkingmeter.view.fragments.HomeFragment;
-import com.sesi.parkingmeter.view.fragments.ParkingType2Fragment;
 import com.sesi.parkingmeter.view.utilities.PreferenceUtilities;
-import com.sesi.parkingmeter.view.utilities.ReminderUtilities;
+import com.sesi.parkingmeter.view.utilities.UtilNetwork;
 import com.sesi.parkingmeter.view.utilities.Utils;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 import static com.sesi.parkingmeter.data.api.billing.BillingManager.BILLING_MANAGER_NOT_INITIALIZED;
 
@@ -74,6 +79,9 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     private PurchaseFragment fPurchaseFragment;
     // Tag for a dialog that allows us to find it when screen was rotated
     private static final String DIALOG_TAG = "dialog";
+    private TextView tvSound;
+    private AdView mAdview;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +104,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
         UpdateListener mUpdateListener = new UpdateListener();
         // Create and initialize BillingManager which talks to BillingLibrary
-        mBillingManager = new BillingManager(this, mUpdateListener);;
+        mBillingManager = new BillingManager(this, mUpdateListener);
         imageViewIcon = findViewById(R.id.imageView);
 
         builder = new AlertDialog.Builder(this);
@@ -114,9 +122,10 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
+        changeFragment(HomeFragment.newInstance(mIsSuscrip), R.id.mainFrame, false, false);
         iPreferenceMin = PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext());
         soundGallery = new SoundGallery(getApplicationContext());
+
     }
 
 
@@ -137,12 +146,13 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
         switch (id) {
             case R.id.nav_parking1:
-                changeFragment(HomeFragment.newInstance(), R.id.mainFrame, false, false);
+                changeFragment(HomeFragment.newInstance(mIsSuscrip), R.id.mainFrame, false, false);
                 break;
-            case R.id.nav_parking2:
-                changeFragment(ParkingType2Fragment.newInstance(), R.id.mainFrame, false, false);
-                break;
+
             case R.id.nav_alarm:
+                if (!mIsSuscrip) {
+                    showInterstitialAd();
+                }
                 createDialogConfigAlarm();
                 break;
 
@@ -160,8 +170,8 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                         > BILLING_MANAGER_NOT_INITIALIZED) {
                     //mAcquireFragment.onManagerReady(this);
                     fPurchaseFragment.onManagerReady(this);
-                   // createDialogCompras();
-                    changeFragment(fPurchaseFragment,R.id.mainFrame, false, false);
+                    // createDialogCompras();
+                    changeFragment(fPurchaseFragment, R.id.mainFrame, false, false);
                 }
                 break;
             default:
@@ -209,7 +219,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     }
 
     public void createDialogConfigAlarm() {
-        final View view = inflater.inflate(R.layout.dialog_alarm, null);
+        @SuppressLint("InflateParams") final View view = inflater.inflate(R.layout.dialog_alarm, null);
 
         final SwitchCompat switchVibrate = view.findViewById(R.id.switchVibrador);
         switchVibrate.setChecked(PreferenceUtilities.getPreferenceDefaultVibrate(getApplicationContext()));
@@ -221,31 +231,31 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         final TextView tvMinutos = view.findViewById(R.id.textViewMin);
         tvMinutos.setText(String.valueOf(PreferenceUtilities.getPreferenceDefaultMinHour(getApplicationContext())));
         Button btnContinuar = view.findViewById(R.id.btn_guardar_dialog_alarm);
+        tvSound = view.findViewById(R.id.tvSound);
         Button btnTono = view.findViewById(R.id.btn_sound);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 
-        TextView tvSound = view.findViewById(R.id.tvSound);
+            btnTono.setOnClickListener(v -> openGallery());
+        } else {
+            btnTono.setVisibility(View.GONE);
+            tvSound.setVisibility(View.GONE);
+        }
+
+
         String path = PreferenceUtilities.getUriSoundSelected(this).getPath();
         File file = new File(path);
         tvSound.setText(file.getName());
-        btnTono.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openGallery();
-            }
-        });
 
-        btnContinuar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if (switchSound.isChecked() | switchVibrate.isChecked()) {
-                    PreferenceUtilities.savePreferenceDefaultMinHour(v.getContext(), iPreferenceMin);
-                    PreferenceUtilities.savePreferenceDefaultVibrate(v.getContext(), switchVibrate.isChecked());
-                    PreferenceUtilities.savePreferenceDefaultSound(v.getContext(), switchSound.isChecked());
-                    dialog.dismiss();
-                } else {
-                    Toast.makeText(v.getContext(), getResources().getString(R.string.msg_check_switch_alert), Toast.LENGTH_LONG).show();
-                }
+        btnContinuar.setOnClickListener(v -> {
+
+            if (switchSound.isChecked() | switchVibrate.isChecked()) {
+                PreferenceUtilities.savePreferenceDefaultMinHour(v.getContext(), iPreferenceMin);
+                PreferenceUtilities.savePreferenceDefaultVibrate(v.getContext(), switchVibrate.isChecked());
+                PreferenceUtilities.savePreferenceDefaultSound(v.getContext(), switchSound.isChecked());
+                dialog.dismiss();
+            } else {
+                Toast.makeText(v.getContext(), getResources().getString(R.string.msg_check_switch_alert), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -286,18 +296,13 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         });
         builder.setView(view);
         dialog = builder.create();
-      //  dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        //  dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.show();
     }
 
     @Override
     protected void onDestroy() {
-        if (ReminderUtilities.dispatcher != null) {
-            ReminderUtilities.dispatcher.cancelAll();
-        }
-
         super.onDestroy();
-
     }
 
     @Override
@@ -308,17 +313,61 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
             if (requestCode == ID_SOUND) {
                 Uri uri = data.getData();
                 soundGallery.setSoundUri(uri);
-                PreferenceUtilities.saveUriSoundSelected(this, soundGallery.getPath());
+                String soundPath = soundGallery.getPath();
+                PreferenceUtilities.saveUriSoundSelected(this, soundPath);
+                String path = PreferenceUtilities.getUriSoundSelected(this).getPath();
+                // String sPathSD = Utils.getExternalSdCardPath();
+                File fileName = new File(path);
+                tvSound.setText(fileName.getName());
             }
         }
     }
 
+    public void cargaPublicidad() {
+
+        if (UtilNetwork.isOnline(Objects.requireNonNull(this))) {
+            mAdview = findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdview.loadAd(adRequest);
+            mAdview.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    // Load the next interstitial.
+                    mAdview.loadAd(new AdRequest.Builder().build());
+                }
+            });
+
+            mInterstitialAd = new InterstitialAd(this);
+            mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial2019));
+            mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    // Load the next interstitial.
+                    mInterstitialAd.loadAd(new AdRequest.Builder().build());
+                }
+
+            });
+        } else {
+            ImageView imgPubli = findViewById(R.id.img_publi_no_internet);
+            imgPubli.setVisibility(View.VISIBLE);
+
+        }
+    }
+
+    public void showInterstitialAd() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+    }
 
     /**
      * Remove loading spinner and refresh the UI
      */
     public void showRefreshedUi() {
-       // setWaitScreen(false);
+        // setWaitScreen(false);
         updateUi();
         if (fPurchaseFragment != null) {
             fPurchaseFragment.refreshUI();
@@ -334,7 +383,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
 
         if (isSixMonthlySubscribed()) {
             imageViewIcon.setImageDrawable(this.getResources().getDrawable(R.drawable.coin_month));
-        } else if (isYearlySubscribed()){
+        } else if (isYearlySubscribed()) {
             imageViewIcon.setImageDrawable(this.getResources().getDrawable(R.drawable.coin_year));
         }
     }
@@ -363,7 +412,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         @Override
         public void onBillingClientSetupFinished() {
             if (null != fPurchaseFragment)
-            fPurchaseFragment.onManagerReady(MainDrawerActivity.this);
+                fPurchaseFragment.onManagerReady(MainDrawerActivity.this);
         }
 
         @Override
@@ -399,6 +448,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
             mGoldYearly = false;
 
             for (Purchase purchase : purchaseList) {
+                Log.d("SUSCRIPCION", purchase.getSku());
                 switch (purchase.getSku()) {
 
                     case MONTH_SKU:
@@ -410,6 +460,11 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                         mIsSuscrip = true;
                         break;
                 }
+            }
+
+            if (!mIsSuscrip) {
+                Log.d("FALLO", "es true");
+                cargaPublicidad();
             }
 
             // mActivity.showRefreshedUi();

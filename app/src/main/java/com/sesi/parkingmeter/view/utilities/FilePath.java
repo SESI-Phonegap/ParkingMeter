@@ -42,6 +42,10 @@ public class FilePath {
 
                 if ("primary".equalsIgnoreCase(type)) {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
+                } else {
+                    String[] splitRootSdPath = (Environment.getExternalStorageDirectory().getAbsolutePath()).split("/");
+
+                    return splitRootSdPath[1] + "/" + split[0] + "/" +split[1];
                 }
             }
             // DownloadsProvider

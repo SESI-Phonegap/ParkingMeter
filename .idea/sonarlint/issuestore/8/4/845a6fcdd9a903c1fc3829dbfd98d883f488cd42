@@ -1,16 +1,0 @@
-
-Dsquid:S1444"*Make this "public static mMap" field final(…ÅßÌüÿÿÿÿ
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(¦œå8Í†µ²õ+
-gsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(éÿãå8¿Éõ§ó+
-"squid:ClassVariableVisibilityCheck"PMake mMap a static final constant or non-public and provide accessors if needed.(…ÅßÌüÿÿÿÿ
-Wsquid:S2696"6Make the enclosing method "static" or remove this set.(ÌÚç“úÿÿÿÿ8¹Þé§ó+
-nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(¡é††8¢ëÌ·ô+
-Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ñ¢¸’8­ó’²õ+
-Wsquid:S2696"6Make the enclosing method "static" or remove this set.(š¼¬àûÿÿÿÿ8ŸØ¥©ó+
-Wsquid:S2696"6Make the enclosing method "static" or remove this set.(ÊæÒ¥ùÿÿÿÿ8ŸØ¥©ó+
-Psquid:S2696"6Make the enclosing method "static" or remove this set.(àŠëÈþÿÿÿÿ
-Dsquid:S1444"/Make this "public static tvDetails" field final(äÕŠó
-"squid:ClassVariableVisibilityCheck"UMake tvDetails a static final constant or non-public and provide accessors if needed.(äÕŠó
-Rsquid:S2696"6Make the enclosing method "static" or remove this set.(ñ¢¸’8£×ÿ±õ+
-lsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(ëÒ­½úÿÿÿÿ8¹Þé§ó+
-nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 25 to the 15 allowed.(ãÜ›Ø8¿Éõ§ó+

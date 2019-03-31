@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.support.design.widget.TextInputEditText;
 import android.util.Log;
@@ -15,11 +16,16 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.sesi.parkingmeter.R;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class Utils {
@@ -76,10 +82,10 @@ public class Utils {
         return Constants.PK_R200 + Constants.PK_R700 + Constants.PK_R900 + Constants.PK_R400 + Constants.PK_R600;
     }
 
-    public static String obtenerDireccionesURL(LatLng origin, LatLng dest) {
+    public static String obtenerDireccionesURL(LatLng origin, LatLng dest, Context context) {
         String sOrigin = "origin=" + origin.latitude + "," + origin.longitude;
         String sDest = "destination=" + dest.latitude + "," + dest.longitude;
-        String parameters = Constants.UNITS + sOrigin + "&" + sDest + "&" + Constants.SENSOR_FALSE;
+        String parameters = Constants.UNITS + sOrigin + "&" + sDest + "&" + Constants.SENSOR_FALSE + "&key="+context.getString(R.string.google_maps_key);
         return Constants.URL_GOOGLE_MAPS_API + Constants.JSON_TYPE + "?" + parameters;
     }
 
@@ -133,4 +139,37 @@ public class Utils {
         }
     }
 
+    public static String getExternalSdCardPath() {
+        String path = null;
+
+        File sdCardFile = null;
+        List<String> sdCardPossiblePath = Arrays.asList("external_sd", "ext_sd", "external", "extSdCard","3D77-AC3B");
+
+        for (String sdPath : sdCardPossiblePath) {
+            File file = new File(Environment.getRootDirectory(), sdPath);
+
+            if (file.isDirectory() && file.canWrite()) {
+                path = file.getAbsolutePath();
+
+                String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss", Locale.US).format(new Date());
+                File testWritable = new File(path, "test_" + timeStamp);
+
+                if (testWritable.mkdirs()) {
+                    testWritable.delete();
+                }
+                else {
+                    path = null;
+                }
+            }
+        }
+
+        if (path != null) {
+            sdCardFile = new File(path);
+        }
+        else {
+            sdCardFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+        }
+
+        return sdCardFile.getAbsolutePath();
+    }
 }

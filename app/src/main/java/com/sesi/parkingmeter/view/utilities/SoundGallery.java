@@ -48,9 +48,10 @@ public class SoundGallery {
             path = FilePath.getRealPathFromURI_API11to18(context, soundUri);
         }
         // SDK > 19 (Android 4.4)
-        else
+        else {
             path = FilePath.getPath(context, soundUri);
+        }
+            return path;
 
-        return path;
     }
 }

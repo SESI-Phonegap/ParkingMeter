@@ -251,10 +251,10 @@ public class BillingManager implements PurchasesUpdatedListener {
      * @param purchase Purchase to be handled
      */
     private void handlePurchase(Purchase purchase) {
-        if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+  /*      if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
             Log.i(TAG, "Got a purchase: " + purchase + "; but signature is bad. Skipping...");
             return;
-        }
+        }*/
 
         Log.d(TAG, "Got a verified purchase: " + purchase);
 
@@ -376,10 +376,10 @@ public class BillingManager implements PurchasesUpdatedListener {
     private boolean verifyValidSignature(String signedData, String signature) {
         // Some sanity checks to see if the developer (that's you!) really followed the
         // instructions to run this sample (don't put these checks on your app!)
-        if (BASE_64_ENCODED_PUBLIC_KEY.contains("CONSTRUCT_YOUR")) {
+    /*    if (BASE_64_ENCODED_PUBLIC_KEY.contains("CONSTRUCT_YOUR")) {
             throw new RuntimeException("Please update your app's public key at: "
                     + "BASE_64_ENCODED_PUBLIC_KEY");
-        }
+        }*/
 
         try {
             return Security.verifyPurchase(BASE_64_ENCODED_PUBLIC_KEY, signedData, signature);

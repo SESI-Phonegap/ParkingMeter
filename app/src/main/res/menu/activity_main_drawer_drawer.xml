@@ -7,10 +7,6 @@
             android:icon="@drawable/nav_parking_1"
             android:title="@string/parking1" />
         <item
-            android:id="@+id/nav_parking2"
-            android:icon="@drawable/nav_parking_2"
-            android:title="@string/parking2" />
-        <item
             android:id="@+id/nav_alarm"
             android:icon="@drawable/alarm_black"
             android:title="@string/alarma" />

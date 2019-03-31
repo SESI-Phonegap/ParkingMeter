@@ -1,23 +1,0 @@
-
-nsquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(À‘İ
-gsquid:S00117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‘«Ë
-nsquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(Œ°©÷
-asquid:S00112"FDefine and throw a dedicated exception instead of using a generic one.(‚¼Šèøÿÿÿÿ
-v%squid:RedundantThrowsDeclarationCheck"GRemove the redundant '!unknownSymbol!' thrown exception declaration(s).(úª¸Ñ
-lsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(òéÿÊÿÿÿÿÿ
-nsquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(Œ°©÷
-gsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(ğ´Ò”
-ssquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(ÑÛ‹“ûÿÿÿÿ
-gsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(úª¸Ñ
-nsquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(Ø…€
-Fsquid:S1153"1Directly append the argument of String.valueOf().(µ…€
-v%squid:RedundantThrowsDeclarationCheck"GRemove the redundant '!unknownSymbol!' thrown exception declaration(s).(›ä¶
-lsquid:S00117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¸Âƒ¤ùÿÿÿÿ
-nsquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(â“Òµ
-lsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 31 to the 15 allowed.(‰ ë„şÿÿÿÿ
-\squid:S00112"FDefine and throw a dedicated exception instead of using a generic one.(šà¥ã
-gsquid:S00117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÕÌøº
-Xsquid:S1155">Use isEmpty() to check whether the collection is empty or not.(Æƒ«­úÿÿÿÿ
-]squid:S1192"HDefine a constant instead of duplicating this literal "consume" 4 times.(·ÎÒ‰
-gsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(Ìâ³ö
-lsquid:S00117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜Õãñÿÿÿÿÿ

@@ -19,6 +19,8 @@
     <string name="distancia">Distance</string>
 
 
+    <string name="msj_dialog_data">Select the format you want to enter.</string>
+
     <string name="cinco">5</string>
     <string name="dies">10</string>
     <string name="quince">15</string>
@@ -59,6 +61,7 @@
     <string name="banner">ca-app-pub-2449148181464779/5005414441</string>
     <string name="banner_2">ca-app-pub-2449148181464779/3117735242</string>
     <string name="banner_intersticial_2">ca-app-pub-2449148181464779/7547934849</string>
+    <string name="banner_intersticial2019">ca-app-pub-2449148181464779/3052148916</string>
 
     <!-- Splash -->
 
@@ -79,4 +82,7 @@
         is setup correctly</string>
     <string name="error_billing_default">Billing unavailable. Please check your device.</string>
 
+    <!-- Dialog Munitos -->
+    <string name="dialog_title_minutos">Enter the minutes</string>
+    <string name="btnAceptar">Accept</string>
 </resources>

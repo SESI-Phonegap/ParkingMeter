@@ -188,18 +188,6 @@
                     app:layout_constraintRight_toRightOf="parent" />
 
 
-                <com.google.android.gms.ads.AdView
-                    android:id="@+id/adView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/relativeDatos"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginStart="8dp"
-                    app:adSize="BANNER"
-                    app:adUnitId="@string/banner"
-                    app:layout_constraintBottom_toTopOf="@+id/relativeDatos"
-                    app:layout_constraintLeft_toLeftOf="parent" />
 
                 <ImageView
                     android:contentDescription="@string/descripcion"
