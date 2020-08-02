@@ -3,9 +3,7 @@ package com.sesi.parkingmeter.view.activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Bundle;
-
 import com.sesi.parkingmeter.R;
-
 
 public class SplashActivity extends BaseActivity {
 

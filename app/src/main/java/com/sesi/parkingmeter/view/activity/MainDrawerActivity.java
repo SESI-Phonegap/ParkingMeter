@@ -5,24 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-
-
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -33,6 +18,19 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.google.android.gms.ads.AdListener;
@@ -40,6 +38,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.navigation.NavigationView;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.data.api.billing.BillingManager;
 import com.sesi.parkingmeter.data.api.billing.BillingProvider;
@@ -49,15 +48,13 @@ import com.sesi.parkingmeter.view.fragments.HomeFragment;
 import com.sesi.parkingmeter.view.utilities.PreferenceUtilities;
 import com.sesi.parkingmeter.view.utilities.UtilNetwork;
 import com.sesi.parkingmeter.view.utilities.Utils;
-
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
-
 import static com.sesi.parkingmeter.data.api.billing.BillingManager.BILLING_MANAGER_NOT_INITIALIZED;
 
 
-public class MainDrawerActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, BillingProvider {
+public class MainDrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BillingProvider {
 
 
     // Debug tag, for logging
@@ -66,7 +63,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     private static final String ANO_SKU = "suscrip_ano";
     private LayoutInflater inflater;
     private AlertDialog dialog;
-    private Builder builder;
+    private AlertDialog.Builder builder;
     private static final int MAX_MIN = 20;
     private int iPreferenceMin;
     public static boolean mIsSuscrip = false;
@@ -88,7 +85,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_drawer);
 
-        MobileAds.initialize(this, getString(R.string.banner_ad_unit_id));
+        MobileAds.initialize(this, initializationStatus -> {});
         init();
 
         // Try to restore dialog fragment if we were showing it prior to screen rotation
@@ -106,6 +103,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         // Create and initialize BillingManager which talks to BillingLibrary
         mBillingManager = new BillingManager(this, mUpdateListener);
         imageViewIcon = findViewById(R.id.imageView);
+        mAdview = findViewById(R.id.adView);
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -150,9 +148,6 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
                 break;
 
             case R.id.nav_alarm:
-                if (!mIsSuscrip) {
-                    showInterstitialAd();
-                }
                 createDialogConfigAlarm();
                 break;
 
@@ -257,6 +252,9 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
             } else {
                 Toast.makeText(v.getContext(), getResources().getString(R.string.msg_check_switch_alert), Toast.LENGTH_LONG).show();
             }
+            if (!mIsSuscrip) {
+                showInterstitialAd();
+            }
         });
 
         SeekBar seekBar = view.findViewById(R.id.seekBarAlarm);
@@ -326,8 +324,8 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
     public void cargaPublicidad() {
 
         if (UtilNetwork.isOnline(Objects.requireNonNull(this))) {
-            mAdview = findViewById(R.id.adView);
             AdRequest adRequest = new AdRequest.Builder().build();
+            mAdview.setVisibility(View.VISIBLE);
             mAdview.loadAd(adRequest);
             mAdview.setAdListener(new AdListener() {
                 @Override
@@ -416,7 +414,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
         }
 
         @Override
-        public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+        public void onConsumeFinished(String token, @BillingClient.BillingResponseCode int result) {
             Log.d("TAG", "Consumption finished. Purchase token: " + token + ", result: " + result);
 
             // Note: We know this is the SKU_GAS, because it's the only one we consume, so we don't
@@ -426,7 +424,7 @@ public class MainDrawerActivity extends BaseActivity implements NavigationView.O
             // It could be done by maintaining a map (updating it every time you call consumeAsync)
             // of all tokens into SKUs which were scheduled to be consumed and then looking through
             // it here to check which SKU corresponds to a consumed token.
-            if (result == BillingClient.BillingResponse.OK) {
+            if (result == BillingClient.BillingResponseCode.OK) {
                 // Successfully consumed, so we apply the effects of the item in our
                 // game world's logic, which in our case means filling the gas tank a bit
                 Log.d("TAG", "Consumption successful. Provisioning.");

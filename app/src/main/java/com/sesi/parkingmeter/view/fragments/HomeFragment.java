@@ -21,16 +21,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PersistableBundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +32,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -52,10 +52,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.textfield.TextInputEditText;
 import com.sesi.parkingmeter.jobservice.JobServiceOreo;
 import com.sesi.parkingmeter.view.utilities.Constants;
 import com.sesi.parkingmeter.view.utilities.Gps;
-import com.sesi.parkingmeter.view.activity.MainDrawerActivity;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.data.api.googlemaps.task.DownloadTask;
 import com.sesi.parkingmeter.view.utilities.PreferenceUtilities;
@@ -210,12 +210,10 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
                 } else {
                     calculaPorMinutos();
                 }
-                publicidad();
                 break;
 
             case R.id.btnCancelar:
                 cancel();
-                publicidad();
                 break;
 
             case R.id.textInputEditTextHoraVence:

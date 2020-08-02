@@ -8,12 +8,12 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.os.Environment;
 import android.os.Parcelable;
-import android.support.design.widget.TextInputEditText;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.textfield.TextInputEditText;
 import com.sesi.parkingmeter.R;
 
 import java.io.File;

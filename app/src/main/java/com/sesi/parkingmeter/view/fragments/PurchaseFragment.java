@@ -2,14 +2,7 @@ package com.sesi.parkingmeter.view.fragments;
 
 import android.content.Context;
 import android.content.res.Resources;
-
 import android.os.Bundle;
-
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +10,15 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.sesi.parkingmeter.R;
@@ -26,7 +27,6 @@ import com.sesi.parkingmeter.view.adapter.CardsWithHeadersDecoration;
 import com.sesi.parkingmeter.view.adapter.SkuRowData;
 import com.sesi.parkingmeter.view.adapter.SkusAdapter;
 import com.sesi.parkingmeter.view.adapter.UiManager;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,11 +146,10 @@ public class PurchaseFragment extends Fragment {
         mBillingProvider.getBillingManager().querySkuDetailsAsync(billingType, skusList,
                 new SkuDetailsResponseListener() {
                     @Override
-                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-
-                        if (responseCode != BillingClient.BillingResponse.OK) {
+                    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, @Nullable List<SkuDetails> skuDetailsList) {
+                        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
                             Log.w("TAG", "Unsuccessful query for type: " + billingType
-                                    + ". Error code: " + responseCode);
+                                    + ". Error code: " + billingResult.getResponseCode());
                         } else if (skuDetailsList != null
                                 && skuDetailsList.size() > 0) {
                             // If we successfully got SKUs, add a header in front of the row
@@ -202,11 +201,11 @@ public class PurchaseFragment extends Fragment {
                 .getBillingClientResponseCode();
 
         switch (billingResponseCode) {
-            case BillingClient.BillingResponse.OK:
+            case BillingClient.BillingResponseCode.OK:
                 // If manager was connected successfully, then show no SKUs error
                 mErrorTextView.setText(getText(R.string.error_no_skus));
                 break;
-            case BillingClient.BillingResponse.BILLING_UNAVAILABLE:
+            case BillingClient.BillingResponseCode.BILLING_UNAVAILABLE:
                 mErrorTextView.setText(getText(R.string.error_billing_unavailable));
                 break;
             default:

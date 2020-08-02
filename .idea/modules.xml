@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pakimetro-ParkingMeter.iml" filepath="$PROJECT_DIR$/.idea/modules/Pakimetro-ParkingMeter.iml" group="ParkingMeter" />
       <module fileurl="file://$PROJECT_DIR$/ParkingMeter.iml" filepath="$PROJECT_DIR$/ParkingMeter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ParkingMeter-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ParkingMeter-app.iml" group="ParkingMeter/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

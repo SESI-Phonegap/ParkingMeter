@@ -15,12 +15,11 @@
  */
 package com.sesi.parkingmeter.view.adapter;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import androidx.recyclerview.widget.RecyclerView;
 import com.sesi.parkingmeter.R;
 
 
@@ -47,12 +46,7 @@ public final class RowViewHolder extends RecyclerView.ViewHolder {
         skuIcon = (ImageView) itemView.findViewById(R.id.sku_icon);
         button = (Button) itemView.findViewById(R.id.state_button);
         if (button != null) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    clickListener.onButtonClicked(getAdapterPosition());
-                }
-            });
+            button.setOnClickListener(view -> clickListener.onButtonClicked(getAdapterPosition()));
         }
     }
 }
