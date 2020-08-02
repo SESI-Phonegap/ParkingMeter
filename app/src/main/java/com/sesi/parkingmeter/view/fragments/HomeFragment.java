@@ -410,7 +410,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
 
 
     public void controlTimer(int min) {
-        countTimer = new CountDownTimer(min * 1000 + 100, 1000) {
+        countTimer = new CountDownTimer(min * 1000L + 100L, 1000L) {
             @Override
             public void onTick(long millisUntilFinished) {
                 String contador = String.format(Locale.US, FORMAT,

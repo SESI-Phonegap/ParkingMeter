@@ -153,7 +153,7 @@ public class PurchaseFragment extends Fragment {
                         } else if (skuDetailsList != null
                                 && skuDetailsList.size() > 0) {
                             // If we successfully got SKUs, add a header in front of the row
-                            @StringRes int stringRes = (billingType == BillingClient.SkuType.INAPP)
+                            @StringRes int stringRes = (billingType.equals(BillingClient.SkuType.INAPP))
                                     ? R.string.header_inapp : R.string.header_subscriptions;
                             inList.add(new SkuRowData(getString(stringRes)));
                             // Then fill all the other rows
