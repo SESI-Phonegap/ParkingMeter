@@ -36,8 +36,10 @@ import com.android.billingclient.api.Purchase;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.navigation.NavigationView;
 import com.sesi.parkingmeter.R;
 import com.sesi.parkingmeter.data.api.billing.BillingManager;
@@ -103,7 +105,7 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
         // Create and initialize BillingManager which talks to BillingLibrary
         mBillingManager = new BillingManager(this, mUpdateListener);
         imageViewIcon = findViewById(R.id.imageView);
-        mAdview = findViewById(R.id.adView);
+        mAdview = new AdView(this);
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -327,25 +329,22 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdview.setVisibility(View.VISIBLE);
             mAdview.loadAd(adRequest);
-            mAdview.setAdListener(new AdListener() {
+            mAdview.setAdUnitId(getString(R.string.banner));
+
+            InterstitialAd.load(getApplicationContext(), getString(R.string.banner_intersticial2019), adRequest, new InterstitialAdLoadCallback() {
                 @Override
-                public void onAdClosed() {
-                    // Load the next interstitial.
-                    mAdview.loadAd(new AdRequest.Builder().build());
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    mInterstitialAd = interstitialAd;
+                    Log.i(TAG, "onAdLoaded");
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    Log.i(TAG, loadAdError.getMessage());
+                    mInterstitialAd = null;
                 }
             });
 
-            mInterstitialAd = new InterstitialAd(this);
-            mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial2019));
-            mInterstitialAd.loadAd(new AdRequest.Builder().build());
-            mInterstitialAd.setAdListener(new AdListener() {
-                @Override
-                public void onAdClosed() {
-                    // Load the next interstitial.
-                    mInterstitialAd.loadAd(new AdRequest.Builder().build());
-                }
-
-            });
         } else {
             ImageView imgPubli = findViewById(R.id.img_publi_no_internet);
             imgPubli.setVisibility(View.VISIBLE);
@@ -354,8 +353,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
     }
 
     public void showInterstitialAd() {
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(MainDrawerActivity.this);
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
         }
@@ -446,17 +445,13 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
             mGoldYearly = false;
 
             for (Purchase purchase : purchaseList) {
-                Log.d("SUSCRIPCION", purchase.getSku());
-                switch (purchase.getSku()) {
-
-                    case MONTH_SKU:
-                        mGoldMonthly = true;
-                        mIsSuscrip = true;
-                        break;
-                    case ANO_SKU:
-                        mGoldYearly = true;
-                        mIsSuscrip = true;
-                        break;
+                Log.d("SUSCRIPCION", purchase.getSkus().toString());
+                if(purchase.getSkus().contains(MONTH_SKU)){
+                    mGoldMonthly = true;
+                    mIsSuscrip = true;
+                } else if(purchase.getSkus().contains(ANO_SKU)){
+                    mGoldYearly = true;
+                    mIsSuscrip = true;
                 }
             }
 

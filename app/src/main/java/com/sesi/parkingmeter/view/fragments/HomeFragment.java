@@ -42,9 +42,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -131,8 +132,8 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
 
     public void init() {
 
-        serviceComponent = new ComponentName(Objects.requireNonNull(getContext()), JobServiceOreo.class);
-        builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        serviceComponent = new ComponentName(requireContext(), JobServiceOreo.class);
+        builder = new AlertDialog.Builder(requireActivity());
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         tvContador = getActivity().findViewById(R.id.contador);
         switchLocation = getActivity().findViewById(R.id.switchLocation);
@@ -163,22 +164,25 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     }
 
     private void cargarInterstitial() {
-        mInterstitialAd = new InterstitialAd(getActivity().getApplicationContext());
-        mInterstitialAd.setAdUnitId(getString(R.string.banner_intersticial2019));
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-        mInterstitialAd.setAdListener(new AdListener() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(requireContext(), getString(R.string.banner_intersticial2019), adRequest, new InterstitialAdLoadCallback() {
             @Override
-            public void onAdClosed() {
-                // Load the next interstitial.
-                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                mInterstitialAd = interstitialAd;
+                Log.i("HOME FRAGMENT", "onAdLoaded");
             }
 
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                Log.i("HOME FRAGMENT", loadAdError.getMessage());
+                mInterstitialAd = null;
+            }
         });
     }
 
     public void showInterstitialAd() {
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(requireActivity());
         } else {
             Log.d("TAG", "The interstitial wasn't loaded yet.");
         }
@@ -242,7 +246,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
 
 
     public void showDialogOptionData() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(getString(R.string.app_name))
                 .setMessage(getString(R.string.msj_dialog_data))
                 .setPositiveButton(getString(R.string.Horavencimiento),
@@ -321,7 +325,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
                 int secondsContador = (int) (TimeUnit.MINUTES.toSeconds(timerMin));
                 controlTimer(secondsContador);
                 Intent startServiceIntent = new Intent(getContext(), JobServiceOreo.class);
-                Objects.requireNonNull(getActivity()).startService(startServiceIntent);
+                requireActivity().startService(startServiceIntent);
                 scheduleJobOreo(secondsStart);
 
                 btnInicio.setEnabled(false);
@@ -352,7 +356,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
                     int secondsStart = (int) (TimeUnit.MINUTES.toSeconds(calMin));
                     controlTimer(secondsStartCount);
                     Intent startServiceIntent = new Intent(getContext(), JobServiceOreo.class);
-                    Objects.requireNonNull(getActivity()).startService(startServiceIntent);
+                    requireActivity().startService(startServiceIntent);
                     scheduleJobOreo(secondsStart);
 
                     enableButtonsStartTime();
@@ -443,7 +447,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        tvDetails = Objects.requireNonNull(getActivity()).findViewById(R.id.tvDatos);
+        tvDetails = requireActivity().findViewById(R.id.tvDatos);
         mMap = googleMap;
 
         LatLng latLng = new LatLng(19.390519, -99.4238192);
@@ -543,8 +547,8 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     }
 
     public void addMarkers() {
-        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
         } else {
             if (null != mMap) {
                 mMap.clear();
@@ -558,7 +562,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         Bitmap bitmapUser;
 
         if (Build.VERSION.SDK_INT >= 21) {
-            bitmapUser = getBitmap((VectorDrawable) Objects.requireNonNull(getActivity()).getResources().getDrawable(R.drawable.ic_human_male));
+            bitmapUser = getBitmap((VectorDrawable) requireActivity().getResources().getDrawable(R.drawable.ic_human_male));
         } else {
             bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
         }
@@ -580,7 +584,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         Bitmap bitmapCar;
         if (vehicleLatLng != null && latLng != null) {
             if (Build.VERSION.SDK_INT >= 21) {
-                bitmapCar = getBitmap((VectorDrawable) Objects.requireNonNull(getActivity()).getResources().getDrawable(R.drawable.ic_sedan_car_front));
+                bitmapCar = getBitmap((VectorDrawable) requireActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
             } else {
                 bitmapCar = BitmapFactory.decodeResource(getResources(), R.drawable.sedan_car_front);
             }
@@ -629,18 +633,18 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         PersistableBundle extras = new PersistableBundle();
         extras.putLong(Constants.WORK_DURATION_KEY, 3000);
         jobBuilder.setExtras(extras);
-        ((JobScheduler) Objects.requireNonNull(Objects.requireNonNull(getActivity()).getSystemService(Context.JOB_SCHEDULER_SERVICE))).schedule(jobBuilder.build());
+        ((JobScheduler) Objects.requireNonNull(requireActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE))).schedule(jobBuilder.build());
 
     }
 
     public void cancelAllJobsOreo() {
-        ((JobScheduler) Objects.requireNonNull(Objects.requireNonNull(getActivity()).getSystemService(Context.JOB_SCHEDULER_SERVICE))).cancelAll();
+        ((JobScheduler) Objects.requireNonNull(requireActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE))).cancelAll();
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            if (UtilNetwork.isOnline(Objects.requireNonNull(getActivity()))) {
+            if (UtilNetwork.isOnline(requireActivity())) {
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
                 } else {
