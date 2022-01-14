@@ -131,7 +131,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     }
 
     public void init() {
-
         serviceComponent = new ComponentName(requireContext(), JobServiceOreo.class);
         builder = new AlertDialog.Builder(requireActivity());
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -154,11 +153,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         sTracker = new UtilGPS(getContext());
         if (!getArguments().getBoolean(SUSCRIP)) {
             cargarInterstitial();
-        }
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
-        } else {
-            startTracker();
         }
 
     }
@@ -731,23 +725,4 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        switch (requestCode) {
-            case PERMISION_LOCATION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startTracker();
-
-                } else {
-                    Toast.makeText(getContext(), getResources().getString(R.string.msgPermissionDeniedLocation), Toast.LENGTH_LONG).show();
-                }
-                break;
-
-            default:
-                Log.d("Invalida", "Opcion Invalida");
-                break;
-        }
-    }
 }

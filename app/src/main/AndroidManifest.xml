@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
     <supports-screens android:largeScreens="true"/>
 
     <application
@@ -34,14 +33,6 @@
             android:launchMode="singleTop">
 
         </activity>
-
-      <!--  <service
-            android:name=".jobservice.ParkingReminderFirebaseJobService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
-            </intent-filter>
-        </service> -->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
