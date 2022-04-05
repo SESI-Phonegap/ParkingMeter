@@ -151,7 +151,7 @@ public class PurchaseFragment extends Fragment {
                             Log.w("TAG", "Unsuccessful query for type: " + billingType
                                     + ". Error code: " + billingResult.getResponseCode());
                         } else if (skuDetailsList != null
-                                && skuDetailsList.size() > 0) {
+                                && !skuDetailsList.isEmpty()) {
                             // If we successfully got SKUs, add a header in front of the row
                             @StringRes int stringRes = (billingType.equals(BillingClient.SkuType.INAPP))
                                     ? R.string.header_inapp : R.string.header_subscriptions;
@@ -163,7 +163,7 @@ public class PurchaseFragment extends Fragment {
                                         billingType));
                             }
 
-                            if (inList.size() == 0) {
+                            if (inList.isEmpty()) {
                                 displayAnErrorIfNeeded();
                             } else {
                                 if (mRecyclerView.getAdapter() == null) {

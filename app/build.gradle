@@ -11,8 +11,8 @@ android {
         applicationId "com.sesi.parkingmeter"
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 16
-        versionName "1.2"
+        versionCode 18
+        versionName "1.5"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {

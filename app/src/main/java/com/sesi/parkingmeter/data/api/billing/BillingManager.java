@@ -20,6 +20,9 @@ import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.MutableLiveData;
+
+import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClient.FeatureType;
 import com.android.billingclient.api.BillingClient.SkuType;
@@ -30,11 +33,14 @@ import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.Purchase.PurchasesResult;
+import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +76,15 @@ public class BillingManager implements PurchasesUpdatedListener {
     private int mBillingClientResponseCode = BILLING_MANAGER_NOT_INITIALIZED;
 
     private Map<String, SkuDetails> skusWithSkuDetails =  new HashMap<>();
+    final private Map<String, MutableLiveData<SkuState>> skuStateMap = new HashMap<>();
+    // SKUs to auto-consume
+    final private Set<String> knownAutoConsumeSKUs;
+    // Observables that are used to communicate state.
+    final private Set<Purchase> purchaseConsumptionInProcess = new HashSet<>();
+
+    final private SingleMediatorLiveEvent<List<String>> newPurchase = new SingleMediatorLiveEvent<>();
+    final private SingleMediatorLiveEvent<List<String>> purchaseConsumed =
+            new SingleMediatorLiveEvent<>();
 
     /* BASE_64_ENCODED_PUBLIC_KEY should be YOUR APPLICATION'S PUBLIC KEY
      * (that you got from the Google Play developer console). This is not your
@@ -115,7 +130,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                 .setListener(this)
                 .enablePendingPurchases()
                 .build();
-
+        knownAutoConsumeSKUs = new HashSet<>();
         Log.d(TAG, "Starting setup.");
 
         // Start setup. This is asynchronous and the specified listener will be called
@@ -233,7 +248,6 @@ public class BillingManager implements PurchasesUpdatedListener {
      * Handles the purchase
      * <p>Note: Notice that for each purchase, we check if signature is valid on the client.
      * It's recommended to move this check into your backend.
-     * See {@link Security#verifyPurchase(String, String, String)}
      * </p>
      * @param purchase Purchase to be handled
      */
@@ -280,8 +294,34 @@ public class BillingManager implements PurchasesUpdatedListener {
      * a listener
      */
     public void queryPurchases() {
+        List<Purchase> listPurchaseInApp = new ArrayList<>();
+        mBillingClient.queryPurchasesAsync(SkuType.INAPP, ((billingResult, list) -> {
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK){
+                Log.e(TAG, "Problem getting purchases: " +
+                        billingResult.getDebugMessage());
+            } else {
+                //processPurchaseList(list, Arrays.asList(INAPP_SKUS));
+            }
+        }));
+
+        if (areSubscriptionsSupported()){
+            mBillingClient.queryPurchasesAsync(SkuType.SUBS, new PurchasesResponseListener() {
+                @Override
+                public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> list) {
+                    long time = System.currentTimeMillis();
+                    Log.i(TAG, "Querying purchases and subscriptions elapsed time: "
+                            + (System.currentTimeMillis() - time) + "ms");
+                    Log.i(TAG, "Querying subscriptions result code: "
+                            + billingResult.getResponseCode()
+                            + " res: " + list.size());
+                    listPurchaseInApp.addAll(list);
+                }
+            });
+        }
+      /*
         Runnable queryToExecute = () -> {
             long time = System.currentTimeMillis();
+
             PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
             Log.i(TAG, "Querying purchases elapsed time: " + (System.currentTimeMillis() - time)
                     + "ms");
@@ -310,7 +350,7 @@ public class BillingManager implements PurchasesUpdatedListener {
             onQueryPurchasesFinished(purchasesResult);
         };
 
-        executeServiceRequest(queryToExecute);
+        executeServiceRequest(queryToExecute);*/
     }
 
     public void startServiceConnection(final Runnable executeOnSuccess) {
@@ -343,6 +383,181 @@ public class BillingManager implements PurchasesUpdatedListener {
             // If billing service was disconnected, we try to reconnect 1 time.
             // (feel free to introduce your retry policy here).
             startServiceConnection(runnable);
+        }
+    }
+
+
+    private void processPurchaseList(List<Purchase> purchases, List<String> skusToUpdate) {
+        HashSet<String> updatedSkus = new HashSet<>();
+        if (null != purchases) {
+            for (final Purchase purchase : purchases) {
+                for (String sku : purchase.getSkus()) {
+                    final MutableLiveData<SkuState> skuStateLiveData = skuStateMap.get(sku);
+                    if (null == skuStateLiveData) {
+                        Log.e(TAG, "Unknown SKU " + sku + ". Check to make " +
+                                "sure SKU matches SKUS in the Play developer console.");
+                        continue;
+                    }
+                    updatedSkus.add(sku);
+                }
+                // Global check to make sure all purchases are signed correctly.
+                // This check is best performed on your server.
+                int purchaseState = purchase.getPurchaseState();
+                if (purchaseState == Purchase.PurchaseState.PURCHASED) {
+                    if (!isSignatureValid(purchase)) {
+                        Log.e(TAG, "Invalid signature on purchase. Check to make " +
+                                "sure your public key is correct.");
+                        continue;
+                    }
+                    // only set the purchased state after we've validated the signature.
+                    setSkuStateFromPurchase(purchase);
+                    boolean isConsumable = false;
+                    for (String sku : purchase.getSkus()) {
+                        if (knownAutoConsumeSKUs.contains(sku)) {
+                            isConsumable = true;
+                        } else {
+                            if (isConsumable) {
+                                Log.e(TAG, "Purchase cannot contain a mixture of consumable" +
+                                        "and non-consumable items: " + purchase.getSkus().toString());
+                                isConsumable = false;
+                                break;
+                            }
+                        }
+                    }
+                    if ( isConsumable ) {
+                        consumePurchase(purchase);
+                    } else if (!purchase.isAcknowledged()) {
+                        mBillingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.getPurchaseToken())
+                                .build(), billingResult -> {
+                            if (billingResult.getResponseCode()
+                                    == BillingClient.BillingResponseCode.OK) {
+                                // purchase acknowledged
+                                for ( String sku : purchase.getSkus() ) {
+                                    setSkuState(sku, SkuState.SKU_STATE_PURCHASED_AND_ACKNOWLEDGED);
+                                }
+                                newPurchase.postValue(purchase.getSkus());
+                            }
+                        });
+                    }
+                } else {
+                    // make sure the state is set
+                    setSkuStateFromPurchase(purchase);
+                }
+            }
+        } else{
+            Log.d(TAG, "Empty purchase list.");
+        }
+        // Clear purchase state of anything that didn't come with this purchase list if this is
+        // part of a refresh.
+        if (null != skusToUpdate) {
+            for (String sku : skusToUpdate) {
+                if (!updatedSkus.contains(sku)) {
+                    setSkuState(sku, SkuState.SKU_STATE_UNPURCHASED);
+                }
+            }
+        }
+    }
+
+    private enum SkuState {
+        SKU_STATE_UNPURCHASED,
+        SKU_STATE_PENDING,
+        SKU_STATE_PURCHASED,
+        SKU_STATE_PURCHASED_AND_ACKNOWLEDGED,
+    }
+
+    /**
+     * Ideally your implementation will comprise a secure server, rendering this check unnecessary.
+     * @see [Security]
+     */
+    private boolean isSignatureValid(@NonNull Purchase purchase) {
+        return Security.verifyPurchase(purchase.getOriginalJson(), purchase.getSignature());
+    }
+
+    /**
+     * Calling this means that we have the most up-to-date information for a Sku in a purchase
+     * object. This uses the purchase state (Pending, Unspecified, Purchased) along with the
+     * acknowledged state.
+     *
+     * @param purchase an up-to-date object to set the state for the Sku
+     */
+    private void setSkuStateFromPurchase(@NonNull Purchase purchase) {
+        for (String purchaseSku:purchase.getSkus()) {
+            MutableLiveData<SkuState> skuStateLiveData = skuStateMap.get(purchaseSku);
+            if (null == skuStateLiveData) {
+                Log.e(TAG, "Unknown SKU " + purchaseSku + ". Check to make " +
+                        "sure SKU matches SKUS in the Play developer console.");
+            } else {
+                switch (purchase.getPurchaseState()) {
+                    case Purchase.PurchaseState.PENDING:
+                        skuStateLiveData.postValue(SkuState.SKU_STATE_PENDING);
+                        break;
+                    case Purchase.PurchaseState.UNSPECIFIED_STATE:
+                        skuStateLiveData.postValue(SkuState.SKU_STATE_UNPURCHASED);
+                        break;
+                    case Purchase.PurchaseState.PURCHASED:
+                        if (purchase.isAcknowledged()) {
+                            skuStateLiveData.postValue(
+                                    SkuState.SKU_STATE_PURCHASED_AND_ACKNOWLEDGED);
+                        } else {
+                            skuStateLiveData.postValue(SkuState.SKU_STATE_PURCHASED);
+                        }
+                        break;
+                    default:
+                        Log.e(TAG, "Purchase in unknown state: " + purchase.getPurchaseState());
+                }
+            }
+        }
+    }
+
+    /**
+     * Internal call only. Assumes that all signature checks have been completed and the purchase is
+     * ready to be consumed. If the sku is already being consumed, does nothing.
+     *
+     * @param purchase purchase to consume
+     */
+    private void consumePurchase(@NonNull Purchase purchase) {
+        // weak check to make sure we're not already consuming the sku
+        if (purchaseConsumptionInProcess.contains(purchase)) {
+            // already consuming
+            return;
+        }
+        purchaseConsumptionInProcess.add(purchase);
+        mBillingClient.consumeAsync(ConsumeParams.newBuilder()
+                .setPurchaseToken(purchase.getPurchaseToken())
+                .build(), (billingResult, s) -> {
+            // ConsumeResponseListener
+            purchaseConsumptionInProcess.remove(purchase);
+            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                Log.d(TAG, "Consumption successful. Delivering entitlement.");
+                purchaseConsumed.postValue(purchase.getSkus());
+                for (String sku: purchase.getSkus()) {
+                    // Since we've consumed the purchase
+                    setSkuState(sku, SkuState.SKU_STATE_UNPURCHASED);
+                    // And this also qualifies as a new purchase
+                }
+                newPurchase.postValue(purchase.getSkus());
+            } else {
+                Log.e(TAG, "Error while consuming: " + billingResult.getDebugMessage());
+            }
+            Log.d(TAG, "End consumption flow.");
+        });
+    }
+
+    /**
+     * Since we (mostly) are getting sku states when we actually make a purchase or update
+     * purchases, we keep some internal state when we do things like acknowledge or consume.
+     *
+     * @param sku         sku to change the state
+     * @param newSkuState the new state of the sku.
+     */
+    private void setSkuState(@NonNull String sku, SkuState newSkuState) {
+        MutableLiveData<SkuState> skuStateLiveData = skuStateMap.get(sku);
+        if (null == skuStateLiveData) {
+            Log.e(TAG, "Unknown SKU " + sku + ". Check to make " +
+                    "sure SKU matches SKUS in the Play developer console.");
+        } else {
+            skuStateLiveData.postValue(newSkuState);
         }
     }
 }
