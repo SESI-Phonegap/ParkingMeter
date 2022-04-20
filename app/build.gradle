@@ -2,17 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    lintOptions{
-        checkReleaseBuilds false
-    }
     compileSdkVersion 32
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
         applicationId "com.sesi.parkingmeter"
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 18
-        versionName "1.5"
+        versionCode 19
+        versionName "1.6"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -27,6 +24,9 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    lint {
+        checkReleaseBuilds false
+    }
 }
 
 sonarqube {
@@ -40,7 +40,7 @@ sonarqube {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api 'com.android.billingclient:billing:4.0.0'
+    api 'com.android.billingclient:billing:4.1.0'
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:29.0.3')
     // Add the dependency for the Firebase SDK for Google Analytics
@@ -48,15 +48,15 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.browser:browser:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
-    implementation 'com.google.firebase:firebase-ads:20.5.0'
+    implementation 'com.google.firebase:firebase-ads:20.6.0'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }

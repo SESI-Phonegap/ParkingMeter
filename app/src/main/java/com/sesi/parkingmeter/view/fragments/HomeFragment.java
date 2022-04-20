@@ -32,6 +32,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -40,6 +43,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.ads.AdRequest;
@@ -151,7 +155,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         tvDatos = getActivity().findViewById(R.id.tvDatos);
         relativeLayoutDatos = getActivity().findViewById(R.id.relativeDatos);
         sTracker = new UtilGPS(getContext());
-        if (!getArguments().getBoolean(SUSCRIP)) {
+        if (!requireArguments().getBoolean(SUSCRIP)) {
             cargarInterstitial();
         }
 
@@ -541,25 +545,16 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     }
 
     public void addMarkers() {
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
-        } else {
-            if (null != mMap) {
-                mMap.clear();
-                addUserMarker();
-                addCarMarker();
-            }
+        if (null != mMap) {
+            mMap.clear();
+            addUserMarker();
+            addCarMarker();
         }
     }
 
     public void addUserMarker() {
         Bitmap bitmapUser;
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            bitmapUser = getBitmap((VectorDrawable) requireActivity().getResources().getDrawable(R.drawable.ic_human_male));
-        } else {
-            bitmapUser = BitmapFactory.decodeResource(getResources(), R.drawable.ic_human_male_black_24dp);
-        }
+        bitmapUser = getBitmap((VectorDrawable) Objects.requireNonNull(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_human_male, null)));
         Location location = getLocation();
 
         if (location != null) {
@@ -577,11 +572,8 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     public void addCarMarker() {
         Bitmap bitmapCar;
         if (vehicleLatLng != null && latLng != null) {
-            if (Build.VERSION.SDK_INT >= 21) {
-                bitmapCar = getBitmap((VectorDrawable) requireActivity().getResources().getDrawable(R.drawable.ic_sedan_car_front));
-            } else {
-                bitmapCar = BitmapFactory.decodeResource(getResources(), R.drawable.sedan_car_front);
-            }
+            bitmapCar = getBitmap((VectorDrawable) Objects.requireNonNull(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sedan_car_front, null)));
+
             relativeLayoutDatos.setVisibility(View.VISIBLE);
             mMap.addMarker(new MarkerOptions()
                     .position(vehicleLatLng)
@@ -640,7 +632,8 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         if (isChecked) {
             if (UtilNetwork.isOnline(requireActivity())) {
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
+                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+                    //ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
                 } else {
                     if (null == vehicleLatLng) {
                         startTracker();
@@ -649,27 +642,11 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
                             if (location != null) {
                                 vehicleLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 addMarkers();
-                            } /*else {
-                                startTracker();
-                                if (canGetLocation()) {
-                                    Location location2 = getLocation();
-                                    if (location != null) {
-                                        vehicleLatLng = new LatLng(location2.getLatitude(), location2.getLongitude());
-                                        addMarkers();
-                                    }
-                                }
-                            }*/
+                            }
                         } else {
                             Toast.makeText(getActivity(), getString(R.string.noGps), Toast.LENGTH_LONG).show();
                             switchLocation.setChecked(false);
-
                             sTracker = new UtilGPS(getActivity());
-                            if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
-                            } else {
-                                startTracker();
-                            }
-
                         }
                     }
                 }
@@ -725,4 +702,25 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         }
     }
 
+    private ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {
+            if (result){
+                if (null == vehicleLatLng) {
+                    startTracker();
+                    if (canGetLocation()) {
+                        Location location = getLocation();
+                        if (location != null) {
+                            vehicleLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            addMarkers();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.noGps), Toast.LENGTH_LONG).show();
+                        switchLocation.setChecked(false);
+                        sTracker = new UtilGPS(getActivity());
+                    }
+                }
+            }
+        }
+    });
 }
