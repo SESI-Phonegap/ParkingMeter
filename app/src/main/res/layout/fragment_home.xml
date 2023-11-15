@@ -117,56 +117,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <RelativeLayout
-            android:id="@+id/relativeMap"
-            android:layout_below="@id/relativeDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <fragment
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context="com.sesi.chris.googlemapslocation.MapsActivity" />
-
-
-
-            <ImageView
-                android:contentDescription="@string/descripcion"
-                android:id="@+id/img_publi_no_internet"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:visibility="gone"
-                android:src="@drawable/gold_icon"
-                android:layout_above="@+id/relativeDatos"
-                />
-
-            <RelativeLayout
-                android:visibility="invisible"
-                android:id="@+id/relativeDatos"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="@dimen/marginTop"
-                android:layout_marginStart="@dimen/marginStartEnd"
-                android:layout_marginEnd="@dimen/marginStartEnd"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/heightDetails"
-                android:background="@drawable/custom_button">
-
-                <TextView
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:id="@+id/tvDatos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/distancia"
-                    android:textSize="@dimen/subtitle"
-                    android:textColor="@android:color/white"/>
-
-
-            </RelativeLayout>
-
-        </RelativeLayout>
 
 
     </RelativeLayout>

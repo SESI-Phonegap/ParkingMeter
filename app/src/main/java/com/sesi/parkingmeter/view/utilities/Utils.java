@@ -12,7 +12,6 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.textfield.TextInputEditText;
 import com.sesi.parkingmeter.R;
 
@@ -80,13 +79,6 @@ public class Utils {
 
     public static String genPK(){
         return Constants.PK_R200 + Constants.PK_R700 + Constants.PK_R900 + Constants.PK_R400 + Constants.PK_R600;
-    }
-
-    public static String obtenerDireccionesURL(LatLng origin, LatLng dest, Context context) {
-        String sOrigin = "origin=" + origin.latitude + "," + origin.longitude;
-        String sDest = "destination=" + dest.latitude + "," + dest.longitude;
-        String parameters = Constants.UNITS + sOrigin + "&" + sDest + "&" + Constants.SENSOR_FALSE + "&key="+context.getString(R.string.google_maps_key);
-        return Constants.URL_GOOGLE_MAPS_API + Constants.JSON_TYPE + "?" + parameters;
     }
 
     public static void sharedSocial(Context context) {

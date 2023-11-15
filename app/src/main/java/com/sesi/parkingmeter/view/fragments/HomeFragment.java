@@ -1,9 +1,6 @@
 package com.sesi.parkingmeter.view.fragments;
 
-import android.Manifest;
-import android.animation.Animator;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.TimePickerDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -11,12 +8,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.VectorDrawable;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -25,47 +19,29 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.sesi.parkingmeter.jobservice.JobServiceOreo;
 import com.sesi.parkingmeter.view.utilities.Constants;
-import com.sesi.parkingmeter.view.utilities.Gps;
 import com.sesi.parkingmeter.R;
-import com.sesi.parkingmeter.data.api.googlemaps.task.DownloadTask;
+
 import com.sesi.parkingmeter.view.utilities.PreferenceUtilities;
-import com.sesi.parkingmeter.view.utilities.UtilGPS;
-import com.sesi.parkingmeter.view.utilities.UtilNetwork;
 import com.sesi.parkingmeter.view.utilities.Utils;
 
 import java.util.Calendar;
@@ -73,7 +49,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class HomeFragment extends Fragment implements Gps, View.OnClickListener, SwitchCompat.OnCheckedChangeListener, SharedPreferences.OnSharedPreferenceChangeListener, OnMapReadyCallback {
+public class HomeFragment extends Fragment implements  View.OnClickListener, SwitchCompat.OnCheckedChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final String HORA = "hora";
     private final String MINUTOS = "minutos";
@@ -86,17 +62,11 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
     private static final int TIME_LIMIT = 5;
     private CountDownTimer countTimer;
     private static final String FORMAT = "%02d:%02d:%02d";
-    public static GoogleMap mMap;
     public static final int PERMISION_LOCATION = 1002;
-    private LatLng latLng;
-    private LatLng vehicleLatLng;
     public TextView tvDetails;
-    private RelativeLayout relativeLayoutDatos;
     private ConstraintLayout relativeHora;
     private boolean statusHour = false;
     private SwitchCompat switchLocation;
-    private TextView tvDatos;
-    private UtilGPS sTracker;
     private String sOpData;
     private LayoutInflater inflater;
     private AlertDialog dialog;
@@ -123,8 +93,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
         return view;
     }
 
@@ -152,9 +120,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         tidHoraVence = getActivity().findViewById(R.id.textInputEditTextHoraVence);
         tidHoraVence.setOnClickListener(this);
         relativeHora = getActivity().findViewById(R.id.relativeDetails);
-        tvDatos = getActivity().findViewById(R.id.tvDatos);
-        relativeLayoutDatos = getActivity().findViewById(R.id.relativeDatos);
-        sTracker = new UtilGPS(getContext());
         if (!requireArguments().getBoolean(SUSCRIP)) {
             cargarInterstitial();
         }
@@ -191,9 +156,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         super.onResume();
         btnCancelar.setEnabled(PreferenceUtilities.getStatusButtonCancel(getContext()));
         btnCancelar.setAlpha(0.7f);
-        if (null != vehicleLatLng) {
-            addMarkers();
-        }
     }
 
     @Override
@@ -442,99 +404,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         countTimer.cancel();
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        tvDetails = requireActivity().findViewById(R.id.tvDatos);
-        mMap = googleMap;
-
-        LatLng latLng = new LatLng(19.390519, -99.4238192);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.setMinZoomPreference(10.0f);
-        mMap.setMaxZoomPreference(23.0f);
-
-        mMap.setOnMapClickListener(latLng1 -> {
-            if (getActivity().findViewById(R.id.tablet_view) == null) {
-                if (!statusHour) {
-                    relativeHora.animate().translationY(-450).alpha(0).setDuration(200).setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            //Empty
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            relativeHora.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-                            //Empty
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-                            //Empty
-                        }
-                    }).start();
-                    statusHour = true;
-                } else {
-                    relativeHora.animate().translationY(0).alpha(1).setDuration(200).setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            //Empty
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            relativeHora.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-                            //Empty
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-                            //Empty
-                        }
-                    }).start();
-
-                    statusHour = false;
-                }
-            }
-        });
-
-        mMap.setOnCameraMoveStartedListener(i -> {
-            if (relativeLayoutDatos.getVisibility() == View.VISIBLE) {
-                AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-                alphaAnimation.setDuration(500);
-                alphaAnimation.setRepeatMode(1);
-                relativeLayoutDatos.startAnimation(alphaAnimation);
-                relativeLayoutDatos.animate().translationY(280).setDuration(600).start();
-
-            }
-        });
-
-
-        mMap.setOnCameraMoveListener(() -> {
-            //Empty
-        });
-
-        mMap.setOnCameraIdleListener(() -> {
-            if (relativeLayoutDatos.getVisibility() == View.VISIBLE) {
-                AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-                alphaAnimation.setDuration(1100);
-                alphaAnimation.setRepeatMode(1);
-                relativeLayoutDatos.startAnimation(alphaAnimation);
-                relativeLayoutDatos.animate().translationY(0).setDuration(600).start();
-            }
-        });
-
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
                 vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -542,49 +411,6 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         vectorDrawable.draw(canvas);
         return bitmap;
-    }
-
-    public void addMarkers() {
-        if (null != mMap) {
-            mMap.clear();
-            addUserMarker();
-            addCarMarker();
-        }
-    }
-
-    public void addUserMarker() {
-        Bitmap bitmapUser;
-        bitmapUser = getBitmap((VectorDrawable) Objects.requireNonNull(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_human_male, null)));
-        Location location = getLocation();
-
-        if (location != null) {
-            latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title("Yo")
-                    .icon(BitmapDescriptorFactory.fromBitmap(bitmapUser)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.setMinZoomPreference(15.0f);
-            mMap.setMaxZoomPreference(23.0f);
-        }
-    }
-
-    public void addCarMarker() {
-        Bitmap bitmapCar;
-        if (vehicleLatLng != null && latLng != null) {
-            bitmapCar = getBitmap((VectorDrawable) Objects.requireNonNull(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sedan_car_front, null)));
-
-            relativeLayoutDatos.setVisibility(View.VISIBLE);
-            mMap.addMarker(new MarkerOptions()
-                    .position(vehicleLatLng)
-                    .title("Mi Auto")
-                    .icon(BitmapDescriptorFactory.fromBitmap(bitmapCar)));
-
-            String url = Utils.obtenerDireccionesURL(latLng, vehicleLatLng, getContext());
-            DownloadTask downloadTask = new DownloadTask(tvDetails, mMap);
-            downloadTask.execute(url);
-
-        }
     }
 
     public void cancel() {
@@ -597,15 +423,12 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
         PreferenceUtilities.changeStatusButtonCancel(getContext(), false);
         PreferenceUtilities.savePreferencesFinalHour(getContext(), getResources().getString(R.string.horaCero));
         tidHoraVence.setText(getResources().getString(R.string.horaCero));
-        if (countTimer != null && mMap != null) {
+        if (countTimer != null) {
             countTimer.cancel();
-            mMap.clear();
         }
         tvContador.setText(getString(R.string.cero));
         switchLocation.setChecked(false);
         switchLocation.setEnabled(true);
-        tvDatos.setText("");
-        vehicleLatLng = null;
 
 
     }
@@ -629,98 +452,7 @@ public class HomeFragment extends Fragment implements Gps, View.OnClickListener,
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            if (UtilNetwork.isOnline(requireActivity())) {
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-                    //ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISION_LOCATION);
-                } else {
-                    if (null == vehicleLatLng) {
-                        startTracker();
-                        if (canGetLocation()) {
-                            Location location = getLocation();
-                            if (location != null) {
-                                vehicleLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                addMarkers();
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), getString(R.string.noGps), Toast.LENGTH_LONG).show();
-                            switchLocation.setChecked(false);
-                            sTracker = new UtilGPS(getActivity());
-                        }
-                    }
-                }
-            } else {
-                Toast.makeText(getActivity(), getString(R.string.noInternet), Toast.LENGTH_LONG).show();
-                switchLocation.setChecked(false);
-            }
-        } else {
-            mMap.clear();
-            tvDetails.setText("");
-            vehicleLatLng = null;
-        }
+
     }
 
-    @Override
-    public void startTracker() {
-        try {
-            if (sTracker != null) {
-                sTracker.startTracking();
-            }
-        } catch (Exception ex) {
-            Log.d("STARTGPS-- ", ex.getMessage());
-        }
-    }
-
-    @Override
-    public void stopTracking() {
-        try {
-            if (sTracker != null) {
-                sTracker.stopUsingGPS();
-            }
-        } catch (Exception ex) {
-            Log.d("STOPGPS--: ", ex.getMessage());
-        }
-    }
-
-    @Override
-    public boolean canGetLocation() {
-        try {
-            return (sTracker != null && sTracker.canGetLocation());
-        } catch (Exception e) {
-            Log.e("GETLOCATION--: ", e.getMessage());
-        }
-        return false;
-    }
-
-    @Override
-    public Location getLocation() {
-        if (sTracker != null) {
-            return sTracker.getCurrentLocation();
-        } else {
-            return null;
-        }
-    }
-
-    private ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
-        @Override
-        public void onActivityResult(Boolean result) {
-            if (result){
-                if (null == vehicleLatLng) {
-                    startTracker();
-                    if (canGetLocation()) {
-                        Location location = getLocation();
-                        if (location != null) {
-                            vehicleLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            addMarkers();
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), getString(R.string.noGps), Toast.LENGTH_LONG).show();
-                        switchLocation.setChecked(false);
-                        sTracker = new UtilGPS(getActivity());
-                    }
-                }
-            }
-        }
-    });
 }
