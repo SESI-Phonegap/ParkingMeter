@@ -89,4 +89,14 @@
     <string name="dialog_title_minutos">Introduce los minutos</string>
     <string name="btnAceptar">Aceptar</string>
 
+    <string name="notify_title">Recordatorio de pago</string>
+    <string name="notify_content">Recuerda realizar tus pagos</string>
+    <string name="dialog_notify_title">¡ Recibe notificaciones !</string>
+    <string name="dialog_notify_desc">Activa las notificaciones para \nrecibir recordatorios de tu parquimetro</string>
+    <string name="dialog_notify_desc2">Que no te vuelvan a multar.</string>
+    <string name="dialog_notify_skip">Saltar</string>
+    <string name="dialog_notify_continue">Deacuerdo</string>
+    <string name="dialog_dayli_message">¡Hola!, recuerda registrar todos tus pagos del día, aquí estamos para ayudarte.</string>
+
+
 </resources>

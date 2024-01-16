@@ -28,13 +28,23 @@ public class NotificationUtils {
     }
     public static void remindUserBecauseCharging(Context context) {
         int smallIcon;
-        if (Build.VERSION.SDK_INT >= 21) {
-            smallIcon = R.drawable.alarm;
-        } else {
-            smallIcon = R.drawable.alarm_png;
-        }
+        smallIcon = R.drawable.alarm;
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,"MY_CH")
+        NotificationChannel channel = new NotificationChannel("Channel_1", "Notificacion", NotificationManager.IMPORTANCE_HIGH);
+        channel.setLightColor(Color.BLUE);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        channel.enableVibration(true);
+        channel.enableLights(true);
+        if (PreferenceUtilities.getPreferenceDefaultSound(context)) {
+            channel.setSound(PreferenceUtilities.getUriSoundSelected(context),null);
+        }
+        if (PreferenceUtilities.getPreferenceDefaultVibrate(context)) {
+            channel.setVibrationPattern(new long[]{1000, 3000, 1000, 3000, 1000});
+        }
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(channel);
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,"Channel_1")
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(smallIcon)
                 .setLargeIcon(largeIcon(context))
@@ -59,34 +69,7 @@ public class NotificationUtils {
         if (PreferenceUtilities.getPreferenceDefaultVibrate(context)) {
             notificationBuilder.setVibrate(new long[]{1000, 3000, 1000, 3000, 1000});
         }
-
-        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-        notificationBuilder.setChannelId("Channel_1");
-
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("Channel_1","Notificacion",NotificationManager.IMPORTANCE_HIGH);
-            channel.setLightColor(Color.BLUE);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            channel.enableVibration(true);
-            channel.enableLights(true);
-            if (PreferenceUtilities.getPreferenceDefaultSound(context)) {
-                channel.setSound(PreferenceUtilities.getUriSoundSelected(context),null);
-            }
-            if (PreferenceUtilities.getPreferenceDefaultVibrate(context)) {
-                channel.setVibrationPattern(new long[]{1000, 3000, 1000, 3000, 1000});
-            }
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        if (null != notificationManager) {
-            notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID, notificationBuilder.build());
-        }
-
-
-
+        notificationManager.notify(ALARM_REMINDER_PENDING_INTENT_ID, notificationBuilder.build());
     }
 /*
     private static NotificationCompat.Action ignoreReminderAction(Context context) {
@@ -150,19 +133,14 @@ public class NotificationUtils {
                 context,
                 ALARM_REMINDER_PENDING_INTENT_ID,
                 startActivityIntent,
-                0);
+               PendingIntent.FLAG_IMMUTABLE);
 
     }
 
     public static Bitmap largeIcon(Context context) {
         Resources resources = context.getResources();
-
         int iIcon;
-        if (Build.VERSION.SDK_INT >= 21) {
-            iIcon = R.drawable.alarm_black;
-        } else {
-            iIcon = R.drawable.alarm_black_png;
-        }
+        iIcon = R.drawable.alarm_black;
         return BitmapFactory.decodeResource(resources, iIcon);
     }
 }

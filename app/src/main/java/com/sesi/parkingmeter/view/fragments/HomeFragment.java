@@ -1,5 +1,6 @@
 package com.sesi.parkingmeter.view.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.app.job.JobInfo;
@@ -8,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.VectorDrawable;
@@ -24,12 +26,16 @@ import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.ads.AdRequest;
@@ -38,6 +44,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.textfield.TextInputEditText;
 import com.sesi.parkingmeter.jobservice.JobServiceOreo;
+import com.sesi.parkingmeter.view.dialog.DialogNotification;
 import com.sesi.parkingmeter.view.utilities.Constants;
 import com.sesi.parkingmeter.R;
 
@@ -49,7 +56,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class HomeFragment extends Fragment implements  View.OnClickListener, SwitchCompat.OnCheckedChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class HomeFragment extends Fragment implements  View.OnClickListener, DialogNotification.OnAction, SwitchCompat.OnCheckedChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final String HORA = "hora";
     private final String MINUTOS = "minutos";
@@ -124,6 +131,17 @@ public class HomeFragment extends Fragment implements  View.OnClickListener, Swi
             cargarInterstitial();
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestNotificationPermission();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void requestNotificationPermission(){
+        int[] permissions = {ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)};
+        if (permissions[0] != PackageManager.PERMISSION_GRANTED) {
+            DialogNotification.INSTANCE.createDialog(getLayoutInflater(), this);
+        }
     }
 
     private void cargarInterstitial() {
@@ -433,7 +451,6 @@ public class HomeFragment extends Fragment implements  View.OnClickListener, Swi
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void scheduleJobOreo(int secondStart) {
         JobInfo.Builder jobBuilder = new JobInfo.Builder(jobId++, serviceComponent);
         jobBuilder.setMinimumLatency(secondStart * TimeUnit.SECONDS.toMillis(1));
@@ -455,4 +472,15 @@ public class HomeFragment extends Fragment implements  View.OnClickListener, Swi
 
     }
 
+    private final ActivityResultLauncher<String> requestNotification = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result) {
+                }
+            });
+
+    @Override
+    public void onAccept() {
+        requestNotification.launch(Manifest.permission.POST_NOTIFICATIONS);
+    }
 }
