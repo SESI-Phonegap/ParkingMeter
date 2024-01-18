@@ -94,7 +94,8 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
     public void init() {
         imageViewIcon = findViewById(R.id.imageView);
-        mAdview = new AdView(this);
+        mAdview = findViewById(R.id.adView);
+        cargaPublicidad();
 
         builder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater) MainDrawerActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -308,9 +309,10 @@ public class MainDrawerActivity extends AppCompatActivity implements NavigationV
 
         if (UtilNetwork.isOnline(Objects.requireNonNull(this))) {
             AdRequest adRequest = new AdRequest.Builder().build();
-            mAdview.setVisibility(View.VISIBLE);
             mAdview.loadAd(adRequest);
-            mAdview.setAdUnitId(getString(R.string.banner));
+            mAdview.setVisibility(View.VISIBLE);
+            //mAdview.loadAd(adRequest);
+            //mAdview.setAdUnitId(getString(R.string.banner));
 
             InterstitialAd.load(getApplicationContext(), getString(R.string.banner_intersticial2019), adRequest, new InterstitialAdLoadCallback() {
                 @Override
