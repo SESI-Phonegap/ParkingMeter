@@ -10,8 +10,8 @@ android {
         applicationId "com.sesi.parkingmeter"
         minSdkVersion 28
         targetSdkVersion 34
-        versionCode 27
-        versionName "2.1"
+        versionCode 29
+        versionName "2.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -48,7 +48,6 @@ sonarqube {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api 'com.android.billingclient:billing:6.1.0'
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:29.0.3')
     // Add the dependency for the Firebase SDK for Google Analytics
@@ -57,10 +56,10 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.browser:browser:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.firebase:firebase-ads:22.5.0'
+    implementation 'com.google.firebase:firebase-ads:22.6.0'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
